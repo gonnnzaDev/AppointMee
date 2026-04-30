@@ -19,13 +19,28 @@ body {
     color: var(--text-color);
 }
 
+
+h1 {
+    font-family: 'Courier New', Courier, monospace;
+
+}
+
+footer a {
+    color: var(--text-color);
+    text-decoration: none;
+
+}
+
+
+
 .gradient {
     width: 100%;
+    min-height: 100vh;
     height: auto;
 }
 
 .card-container {
-    display: flexbox;
+    display: flex;
     height: auto;
 
 }
@@ -57,10 +72,6 @@ body {
     color: var(--primary-color);
 }
 
-.card-container h1 {
-    font-family: 'Courier New', Courier, monospace;
-
-}
 
 
 .text-card {
@@ -108,11 +119,6 @@ body {
 }
 
 
-footer a {
-    color: var(--text-color);
-    text-decoration: none;
-
-}
 
 .information-project {
     position: relative;
@@ -140,4 +146,31 @@ footer a {
     height: 700px;
     width: 900px;
 
+}
+
+.background-forms {
+    background-color: wheat;
+    width: auto;
+    min-height: 100vh;
+    height: auto;
+
+
+
+}
+
+.container-register {
+
+    background-color: var(--background-color-div);
+    height: auto;
+    width: 50%;
+    padding: 20px;
+    border-radius: 20px;
+    min-width: 175px;
+    align-items: center;
+
+}
+
+.boton-register {
+    border-width: 3px;
+    border-color: var(--primary-page-color)
 }
