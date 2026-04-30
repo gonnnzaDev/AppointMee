@@ -1,5 +1,6 @@
 package com.gg.turnlook.Service;
 
+import com.gg.turnlook.Model.ReqInicioSesion;
 import com.gg.turnlook.Model.Rol;
 import com.gg.turnlook.Model.Usuario;
 import com.gg.turnlook.Repository.RolRepository;
@@ -22,6 +23,23 @@ public class UsuarioService {
         this.usRepo = usRepo;
         this.rolRepo = rolRepo;
         this.passEncoder = passEncoder;
+    }
+
+
+    public Optional<Usuario> inicioSesion(ReqInicioSesion login){
+
+            if(login.getEmail() == null || login.getEmail().isBlank() ||
+               login.getPass() == null || login.getPass().isBlank()){
+                return Optional.empty();
+            }
+
+            Optional<Usuario> u = usRepo.findByEmail(login.getEmail());
+
+            if(u.isEmpty()) return u;
+
+            if(!passEncoder.matches(login.getPass(), u.get().getPassword())) return Optional.empty();
+
+            return u;
     }
 
     public Usuario crearUsuario(Usuario u) {

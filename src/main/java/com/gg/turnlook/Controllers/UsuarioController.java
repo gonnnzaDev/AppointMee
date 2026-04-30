@@ -1,5 +1,6 @@
 package com.gg.turnlook.Controllers;
 
+import com.gg.turnlook.Model.ReqInicioSesion;
 import com.gg.turnlook.Model.Usuario;
 import com.gg.turnlook.Service.UsuarioService;
 import org.apache.coyote.Response;
@@ -15,12 +16,29 @@ import java.util.Optional;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+    private Usuario user = null;
 
     public UsuarioController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
     }
 
     /// ENDPOINTS
+
+
+    @PostMapping("/inicio_sesion")
+    public ResponseEntity<?> iniciarSesion(@RequestBody ReqInicioSesion login){
+        Optional<Usuario> u = usuarioService.inicioSesion(login);
+        if (u.isPresent()) user = u.get();
+        return user != null ? ResponseEntity.ok().body("Has iniciado sesion")
+                             : ResponseEntity.status(404).body("Credenciales incorrectas");
+    }
+
+    // BORRAR DESPUES
+    @PostMapping("/cerrar_sesion")
+    public ResponseEntity<?> cerrarSesion(){
+        user = null;
+        return ResponseEntity.ok("cerraste");
+    }
 
     @PostMapping("/crear")
     public ResponseEntity<?> crearUsuario(@RequestBody Usuario u) {
