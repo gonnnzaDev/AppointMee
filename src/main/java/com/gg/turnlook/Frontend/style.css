@@ -2,6 +2,7 @@
     --text-color: #fff;
     --primary-color: #333;
     --background-color-div: #1e1e1e;
+    --primary-page-color: rgb(141, 41, 161);
 }
 
 body,
@@ -19,7 +20,6 @@ body {
     color: var(--text-color);
 }
 
-
 h1 {
     font-family: 'Courier New', Courier, monospace;
 
@@ -30,8 +30,6 @@ footer a {
     text-decoration: none;
 
 }
-
-
 
 .gradient {
     width: 100%;
@@ -64,15 +62,12 @@ footer a {
     gap: 10px;
 }
 
-
 .login-container button {
     width: 100%;
     padding: 10px;
     background-color: var(--text-color);
     color: var(--primary-color);
 }
-
-
 
 .text-card {
     display: flex;
@@ -82,25 +77,18 @@ footer a {
     padding: 5px 20px;
 }
 
-
-
 .description {
     background-repeat: no-repeat;
     background-color: var(--background-color-div);
-
     background-size: cover;
     height: auto;
     width: auto;
-
     margin-bottom: 80px;
-
     transform: skewY(-4deg);
-
 
 }
 
 .description-info {
-
     display: flex;
     gap: 15px;
     align-items: flex-start;
@@ -117,8 +105,6 @@ footer a {
 .description-info div {
     flex: 1;
 }
-
-
 
 .information-project {
     position: relative;
@@ -139,35 +125,27 @@ footer a {
     max-width: 100%;
     max-height: 100%;
     margin: 50px auto;
-
 }
 
 .img-container img {
     height: 700px;
     width: 900px;
-
 }
 
 .background-forms {
-    background-color: wheat;
-    width: auto;
     min-height: 100vh;
-    height: auto;
-
-
-
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .container-register {
-
     background-color: var(--background-color-div);
     height: auto;
     width: 50%;
     padding: 20px;
     border-radius: 20px;
     min-width: 175px;
-    align-items: center;
-
 }
 
 .boton-register {
