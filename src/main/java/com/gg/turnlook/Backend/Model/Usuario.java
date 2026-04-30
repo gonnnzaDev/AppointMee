@@ -1,4 +1,4 @@
-package com.gg.turnlook.Model;
+package com.gg.turnlook.Backend.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;

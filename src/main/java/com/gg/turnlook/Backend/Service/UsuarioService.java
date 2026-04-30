@@ -1,11 +1,10 @@
-package com.gg.turnlook.Service;
+package com.gg.turnlook.Backend.Service;
 
-import com.gg.turnlook.Model.ReqInicioSesion;
-import com.gg.turnlook.Model.Rol;
-import com.gg.turnlook.Model.Usuario;
-import com.gg.turnlook.Repository.RolRepository;
-import com.gg.turnlook.Repository.UsuarioRepository;
-import org.springframework.http.ResponseEntity;
+import com.gg.turnlook.Backend.Model.ReqInicioSesion;
+import com.gg.turnlook.Backend.Model.Rol;
+import com.gg.turnlook.Backend.Model.Usuario;
+import com.gg.turnlook.Backend.Repository.RolRepository;
+import com.gg.turnlook.Backend.Repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

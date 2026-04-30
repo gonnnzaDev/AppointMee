@@ -1,4 +1,4 @@
-package com.gg.turnlook.Model;
+package com.gg.turnlook.Backend.Model;
 
 import jakarta.persistence.*;
 import net.minidev.json.annotate.JsonIgnore;

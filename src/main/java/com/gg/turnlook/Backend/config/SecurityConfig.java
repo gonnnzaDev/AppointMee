@@ -1,4 +1,4 @@
-package com.gg.turnlook.config;
+package com.gg.turnlook.Backend.config;
 
 
 import org.springframework.context.annotation.Bean;

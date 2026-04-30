@@ -1,6 +1,6 @@
-package com.gg.turnlook.Repository;
+package com.gg.turnlook.Backend.Repository;
 
-import com.gg.turnlook.Model.Rol;
+import com.gg.turnlook.Backend.Model.Rol;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
