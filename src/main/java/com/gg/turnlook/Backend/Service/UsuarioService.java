@@ -1,15 +1,19 @@
 package com.gg.turnlook.Backend.Service;
 
-import com.gg.turnlook.Backend.Model.ReqInicioSesion;
+import com.gg.turnlook.DTO.LoginDTO;
 import com.gg.turnlook.Backend.Model.Rol;
 import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Repository.RolRepository;
 import com.gg.turnlook.Backend.Repository.UsuarioRepository;
+import com.gg.turnlook.DTO.UsuarioCrearDTO;
+import com.gg.turnlook.DTO.UsuarioMostrarDTO;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UsuarioService {
@@ -25,7 +29,7 @@ public class UsuarioService {
     }
 
 
-    public Optional<Usuario> inicioSesion(ReqInicioSesion login){
+    public Optional<Usuario> inicioSesion(LoginDTO login){
 
             if(login.getEmail() == null || login.getEmail().isBlank() ||
                login.getPass() == null || login.getPass().isBlank()){
@@ -41,14 +45,20 @@ public class UsuarioService {
             return u;
     }
 
-    public Usuario crearUsuario(Usuario u) {
+    public Set<String> setRolesComoString(Usuario u){
+        return u.getRoles().stream()
+                .map(r -> r.getNombre())
+                .collect(Collectors.toSet());
+    }
+
+    public Usuario crearUsuario(UsuarioCrearDTO u) {
         Optional<Rol> rol = rolRepo.findByNombre("CLIENTE");
-        if(rol.isEmpty()){
-            throw new RuntimeException("El rol no existe");
-        }
-        u.setPassword(passEncoder.encode(u.getPassword()));
-        u.getRoles().add(rol.get());
-        return usRepo.save(u);
+        if(rol.isEmpty()) throw new RuntimeException("El rol no existe");
+
+        Usuario user = new Usuario(u.getNombre(),u.getApellido(),u.getEmail(),
+                                   passEncoder.encode(u.getPassword()));
+        user.getRoles().add(rol.get());
+        return usRepo.save(user);
     }
 
     public boolean eliminarUsuario(Integer id){
@@ -63,7 +73,7 @@ public class UsuarioService {
     public Optional<Usuario> modificarUsuario(Integer id, Usuario u){
         Optional<Usuario> user = listarUsuarioPorId(id);
         if (user.isEmpty()) {
-            return user;
+            return Optional.empty();
         }
         if (u.getNombre() != null) user.get().setNombre(u.getNombre());
         if (u.getApellido() != null) user.get().setApellido(u.getApellido());
@@ -82,11 +92,21 @@ public class UsuarioService {
         return filtro.stream()
                 .filter(u -> nombre == null || u.getNombre().equalsIgnoreCase(nombre))
                 .filter(u -> apellido == null || u.getApellido().equalsIgnoreCase(apellido))
-                .filter(u -> activo == null || u.isActivo() == activo).toList();
+                .filter(u -> activo == null || u.isActivo() == activo)
+                .toList();
     }
 
-    public Optional<Usuario> listarUsuariosPorEmail(String email){
+    public Optional<Usuario> listarUsuariosPorEmailAdmin(String email){
         return usRepo.findByEmail(email);
+    }
+
+    public Optional<UsuarioMostrarDTO> listarUsuariosPorEmailEmpleador(String email){
+        Optional<Usuario> aux =  usRepo.findByEmail(email);
+        if(aux.isEmpty()) return Optional.empty();
+
+        UsuarioMostrarDTO u =  new UsuarioMostrarDTO(aux.get().getNombre(), aux.get().getApellido(),
+                                                     aux.get().getEmail());
+        return Optional.of(u);
     }
 
     public Optional<Usuario> listarUsuarioPorId(Integer id){
