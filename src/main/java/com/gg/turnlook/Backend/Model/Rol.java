@@ -13,7 +13,8 @@ public class Rol {
     /// ATRIBUTOS
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id; /// (PK BDD)
+    private Integer id;
+    /// (PK BDD)
 
     @Column(unique = true, nullable = false)
     private String nombre;

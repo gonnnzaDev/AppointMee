@@ -139,17 +139,4 @@ public class Usuario {
         this.roles = roles;
     }
 
-    /// METODOS
-    @Override
-    public String toString() {
-        return "Usuario{" +
-                "id=" + id +
-                ", nombre='" + nombre + '\'' +
-                ", apellido='" + apellido + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", fechaCreacion=" + fechaCreacion +
-                ", activo=" + activo +
-                '}';
-    }
 }

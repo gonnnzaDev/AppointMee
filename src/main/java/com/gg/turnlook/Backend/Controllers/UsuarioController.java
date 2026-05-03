@@ -1,45 +1,51 @@
 package com.gg.turnlook.Backend.Controllers;
 
-import com.gg.turnlook.Backend.Model.ReqInicioSesion;
+import com.gg.turnlook.DTO.LoginDTO;
 import com.gg.turnlook.Backend.Model.Usuario;
+import com.gg.turnlook.Backend.Service.SesionService;
 import com.gg.turnlook.Backend.Service.UsuarioService;
+import com.gg.turnlook.DTO.UsuarioCrearDTO;
+import com.gg.turnlook.DTO.UsuarioMostrarDTO;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
-    private Usuario user = null;
+    private final SesionService sesionService;
 
-    public UsuarioController(UsuarioService usuarioService) {
+    public UsuarioController(UsuarioService usuarioService, SesionService sesionService) {
         this.usuarioService = usuarioService;
+        this.sesionService = sesionService;
     }
 
     /// ENDPOINTS
 
 
     @PostMapping("/inicio_sesion")
-    public ResponseEntity<?> iniciarSesion(@RequestBody ReqInicioSesion login){
+    public ResponseEntity<?> iniciarSesion(@RequestBody LoginDTO login,
+                                           HttpSession sesion) {
         Optional<Usuario> u = usuarioService.inicioSesion(login);
-        if (u.isPresent()) user = u.get();
-        return user != null ? ResponseEntity.ok().body("Has iniciado sesion")
-                             : ResponseEntity.status(404).body("Credenciales incorrectas");
+        if (u.isPresent()) {
+            sesion.setAttribute("userId", u.get().getId());
+            sesion.setAttribute("userRoles", usuarioService.setRolesComoString(u.get()));
+        }
+        return u.isPresent() ? ResponseEntity.ok().body("Has iniciado sesion")
+                : ResponseEntity.status(401).body("Credenciales incorrectas");
     }
 
-    // BORRAR DESPUES
-    @PostMapping("/cerrar_sesion")
-    public ResponseEntity<?> cerrarSesion(){
-        user = null;
-        return ResponseEntity.ok("cerraste");
-    }
 
     @PostMapping("/crear")
-    public ResponseEntity<?> crearUsuario(@RequestBody Usuario u) {
+    public ResponseEntity<?> crearUsuario(@Valid @RequestBody UsuarioCrearDTO u) {
         try {
             usuarioService.crearUsuario(u);
             return ResponseEntity.ok().body("Se creo al usuario");
@@ -49,29 +55,52 @@ public class UsuarioController {
     }
 
     @PatchMapping("/modificar/{id}")
-    public ResponseEntity<?> modificarUsuario(@PathVariable("id") Integer id, @RequestBody Usuario u) {
-        try{
-            return usuarioService.modificarUsuario(id,u).isPresent() ?
+    public ResponseEntity<?> modificarUsuario(@PathVariable("id") Integer id, @RequestBody Usuario u,
+                                              HttpSession sesion) {
+
+        if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+
+        if (!sesionService.tieneRol(sesion, "ADMINISTRADOR")) {
+            return ResponseEntity.status(403).body("No tenes permisos");
+        }
+        try {
+            return usuarioService.modificarUsuario(id, u).isPresent() ?
                     ResponseEntity.ok().body("Se modifico al usuario correctamente")
                     : ResponseEntity.status(404).body("No se encontro al usuario");
-        }catch(Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(500).body("Error al modificar usuario");
         }
     }
 
     @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<?> eliminarUsuario(@PathVariable Integer id) {
-       try {
-           return usuarioService.eliminarUsuario(id) ?
-                   ResponseEntity.ok().body("Se elimino al usuario")
-                   : ResponseEntity.status(404).body("No se encontro al usuario");
-       }catch(Exception e){
-           return ResponseEntity.status(500).body("Error al eliminar usuario");
-       }
+    public ResponseEntity<?> eliminarUsuario(@PathVariable("id") Integer id,
+                                             HttpSession sesion) {
+
+        if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+
+        if (!sesionService.tieneRol(sesion, "ADMINISTRADOR")) {
+            return ResponseEntity.status(403).body("No tenes permisos");
+        }
+
+        try {
+            return usuarioService.eliminarUsuario(id) ?
+                    ResponseEntity.ok().body("Se elimino al usuario")
+                    : ResponseEntity.status(404).body("No se encontro al usuario");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error al eliminar usuario");
+        }
     }
 
+
     @GetMapping("/listar")
-    public ResponseEntity<?> listarUsuarios() {
+    public ResponseEntity<?> listarUsuarios(HttpSession sesion) {
+
+        if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+
+        if (!sesionService.tieneRol(sesion, "ADMINISTRADOR")) {
+            return ResponseEntity.status(403).body("No tenes permisos");
+        }
+
         try {
             return ResponseEntity.ok().body(usuarioService.listarUsuarios());
         } catch (Exception e) {
@@ -79,11 +108,20 @@ public class UsuarioController {
         }
     }
 
+
     @GetMapping("/listar/filtrar")
     public ResponseEntity<?> filtrarListaUsuarios(
             @RequestParam(required = false) String nombre,
             @RequestParam(required = false) String apellido,
-            @RequestParam(required = false) Boolean activo) {
+            @RequestParam(required = false) Boolean activo,
+            HttpSession sesion) {
+
+        if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+
+        if (!sesionService.tieneRol(sesion, "ADMINISTRADOR")) {
+            return ResponseEntity.status(403).body("No tenes permisos");
+        }
+
         try {
             List<Usuario> usuarios = usuarioService.filtrarListaUsuarios(nombre, apellido, activo);
             return !usuarios.isEmpty() ? ResponseEntity.ok().body(usuarios)
@@ -94,7 +132,14 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> filtrarUsuariosId(@PathVariable Integer id) {
+    public ResponseEntity<?> filtrarUsuariosId(@PathVariable Integer id, HttpSession sesion) {
+
+        if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+
+        if (!sesionService.tieneRol(sesion, "ADMINISTRADOR")) {
+            return ResponseEntity.status(403).body("No tenes permisos");
+        }
+
         try {
             Optional<Usuario> u = usuarioService.listarUsuarioPorId(id);
             return u.isPresent() ?
@@ -106,9 +151,19 @@ public class UsuarioController {
     }
 
     @GetMapping("/email/{email}")
-    public ResponseEntity<?> filtrarUsuariosEmail(@PathVariable String email) {
+    public ResponseEntity<?> filtrarUsuariosEmail(@PathVariable String email, HttpSession sesion) {
+
+        Optional<?> u;
         try {
-            Optional<Usuario> u = usuarioService.listarUsuariosPorEmail(email);
+            if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+
+            if (sesionService.tieneRol(sesion, "ADMINISTRADOR")) {
+                u = usuarioService.listarUsuariosPorEmailAdmin(email);
+            } else if (sesionService.tieneRol(sesion, "EMPLEADOR")) {
+                u = usuarioService.listarUsuariosPorEmailEmpleador(email);
+            } else {
+                return ResponseEntity.status(403).body("No tenes permisos");
+            }
             return u.isPresent() ?
                     ResponseEntity.ok().body(u.get())
                     : ResponseEntity.status(404).body("No se encontro a ningun usuario");
