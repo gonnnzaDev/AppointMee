@@ -1,11 +1,10 @@
 package com.gg.turnlook.Backend.Controllers;
 
-import com.gg.turnlook.DTO.LoginDTO;
+import com.gg.turnlook.Backend.DTO.LoginDTO;
 import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Service.SesionService;
 import com.gg.turnlook.Backend.Service.UsuarioService;
-import com.gg.turnlook.DTO.UsuarioCrearDTO;
-import com.gg.turnlook.DTO.UsuarioMostrarDTO;
+import com.gg.turnlook.Backend.DTO.UsuarioCrearDTO;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -13,8 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/usuarios")

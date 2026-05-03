@@ -1,4 +1,4 @@
-package com.gg.turnlook.Excepciones;
+package com.gg.turnlook.Backend.Excepciones;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.gg.turnlook.DTO;
+package com.gg.turnlook.Backend.DTO;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 

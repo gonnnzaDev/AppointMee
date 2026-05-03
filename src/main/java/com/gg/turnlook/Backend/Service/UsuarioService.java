@@ -1,12 +1,12 @@
 package com.gg.turnlook.Backend.Service;
 
-import com.gg.turnlook.DTO.LoginDTO;
+import com.gg.turnlook.Backend.DTO.LoginDTO;
 import com.gg.turnlook.Backend.Model.Rol;
 import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Repository.RolRepository;
 import com.gg.turnlook.Backend.Repository.UsuarioRepository;
-import com.gg.turnlook.DTO.UsuarioCrearDTO;
-import com.gg.turnlook.DTO.UsuarioMostrarDTO;
+import com.gg.turnlook.Backend.DTO.UsuarioCrearDTO;
+import com.gg.turnlook.Backend.DTO.UsuarioMostrarDTO;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
