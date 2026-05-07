@@ -38,33 +38,10 @@ body::before {
     pointer-events: none;
 }
 
-#navbar,
-.navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1100;
-    background: rgba(0, 0, 0, 0.85) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.navbar .navbar-brand,
-.navbar .nav-link,
-.navbar .nav-link.active,
-.navbar .navbar-toggler {
-    color: #fff !important;
-}
-
-.navbar .navbar-toggler-icon {
-    filter: invert(1);
-}
-
 .gradient {
     position: relative;
     width: 100%;
     min-height: 100vh;
-    padding: 90px 24px 40px;
     margin: 0 auto;
 }
 
@@ -294,7 +271,7 @@ footer a {
 
 @media (max-width: 768px) {
     .gradient {
-        padding: 18px 16px 28px;
+        padding: 0px 4px;
     }
 
     .login-container,
@@ -317,7 +294,7 @@ footer a {
     }
 
     .gradient {
-        padding: 14px 12px 24px;
+        padding: 0px 4px;
     }
 
     h1 {
