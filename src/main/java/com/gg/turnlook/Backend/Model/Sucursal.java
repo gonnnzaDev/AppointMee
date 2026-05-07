@@ -32,6 +32,14 @@ public class Sucursal {
     @Column(nullable = false)
     private boolean activo = true;
 
+    @Column(nullable = true)
+    private String mpToken;
+
+    // hacer tabla categoria en bdd y relacionar
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categoria_id")
+    private Categoria categoria;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
@@ -42,8 +50,10 @@ public class Sucursal {
     }
 
 
+
+
     /// CONSTRUCTORES
-    public Sucursal(Integer id, String nombre, String direccion, String telefono, String descripcion, LocalDateTime fechaCreacion, boolean activo, Usuario usuario) {
+    public Sucursal(Integer id, String nombre, String direccion, String telefono, String descripcion, LocalDateTime fechaCreacion, boolean activo, String mpToken, Categoria categoria, Usuario usuario) {
         this.id = id;
         this.nombre = nombre;
         this.direccion = direccion;
@@ -51,14 +61,17 @@ public class Sucursal {
         this.descripcion = descripcion;
         this.fechaCreacion = fechaCreacion;
         this.activo = activo;
+        this.mpToken = mpToken;
+        this.categoria = categoria;
         this.usuario = usuario;
     }
 
-    public Sucursal(String nombre, String direccion, String telefono, String descripcion, Usuario usuario) {
+    public Sucursal(String nombre, String direccion, String telefono, String descripcion, Categoria categoria, Usuario usuario) {
         this.nombre = nombre;
         this.direccion = direccion;
         this.telefono = telefono;
         this.descripcion = descripcion;
+        this.categoria = categoria;
         this.usuario = usuario;
     }
 
@@ -128,5 +141,21 @@ public class Sucursal {
 
     public void setFechaCreacion(LocalDateTime fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
+    }
+
+    public String getMpToken() {
+        return mpToken;
+    }
+
+    public void setMpToken(String mpToken) {
+        this.mpToken = mpToken;
+    }
+
+    public Categoria getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
     }
 }

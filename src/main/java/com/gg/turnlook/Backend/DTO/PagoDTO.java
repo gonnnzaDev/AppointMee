@@ -26,6 +26,8 @@ public class PagoDTO {
     @Positive(message = "El precio debe ser mayor a cero")
     private BigDecimal precio;
 
+    // aca el token
+
     /// CONSTRUCTORES
     public PagoDTO(String titulo, String descripcion, Integer cantidad, BigDecimal precio) {
         this.titulo = titulo;
