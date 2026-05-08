@@ -1,20 +1,27 @@
-const gradient = document.querySelector(".gradient");
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // regla q todos los email deben cumplir
 
-function onMouseMove(event) {
-  gradient.style.backgroundImage = 'radial-gradient(at ' + event.clientX + 'px ' + event.clientY + 'px, rgba(60, 3, 167, 0.9) 0, #905fe9 100%)';
-}
-document.addEventListener("mousemove", onMouseMove);
+//Esto carga la parte principal O Login de una
+renderLogin();
 
-document.getElementById("Navbar").innerHTML = `
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
+
+const renderNavbar = document.getElementById("navbar")
+//Esto es para modularizar el navbar
+
+if (renderNavbar) {
+
+    navbar.innerHTML = `
+<nav class="navbar border-bottom border-body" data-bs-theme="dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">Navbar scroll</a>
+        <a class="navbar-brand" href="#">
+        <img src="https://cdn.discordapp.com/attachments/1492334072901533747/1502155047633424504/content.png?ex=69feae68&is=69fd5ce8&hm=373d791a61c3ae304c7d324ffe6da30d02ae77d062898b8284aacd23271ea4fb"></a>
 
         <button class="navbar-toggler" type="button"
             data-bs-toggle="collapse"
             data-bs-target="#navbarScroll">
 
-            <span class="navbar-toggler-icon"></span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-left" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M2 13.5a.5.5 0 0 0 .5.5h6a.5.5 0 0 0 0-1H3.707L13.854 2.854a.5.5 0 0 0-.708-.708L3 12.293V7.5a.5.5 0 0 0-1 0z"/>
+</svg>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarScroll">
@@ -43,5 +50,244 @@ document.getElementById("Navbar").innerHTML = `
     </div>
 </nav>
 `;
+}
+
+
+function renderLogin() {
+
+    const container = document.getElementById("form-login");
+
+    container.innerHTML = `
+      
+
+ <div class="login" id="info-login">
+                    <img src="https://cdn.discordapp.com/attachments/1492334072901533747/1502155047633424504/content.png?ex=69feae68&is=69fd5ce8&hm=373d791a61c3ae304c7d324ffe6da30d02ae77d062898b8284aacd23271ea4fb"
+                        alt="Login">
+
+                    <h1>AppointMe</h1>
+                    <div class="login-form">
+                        <div class="input-group mb-1">
+                            <input type="text" class="form-control" placeholder="Mail" aria-label="Username"
+                                aria-describedby="basic-addon1" id="login-mail-input">
+                        </div>
+                        <div class="input-group mb-1">
+                            <input type="password" class="form-control" placeholder="Password" aria-label="Password"
+                                aria-describedby="basic-addon1" id="password-mail-input">
+                        </div>
+
+
+                        <div class="vstack gap-1 mb-3">
+                            <button type="button" id="login-button">Login</button>
+                            <button type="button" id="google-button"><svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                    height="16" fill="currentColor" class="bi bi-google" viewBox="0 0 16 16">
+                                    <path
+                                        d="M15.545 6.558a9.4 9.4 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.7 7.7 0 0 1 5.352 2.082l-2.284 2.284A4.35 4.35 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.8 4.8 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.7 3.7 0 0 0 1.599-2.431H8v-3.08z" />
+                                </svg>
+                            </button>
+                            <hr>
+                            </hr>
+                            <button type="button" id="register-button">Register</button>
+
+                        </div>
+                    </div>
+                </div>
+    `;
+
+    const registerButton = document.getElementById("register-button");
+
+
+    //Esto cambia la info del div y pone la info del register
+    registerButton.addEventListener("click", renderRegister);
+}
+
+
+
+
+
+const botonLogin = document.getElementById("login-button");
+
+if (botonLogin) {
+
+    botonLogin.addEventListener("click", function () {
+
+
+        const mail = document.getElementById("login-mail-input");
+        const pass = document.getElementById("password-mail-input");
+
+        if (!emailRegex.test(mail.value)) {
+            alert("Mail inválido");
+        } else if (pass.value.length < 4) {
+            alert("La contraseña debe tener al menos 4 caracteres");
+        } else {
+
+            userExists(mail, pass)
+
+        }
+
+
+
+    });
+
+}
+
+//este verifica q el usuario exista
+
+function userExists(mail, pass) {
+
+    return alert("Paso!");
+}
+
+const botonGoogle = document.getElementById("google-button");
+
+if (botonGoogle) {
+
+    botonGoogle.addEventListener("click", function () {
+
+
+        alert("hola");
+    });
+
+}
+
+
+
+
+function renderRegister() {
+
+    const container = document.getElementById("form-login");
+
+    container.innerHTML = `
+        <div class="form-register">
+
+                            <div class="input-group mb-1">
+                                <input type="text" class="form-control" placeholder="Name" aria-label="Username"
+                                    aria-describedby="basic-addon1" id="register-name-input">
+                            </div>
+                            <div class="input-group mb-1">
+                                <input type="text" class="form-control" placeholder="Surname" aria-label="Username"
+                                    aria-describedby="basic-addon1" id="register-surname-input">
+                            </div>
+                            <div class="input-group mb-1">
+                                <input type="text" class="form-control" placeholder="Mail" aria-label="Username"
+                                    aria-describedby="basic-addon1" id="register-mail-input">
+                            </div>
+                            <div class="input-group mb-1">
+                                <input type="password" class="form-control" placeholder="Password" aria-label="Password"
+                                    aria-describedby="basic-addon1" id="register-password1-input">
+                            </div>
+
+                            <div class="input-group mb-1">
+                                <input type="password" class="form-control" placeholder="Confirm Password"
+                                    aria-label="Password" aria-describedby="basic-addon1" id="register-password2-input">
+                            </div>
+
+
+                            <div class="vstack gap-1 mb-3">
+                                <button type="button" id="register-person">  > </button>
+
+                            </div>
+                               <div class="vstack gap-1 mb-3">
+                                <button type="button" id="cancel-button">Cancel</button>
+
+                            </div>
+                        </div>
+    `;
+
+
+    //Aca esta la autenticacion previa a registrar una persona
+
+    const registerPerson = document.getElementById("register-person");
+
+    if (registerPerson) {
+
+        registerPerson.addEventListener("click", function () {
+
+            const name = document.getElementById("register-name-input").value;
+            const surname = document.getElementById("register-surname-input").value;
+            const mail = document.getElementById("register-mail-input").value;
+            const pass1 = document.getElementById("register-password1-input").value;
+            const pass2 = document.getElementById("register-password2-input").value;
+
+
+            if (
+                name.trim() === "" ||
+                surname.trim() === "" ||
+                mail.trim() === "" ||
+                pass1.trim() === "" ||
+                pass2.trim() === ""
+            ) {
+                alert("Completá todos los campos");
+            }
+
+            else if (!emailRegex.test(mail)) {
+                alert("Mail inválido");
+            }
+
+            else if (pass1.length < 4) {
+                alert("La contraseña debe tener mínimo 4 caracteres");
+            }
+
+            else if (pass1 !== pass2) {
+                alert("Las contraseñas no coinciden");
+            }
+
+            else {
+
+                postUser(name, surname, mail, pass1)
+
+            }
+
+
+
+        });
+
+    }
+
+    const cancelButton = document.getElementById("cancel-button");
+
+
+    if (cancelButton) {
+
+        cancelButton.addEventListener("click", renderLogin);
+
+    }
+
+
+
+}
+
+//esto hace el post de usuarios desde el login
+
+function postUser(name, surname, mail, pass) {
+
+    fetch("http://localhost:8080/", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+            nombre: nombre,
+            apellido: apellido
+        })
+
+    })
+        .then(response => response.json())
+        .then(data => {
+
+            alert("Registrado con exito!");
+
+        })
+        .catch(error => {
+
+            alert(error)
+
+        });
+
+
+}
+
 
 
