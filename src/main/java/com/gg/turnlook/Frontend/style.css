@@ -38,7 +38,7 @@ nav {
 }
 
 /*aca se cambia el tamaño de la abeja del navbar*/
-/*centrar todo HACER !!!!*/
+/*centrar todo HACER */
 nav img {
     width: 80px;
     height: 80px;
@@ -76,6 +76,8 @@ nav form {
     height: 100vh;
     width: 100vw;
     justify-content: center;
+    align-items: center;
+
 
 }
 
@@ -133,16 +135,85 @@ nav form {
 }
 
 .login-container button {
-
-    border-radius: 10px;
+    border-radius: 12px;
     height: 40px;
     width: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, #ffffff, #f2f2f2);
+    color: #111;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.login-container button:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #7c3aed, #4c1d95);
+    color: white;
+    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
+}
+
+.login-container button:active {
+    transform: translateY(0px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.form-register {
+    height: 70%;
+    min-width: 50vw;
+
+}
+
+.about-container {
+
+    display: flex;
+    margin: 10px 40px 30px 40px;
+    backdrop-filter: blur(10px) saturate(180%);
+    border: 1px solid rgba(160, 160, 160, 0.608);
+    padding: 20px;
+    font-family: monospace;
+    box-shadow: var(--shadow-color);
 
 
 }
 
-.form-register {
-    height: auto;
-    min-width: 50vw;
+.about-info img {
+    max-width: 80%;
+    max-height: 60%;
+}
 
+.about-info h1 {
+    font-size: 70px;
+}
+
+.about-info h2 {
+    font-size: 50px;
+    margin: 10px 0px;
+}
+
+
+.about-info h3 {
+    font-size: 40px;
+}
+
+
+
+footer {
+    display: flex;
+    position: fixed;
+    bottom: 0px;
+    background: rgb(19, 19, 19);
+    width: 100vw;
+    justify-content: start;
+    height: 25px;
+   
+}
+footer a {
+    color: white;
+    text-decoration: none;
+    margin: 2px;
+    padding: 5px;
+    font-size: 15px;
 }

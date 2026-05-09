@@ -277,47 +277,34 @@ function renderRegister() {
 
 function postUser(name, surname, mail, pass) {
 
+
+    // testea 
     fetch("http://localhost:8080/usuarios/crear", {
-
         method: "POST",
-
         headers: {
             "Content-Type": "application/json"
         },
-
         body: JSON.stringify({
             nombre: name,
             apellido: surname,
             password: pass,
             email: mail
         })
-
+    }).then(data => {
+        alert("Registrado con exito!");
     })
-        .then(async response => {
-            console.log("CONTENT-TYPE:", response.headers.get("content-type"));
-            return response.json();
-        })
-        .then(response => response.json())
-        .then(data => {
-
-            alert("Registrado con exito!");
-
-        })
-        .catch(error => {
-
-            alert(error)
-
-        });
-
-
+    .catch(error => {
+        alert("Error en registro");
+        alert(error)
+    });
 }
-document.querySelector("form").addEventListener("submit", (e) => {
-    e.preventDefault();
-});
+
+
+
 
 //Perfil de usuario
 
-
+/*
 const infoAccountDiv = document.getElementById("info-account");
 
 infoAccountDiv.innerHTML = `    
@@ -331,7 +318,7 @@ infoAccountDiv.innerHTML = `
             <img src="https://i.pinimg.com/236x/63/25/10/632510e53b3ae17f36993d7993c9fe8f.jpg" alt="">
       `;
 
-
+ */
 
 
 
