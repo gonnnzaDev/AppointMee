@@ -178,7 +178,7 @@ nav form {
 .about-container {
 
     display: flex;
-    margin: 10px 40px 30px 40px;
+    margin: 20px 40px 30px 40px;
     backdrop-filter: blur(10px) saturate(180%);
     border: 1px solid rgba(160, 160, 160, 0.608);
     padding: 20px;
@@ -310,25 +310,25 @@ nav form {
     }
 }
 
-@media(max-width: 435px) 
-{
-      .left-container {
+@media(max-width: 435px) {
+    .left-container {
         opacity: 0;
     }
-       .turn-container {
+
+    .turn-container {
         margin: 0px 0 0px 0;
 
     }
 }
 
 @media (max-width: 315px) {
-  
+
 
     .navbar {
         height: 35vh;
     }
 
- 
+
 }
 
 .info-left-container {
