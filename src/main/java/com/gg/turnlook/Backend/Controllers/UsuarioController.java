@@ -1,6 +1,8 @@
 package com.gg.turnlook.Backend.Controllers;
 
 import com.gg.turnlook.Backend.DTO.LoginDTO;
+import com.gg.turnlook.Backend.DTO.UsuarioModificarDTO;
+import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Service.SesionService;
 import com.gg.turnlook.Backend.Service.UsuarioService;
@@ -11,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -52,18 +55,23 @@ public class UsuarioController {
     }
 
     @PatchMapping("/modificar/{id}")
-    public ResponseEntity<?> modificarUsuario(@PathVariable("id") Integer id, @RequestBody Usuario u,
+    public ResponseEntity<?> modificarUsuario(@PathVariable("id") Integer id,
+                                              @Valid @RequestBody UsuarioModificarDTO usuario,
                                               HttpSession sesion) {
 
         if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
 
-        if (!sesionService.tieneRol(sesion, "ADMINISTRADOR")) {
+        Optional<Usuario> user = usuarioService.listarUsuarioPorId(id);
+        if(user.isEmpty()) return ResponseEntity.status(404).body("No existe el usuario");
+
+        if(!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())
+           && !Objects.equals((Integer) sesion.getAttribute("userId"), user.get().getId())){
             return ResponseEntity.status(403).body("No tenes permisos");
         }
+
         try {
-            return usuarioService.modificarUsuario(id, u).isPresent() ?
-                    ResponseEntity.ok().body("Se modifico al usuario correctamente")
-                    : ResponseEntity.status(404).body("No se encontro al usuario");
+            usuarioService.modificarUsuario(usuario, user.get());
+            return ResponseEntity.ok().body("Usuario modificado");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error al modificar usuario");
         }
@@ -75,7 +83,7 @@ public class UsuarioController {
 
         if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
 
-        if (!sesionService.tieneRol(sesion, "ADMINISTRADOR")) {
+        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
             return ResponseEntity.status(403).body("No tenes permisos");
         }
 
@@ -94,7 +102,7 @@ public class UsuarioController {
 
         if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
 
-        if (!sesionService.tieneRol(sesion, "ADMINISTRADOR")) {
+        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
             return ResponseEntity.status(403).body("No tenes permisos");
         }
 
@@ -115,7 +123,7 @@ public class UsuarioController {
 
         if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
 
-        if (!sesionService.tieneRol(sesion, "ADMINISTRADOR")) {
+        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
             return ResponseEntity.status(403).body("No tenes permisos");
         }
 
@@ -133,7 +141,7 @@ public class UsuarioController {
 
         if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
 
-        if (!sesionService.tieneRol(sesion, "ADMINISTRADOR")) {
+        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
             return ResponseEntity.status(403).body("No tenes permisos");
         }
 
@@ -154,9 +162,9 @@ public class UsuarioController {
         try {
             if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
 
-            if (sesionService.tieneRol(sesion, "ADMINISTRADOR")) {
+            if (sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
                 u = usuarioService.listarUsuariosPorEmailAdmin(email);
-            } else if (sesionService.tieneRol(sesion, "EMPLEADOR")) {
+            } else if (sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
                 u = usuarioService.listarUsuariosPorEmailEmpleador(email);
             } else {
                 return ResponseEntity.status(403).body("No tenes permisos");

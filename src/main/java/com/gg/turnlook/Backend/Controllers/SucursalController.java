@@ -1,6 +1,8 @@
 package com.gg.turnlook.Backend.Controllers;
 
 import com.gg.turnlook.Backend.DTO.SucursalCrearDTO;
+import com.gg.turnlook.Backend.DTO.SucursalModificarDTO;
+import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Model.Sucursal;
 import com.gg.turnlook.Backend.Service.SesionService;
 import com.gg.turnlook.Backend.Service.SucursalService;
@@ -11,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -38,11 +41,11 @@ public class SucursalController {
 
         if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
 
-        // ver si dsp borro admin
-        if (!sesionService.tieneRol(sesion, "EMPLEADOR")
-                && !sesionService.tieneRol(sesion, "ADMINISTRADOR")) {
+        // ver si dsp agrego admin (no creo pq no tiene sentido)
+        if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
             return ResponseEntity.status(403).body("No tenes permisos");
         }
+
         try {
             return sucursalService.crearSucursal(sucursal,
                     (Integer) sesion.getAttribute("userId")).isPresent() ?
@@ -52,11 +55,38 @@ public class SucursalController {
             return ResponseEntity.status(500).body("Error al crear la sucursal");
         }
     }
-  /*
-    @PatchMapping("/modificar")
-    public ResponseEntity<?> modificarSucursal()
-    VER COMO LO HAGO
-  */
+
+    @PatchMapping("/modificar/{id}")
+    public ResponseEntity<?> modificarSucursal(@PathVariable("id") Integer id,
+                                               @Valid @RequestBody SucursalModificarDTO suc,
+                                               HttpSession sesion){
+
+        if(!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+
+        if(!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name()) &&
+           !sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())){
+            return ResponseEntity.status(403).body("No tenes permisos");
+        }
+
+        Optional<Sucursal> sucursal = sucursalService.listarSucursalPorId(id);
+        if(sucursal.isEmpty()) return ResponseEntity.status(404).body("No se encontro la sucursal");
+
+        if(!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
+                !Objects.equals((Integer) sesion.getAttribute("userId"),
+                   sucursal.get().getUsuario().getId())){
+            return ResponseEntity.status(403).body("No tenes permisos");
+        }
+
+        try{
+            return sucursalService.modificarSucursal(suc, sucursal.get()).isPresent() ?
+                    ResponseEntity.ok().body("Se modifico la sucursal")
+                    : ResponseEntity.status(404).body("No se encontro la categoria deseada");
+        }catch(Exception e){
+            return ResponseEntity.status(500).body("Error al modificar la sucursal");
+        }
+    }
+
+
 
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<?> eliminarSucursal(@PathVariable Integer id, HttpSession sesion) {

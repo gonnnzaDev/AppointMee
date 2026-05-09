@@ -1,6 +1,7 @@
 package com.gg.turnlook.Backend.Service;
 
 import com.gg.turnlook.Backend.DTO.LoginDTO;
+import com.gg.turnlook.Backend.DTO.UsuarioModificarDTO;
 import com.gg.turnlook.Backend.Model.Rol;
 import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Repository.RolRepository;
@@ -70,16 +71,14 @@ public class UsuarioService {
         return true;
     }
 
-    public Optional<Usuario> modificarUsuario(Integer id, Usuario u){
-        Optional<Usuario> user = listarUsuarioPorId(id);
-        if (user.isEmpty()) return Optional.empty();
+    public void modificarUsuario(UsuarioModificarDTO usuario, Usuario user){
 
-        if (u.getNombre() != null) user.get().setNombre(u.getNombre());
-        if (u.getApellido() != null) user.get().setApellido(u.getApellido());
-        if (u.getEmail() != null) user.get().setEmail(u.getEmail());
-        if (u.getPassword() != null) user.get().setPassword(passEncoder.encode(u.getPassword()));
-        usRepo.save(user.get());
-        return user;
+        if (usuario.getNombre() != null) user.setNombre(usuario.getNombre());
+        if (usuario.getApellido() != null) user.setApellido(usuario.getApellido());
+        if (usuario.getEmail() != null) user.setEmail(usuario.getEmail());
+        if (usuario.getPassword() != null) user.setPassword(passEncoder.encode(usuario.getPassword()));
+
+        usRepo.save(user);
     }
 
     public List<Usuario> listarUsuarios(){
