@@ -1,6 +1,6 @@
 :root {
 
-
+    --bee-color: #f0bd03;
     --shadow-color: 0 4px 32px rgba(0, 0, 0, 0.3);
 }
 
@@ -25,10 +25,6 @@ img {
     max-width: 100%;
 }
 
-nav img {
-    width: 80px;
-    height: 80px;
-}
 
 nav {
     position: fixed;
@@ -37,6 +33,22 @@ nav {
     border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: var(--shadow-color)
 }
+nav img {
+    width: 80px;
+    height: 80px;
+}
+.nav-item a{
+
+    font-size: 23px;
+}
+
+nav h2 {
+
+    margin: 0px 70px 0px 0px;
+
+}
+
+
 
 .form-container {
     display: flex;
@@ -54,10 +66,12 @@ nav {
     backdrop-filter: blur(10px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 10px;
-    border: 3px solid gray;
+    border: 3px solid var(--bee-color)
 
 
 }
+
+
 
 .login-container img {
     width: 230px;
@@ -73,6 +87,8 @@ nav {
     padding: 20px;
 
 }
+
+
 
 .login-container input::placeholder {
     color: #ffffff;
@@ -108,8 +124,8 @@ nav {
 }
 
 .form-register {
-    min-height: 40vh ;
-    min-width: 50vw ;
+    height: 70%;
+    min-width: 50vw;
 
 }
 
