@@ -1,6 +1,7 @@
 package com.gg.turnlook.Backend.Service;
 
 import com.gg.turnlook.Backend.DTO.SucursalCrearDTO;
+import com.gg.turnlook.Backend.DTO.SucursalModificarDTO;
 import com.gg.turnlook.Backend.Model.Categoria;
 import com.gg.turnlook.Backend.Model.Sucursal;
 import com.gg.turnlook.Backend.Model.Usuario;
@@ -40,7 +41,20 @@ public class SucursalService {
         return Optional.of(sucRepo.save(suc));
     }
 
-    // modificar aca
+    public Optional<Sucursal> modificarSucursal(SucursalModificarDTO sucursal, Sucursal suc){
+
+        if(sucursal.getCategoriaId() != null){
+            Optional<Categoria> cat = catRepo.findById(sucursal.getCategoriaId());
+            if(cat.isEmpty()) return Optional.empty();
+            suc.setCategoria(cat.get());
+        }
+        if(sucursal.getNombre() != null) suc.setNombre(sucursal.getNombre());
+        if(sucursal.getDireccion() != null) suc.setDireccion(sucursal.getDireccion());
+        if(sucursal.getTelefono() != null) suc.setTelefono(sucursal.getTelefono());
+        if(sucursal.getDescripcion() != null) suc.setDescripcion(sucursal.getDescripcion());
+
+        return Optional.of(sucRepo.save(suc));
+    }
 
     public boolean eliminarSucursal(Integer id) {
         Optional<Sucursal> sucursal = sucRepo.findById(id);
