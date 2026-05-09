@@ -1,5 +1,8 @@
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // regla q todos los email deben cumplir
 
+
+document.addEventListener("submit", (e) => e.preventDefault());
+
 const navbar = document.getElementById("navbar");
 //Esto es para modularizar el navbar
 
@@ -8,10 +11,11 @@ if (navbar) {
     navbar.innerHTML = `
 
 <nav class="navbar navbar-expand-sm border-bottom border-body" data-bs-theme="dark">
-    <div class="container-fluid">
+    <div class="container">
         <a class="navbar-brand" href="#">
         <img src="https://cdn.discordapp.com/attachments/1492334072901533747/1502155047633424504/content.png?ex=69feae68&is=69fd5ce8&hm=373d791a61c3ae304c7d324ffe6da30d02ae77d062898b8284aacd23271ea4fb"></a>
-<h2>AppointMee</h2>
+        
+        <h2>AppointMee</h2>
 
         <button class="navbar-toggler" type="button"
             data-bs-toggle="collapse"
@@ -22,6 +26,16 @@ if (navbar) {
 </svg>
 
         </button>
+
+        <form class="d-flex">
+                <input class="form-control me-2" type="search" placeholder="Search">
+
+                <button class="btn btn-outline-success" type="submit">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+</svg>
+                </button>
+            </form>
 
         <div class="collapse navbar-collapse" id="navbarScroll">
 
@@ -41,15 +55,7 @@ if (navbar) {
 
             </ul>
 
-            <form class="d-flex">
-                <input class="form-control me-2" type="search" placeholder="Search">
-
-                <button class="btn btn-outline-success" type="submit">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-</svg>
-                </button>
-            </form>
+            
 
         </div>
     </div>
@@ -101,8 +107,46 @@ function renderLogin() {
                 </div>
     `;
 
+
+
+    const botonLogin = document.getElementById("login-button");
+
+    if (botonLogin) {
+
+        botonLogin.addEventListener("click", function () {
+
+
+            const mail = document.getElementById("login-mail-input");
+            const pass = document.getElementById("password-mail-input");
+
+            if (!emailRegex.test(mail.value)) {
+                alert("Mail inválido");
+            } else if (pass.value.length < 4) {
+                alert("La contraseña debe tener al menos 4 caracteres");
+            } else {
+
+                userExists(mail, pass)
+
+            }
+
+
+
+        });
+
+    }
     const registerButton = document.getElementById("register-button");
 
+    const botonGoogle = document.getElementById("google-button");
+
+    if (botonGoogle) {
+
+        botonGoogle.addEventListener("click", function () {
+
+
+            alert("hola");
+        });
+
+    }
 
     //Esto cambia la info del div y pone la info del register
     registerButton.addEventListener("click", renderRegister);
@@ -112,32 +156,6 @@ function renderLogin() {
 
 
 
-const botonLogin = document.getElementById("login-button");
-
-if (botonLogin) {
-
-    botonLogin.addEventListener("click", function () {
-
-
-        const mail = document.getElementById("login-mail-input");
-        const pass = document.getElementById("password-mail-input");
-
-        if (!emailRegex.test(mail.value)) {
-            alert("Mail inválido");
-        } else if (pass.value.length < 4) {
-            alert("La contraseña debe tener al menos 4 caracteres");
-        } else {
-
-            userExists(mail, pass)
-
-        }
-
-
-
-    });
-
-}
-
 //este verifica q el usuario exista
 
 function userExists(mail, pass) {
@@ -145,17 +163,7 @@ function userExists(mail, pass) {
     return alert("Paso!");
 }
 
-const botonGoogle = document.getElementById("google-button");
 
-if (botonGoogle) {
-
-    botonGoogle.addEventListener("click", function () {
-
-
-        alert("hola");
-    });
-
-}
 
 
 
@@ -231,8 +239,8 @@ function renderRegister() {
                 alert("Mail inválido");
             }
 
-            else if (pass1.length < 4) {
-                alert("La contraseña debe tener mínimo 4 caracteres");
+            else if (pass1.length < 8) {
+                alert("La contraseña debe tener mínimo 8 caracteres");
             }
 
             else if (pass1 !== pass2) {
@@ -250,7 +258,6 @@ function renderRegister() {
         });
 
     }
-
     const cancelButton = document.getElementById("cancel-button");
 
 
@@ -259,6 +266,8 @@ function renderRegister() {
         cancelButton.addEventListener("click", renderLogin);
 
     }
+
+
 
 
 
@@ -279,11 +288,15 @@ function postUser(name, surname, mail, pass) {
         body: JSON.stringify({
             nombre: name,
             apellido: surname,
-            email: mail,
-            password: pass
+            password: pass,
+            email: mail
         })
 
     })
+        .then(async response => {
+            console.log("CONTENT-TYPE:", response.headers.get("content-type"));
+            return response.json();
+        })
         .then(response => response.json())
         .then(data => {
 
@@ -298,7 +311,9 @@ function postUser(name, surname, mail, pass) {
 
 
 }
-
+document.querySelector("form").addEventListener("submit", (e) => {
+    e.preventDefault();
+});
 
 //Perfil de usuario
 

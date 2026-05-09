@@ -13,6 +13,7 @@ body {
         radial-gradient(circle at bottom right, rgba(149, 149, 149, 0.14), transparent 22%),
         linear-gradient(180deg, #0b0b0b 0%, #171717 48%, #000000 100%);
     color: var(--text-main);
+
 }
 
 body {
@@ -27,13 +28,17 @@ img {
 
 
 nav {
+    display: flex;
     position: fixed;
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(10px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.15);
+
     box-shadow: var(--shadow-color)
 }
+
 /*aca se cambia el tamaño de la abeja del navbar*/
+/*centrar todo HACER !!!!*/
 nav img {
     width: 80px;
     height: 80px;
@@ -46,16 +51,23 @@ nav button svg {
     margin: 5px;
 
 }
-.nav-item a{
+
+.nav-item a {
 
     font-size: 23px;
 }
 
-nav h2 {
+.navbar-nav {
 
-    margin: 0px 70px 0px 0px;
-
+    justify-content: end;
+    margin-left: auto;
 }
+
+
+nav form {
+    margin: 0 30px;
+}
+
 
 
 
@@ -64,7 +76,6 @@ nav h2 {
     height: 100vh;
     width: 100vw;
     justify-content: center;
-    align-items: center;
 
 }
 
@@ -76,8 +87,6 @@ nav h2 {
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 10px;
     border: 3px solid var(--bee-color)
-
-
 }
 
 
@@ -133,8 +142,7 @@ nav h2 {
 }
 
 .form-register {
-    height: 70%;
+    height: auto;
     min-width: 50vw;
 
 }
-
