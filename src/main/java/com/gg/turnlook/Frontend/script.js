@@ -1,8 +1,6 @@
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // regla q todos los email deben cumplir
 
-
-document.addEventListener("submit", (e) => e.preventDefault());
-
+document.querySelector("form")?.addEventListener("submit", e => e.preventDefault());
 const navbar = document.getElementById("navbar");
 //Esto es para modularizar el navbar
 
@@ -67,7 +65,7 @@ if (navbar) {
 renderLogin();
 
 
-
+//renderiza todo el login 
 function renderLogin() {
 
     const container = document.getElementById("form-login");
@@ -93,6 +91,7 @@ function renderLogin() {
 
                         <div class="vstack gap-1 mb-3">
                             <button type="button" id="login-button">Login</button>
+                            
                             <button type="button" id="google-button"><svg xmlns="http://www.w3.org/2000/svg" width="16"
                                     height="16" fill="currentColor" class="bi bi-google" viewBox="0 0 16 16">
                                     <path
@@ -141,9 +140,7 @@ function renderLogin() {
     if (botonGoogle) {
 
         botonGoogle.addEventListener("click", function () {
-
-
-            alert("hola");
+            signInWithGoogle();
         });
 
     }
@@ -152,6 +149,48 @@ function renderLogin() {
     registerButton.addEventListener("click", renderRegister);
 }
 
+
+
+
+//esta funcion la llama el boton de google es el funcionamiento
+
+function signInWithGoogle() {
+
+    if (typeof gapi === "undefined") {
+        return;
+    }
+
+    const auth2 = gapi.auth2 ? gapi.auth2.getAuthInstance() : null;
+    if (!auth2) {
+        return;
+    }
+
+    auth2.signIn()
+        .then(googleUser => {
+            const profile = googleUser.getBasicProfile();
+
+            const name = profile.getName();
+            const email = profile.getEmail();
+
+            console.log("Name:", name);
+            console.log("Email:", email);
+
+            // fetch
+        })
+        .catch(error => {
+            alert("No se pudo iniciar sesión con Google.");
+        });
+}
+
+window.renderGoogleButton = function () {
+    if (typeof gapi === "undefined" || !gapi.load) return;
+
+    gapi.load("auth2", function () {
+        gapi.auth2.init({
+            client_id: "691542888201-80r4uo4g37mugnbqld9plu2jc9josp39.apps.googleusercontent.com"
+        });
+    });
+};
 
 
 
@@ -167,7 +206,7 @@ function userExists(mail, pass) {
 
 
 
-
+//render de register para que funcione en la misma pagina q el login
 function renderRegister() {
 
     const container = document.getElementById("form-login");
@@ -293,10 +332,10 @@ function postUser(name, surname, mail, pass) {
     }).then(data => {
         alert("Registrado con exito!");
     })
-    .catch(error => {
-        alert("Error en registro");
-        alert(error)
-    });
+        .catch(error => {
+            alert("Error en registro");
+            alert(error)
+        });
 }
 
 
@@ -324,8 +363,8 @@ infoAccountDiv.innerHTML = `
 
 
 
-function renderMyProfile(){
+function renderMyProfile() {
 
-    
+
 
 }

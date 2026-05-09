@@ -159,9 +159,9 @@ nav form {
 
 .login-container button:hover {
     transform: translateY(-2px);
-    background: linear-gradient(135deg, #7c3aed, #4c1d95);
+    background: linear-gradient(135deg, #3aa5ed, #1d7395);
     color: white;
-    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
+    box-shadow: 0 8px 20px rgba(0, 133, 177, 0.35);
 }
 
 .login-container button:active {
@@ -306,7 +306,7 @@ nav form {
     }
 
     .navbar {
-        height: 25vh;
+        height: 30vh;
     }
 }
 
@@ -325,7 +325,7 @@ nav form {
   
 
     .navbar {
-        height: 30vh;
+        height: 35vh;
     }
 
  
