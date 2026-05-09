@@ -324,3 +324,8 @@ infoAccountDiv.innerHTML = `
 
 
 
+function renderMyProfile(){
+
+    
+
+}
