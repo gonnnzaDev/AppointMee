@@ -17,7 +17,7 @@ public class Sucursal {
     @Column(nullable = false)
     private String nombre;
 
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String direccion;
 
     @Column(nullable = true)
@@ -35,7 +35,6 @@ public class Sucursal {
     @Column(nullable = true)
     private String mpToken;
 
-    // hacer tabla categoria en bdd y relacionar
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
@@ -48,8 +47,6 @@ public class Sucursal {
     public void prePersist() {
         this.fechaCreacion = LocalDateTime.now();
     }
-
-
 
 
     /// CONSTRUCTORES

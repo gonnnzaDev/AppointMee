@@ -63,18 +63,17 @@ public class UsuarioService {
 
     public boolean eliminarUsuario(Integer id){
         Optional<Usuario> u = usRepo.findById(id);
-        if(u.isEmpty()){
-            return false;
-        }
-        usRepo.delete(u.get());
+        if(u.isEmpty()) return false;
+        // usRepo.delete(u.get());  ver si dejo el delete o el activo -> false
+        u.get().setActivo(false);
+        usRepo.save(u.get());
         return true;
     }
 
     public Optional<Usuario> modificarUsuario(Integer id, Usuario u){
         Optional<Usuario> user = listarUsuarioPorId(id);
-        if (user.isEmpty()) {
-            return Optional.empty();
-        }
+        if (user.isEmpty()) return Optional.empty();
+
         if (u.getNombre() != null) user.get().setNombre(u.getNombre());
         if (u.getApellido() != null) user.get().setApellido(u.getApellido());
         if (u.getEmail() != null) user.get().setEmail(u.getEmail());
@@ -84,11 +83,11 @@ public class UsuarioService {
     }
 
     public List<Usuario> listarUsuarios(){
-        return usRepo.findAll();
+        return usRepo.findByActivoTrue();
     }
 
     public List<Usuario> filtrarListaUsuarios(String nombre, String apellido, Boolean activo){
-        List<Usuario> filtro = listarUsuarios();
+        List<Usuario> filtro = usRepo.findAll();
         return filtro.stream()
                 .filter(u -> nombre == null || u.getNombre().equalsIgnoreCase(nombre))
                 .filter(u -> apellido == null || u.getApellido().equalsIgnoreCase(apellido))
