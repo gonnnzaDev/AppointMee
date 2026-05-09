@@ -33,9 +33,18 @@ nav {
     border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: var(--shadow-color)
 }
+/*aca se cambia el tamaño de la abeja del navbar*/
 nav img {
     width: 80px;
     height: 80px;
+    min-height: 80px;
+    min-width: 80px;
+}
+
+nav button svg {
+
+    margin: 5px;
+
 }
 .nav-item a{
 
