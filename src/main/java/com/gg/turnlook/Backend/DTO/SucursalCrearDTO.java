@@ -1,16 +1,12 @@
 package com.gg.turnlook.Backend.DTO;
 
-import com.gg.turnlook.Backend.Model.Categoria;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 public class SucursalCrearDTO {
 
 
     @NotBlank(message = "El nombre es obligatorio")
-    @Size(min = 4, max = 60, message = "El nombre debe estar entre 4 y 60 caracteres")
+    @Size(min = 4, max = 120, message = "El nombre debe estar entre 4 y 120 caracteres")
     private String nombre;
 
     @NotBlank(message = "La direccion es obligatoria")
@@ -19,23 +15,25 @@ public class SucursalCrearDTO {
              message = "La direccion solo debe contener letras y numeros")
     private String direccion;
 
-    @Size(min = 8, max = 15, message = "El telefono debe estar entre los 8 y 15 digitos")
-    @Pattern(regexp = "^[\\d]+$" , message = "El numero solo puede contener numeros")
+    @Size(min = 8, max = 20, message = "El telefono debe estar entre los 8 y 20 digitos")
+    @Pattern(regexp = "^\\d+$" , message = "El telefono solo puede contener numeros")
     private String telefono;
 
     @NotBlank(message = "La descripcion es obligatoria")
     @Size(min = 10, max = 255, message = "La descripcion debe estar entre 10 y 255 caracteres")
     private String descripcion;
 
-    @NotNull
-    private Categoria categoria;
+    @NotNull(message = "El ID de categoria es obligatorio")
+    @Positive(message = "El ID de categoria debe ser positivo")
+    private Integer categoriaId;
 
     /// CONSTRUCTORES
-    public SucursalCrearDTO(String nombre, String direccion, String telefono, String descripcion) {
+    public SucursalCrearDTO(String nombre, String direccion, String telefono, String descripcion, Integer categoriaId) {
         this.nombre = nombre;
         this.direccion = direccion;
         this.telefono = telefono;
         this.descripcion = descripcion;
+        this.categoriaId = categoriaId;
     }
 
     public SucursalCrearDTO() {
@@ -74,11 +72,11 @@ public class SucursalCrearDTO {
         this.descripcion = descripcion;
     }
 
-    public Categoria getCategoria() {
-        return categoria;
+    public Integer getCategoriaId() {
+        return categoriaId;
     }
 
-    public void setCategoria(Categoria categoria) {
-        this.categoria = categoria;
+    public void setCategoriaId(Integer categoriaId) {
+        this.categoriaId = categoriaId;
     }
 }
