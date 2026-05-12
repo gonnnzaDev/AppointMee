@@ -1,6 +1,14 @@
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // regla q todos los email deben cumplir
 
+
 document.querySelector("form")?.addEventListener("submit", e => e.preventDefault());
+
+
+
+
+
+
+
 const navbar = document.getElementById("navbar");
 //Esto es para modularizar el navbar
 
@@ -64,6 +72,7 @@ if (navbar) {
 //Esto carga la parte principal O Login de una
 renderLogin();
 
+getUser(1);
 
 //renderiza todo el login 
 function renderLogin() {
@@ -333,38 +342,45 @@ function postUser(name, surname, mail, pass) {
         alert("Registrado con exito!");
     })
         .catch(error => {
-            alert("Error en registro");
             alert(error)
         });
 }
 
+getUser(2)1
 
 
+function getUser(id) {
 
-//Perfil de usuario
-
-/*
-const infoAccountDiv = document.getElementById("info-account");
-
-infoAccountDiv.innerHTML = `    
-  <h1>My Account</h1>
-
-            <h3>Nombre: </h3>
-            <h3>Apellido: </h3>
-            <h3>Email: </h3>
-            <h3>Fecha De Creacion: </h3>
-
-            <img src="https://i.pinimg.com/236x/63/25/10/632510e53b3ae17f36993d7993c9fe8f.jpg" alt="">
-      `;
-
- */
-
-
-
-
-
-function renderMyProfile() {
-
-
+    fetch(`http://localhost:8080/usuarios/${id}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+    .then(res => res.json())
+    .then(usuario => {
+        renderMyProfile(usuario);
+    })
+    .catch(error => {
+        alert(error);
+    });
 
 }
+function renderMyProfile(usuario) {
+
+    const infoAccountDiv = document.getElementById("info-account");
+
+    infoAccountDiv.innerHTML = `    
+    
+    <h1>My Account</h1>
+    
+    <h3>Nombre: ${usuario.nombre}</h3>
+    <h3>Apellido: ${usuario.apellido}</h3>
+    <h3>Email: ${usuario.email}</h3>
+    <h3>Fecha De Creacion: ${usuario.fechaCreacion}</h3>
+    
+    <img src="https://i.pinimg.com/236x/63/25/10/632510e53b3ae17f36993d7993c9fe8f.jpg" alt="">
+    `;
+}
+
+
