@@ -29,6 +29,16 @@ public class SucursalService {
 
     /// METODOS
 
+    public boolean enSucursal(Integer idUsuario, Integer idSucursal){
+        Optional<Sucursal> sucursal = sucRepo.findById(idSucursal);
+        if(sucursal.isEmpty()) return false;
+        Optional<Usuario> usuario = userRepo.findById(idUsuario);
+        if(usuario.isEmpty()) return false;
+
+        return sucursal.get().getEmpleados().contains(usuario.get()) ||
+               sucursal.get().getEmpleador().equals(usuario.get());
+    }
+
     public Optional<Sucursal> crearSucursal(SucursalCrearDTO sucursal, Integer userId) {
 
         Optional<Categoria> cat = catRepo.findById(sucursal.getCategoriaId());
@@ -77,7 +87,7 @@ public class SucursalService {
                 filter(s -> nombre == null || s.getNombre().equalsIgnoreCase(nombre)).
                 filter(s -> activo == null || s.isActivo() == activo).
                 filter(s -> catId == null || s.getCategoria().getId() == catId).
-                filter(s -> userId == null || s.getUsuario().getId() == userId).
+                filter(s -> userId == null || s.getEmpleador().getId() == userId).
                 toList();
     }
 

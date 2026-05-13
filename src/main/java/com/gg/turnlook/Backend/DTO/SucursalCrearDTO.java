@@ -11,7 +11,7 @@ public class SucursalCrearDTO {
 
     @NotBlank(message = "La direccion es obligatoria")
     @Size(min = 10, max = 60, message = "La direccion debe estar entre 10 y 60 caracteres")
-    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\d]+$",
+    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\d\\s.,#-]+$",
              message = "La direccion solo debe contener letras y numeros")
     private String direccion;
 
@@ -20,7 +20,7 @@ public class SucursalCrearDTO {
     private String telefono;
 
     @NotBlank(message = "La descripcion es obligatoria")
-    @Size(min = 10, max = 255, message = "La descripcion debe estar entre 10 y 255 caracteres")
+    @Size(min = 10, max = 1500, message = "La descripcion debe estar entre 10 y 1500 caracteres")
     private String descripcion;
 
     @NotNull(message = "El ID de categoria es obligatorio")

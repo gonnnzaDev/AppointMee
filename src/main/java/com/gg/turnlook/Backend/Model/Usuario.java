@@ -47,6 +47,10 @@ public class Usuario {
     @JsonIgnoreProperties("usuarios")
     private Set<Rol> roles = new HashSet<>();
 
+    @ManyToMany(mappedBy = "empleados")
+    @JsonIgnoreProperties("empleados")
+    private Set<Sucursal> sucursalesEmpleado = new HashSet<>();
+
     @PrePersist
     public void prePersist() {
         this.fechaCreacion = LocalDateTime.now();
@@ -141,4 +145,25 @@ public class Usuario {
         this.roles = roles;
     }
 
+    public Set<Sucursal> getSucursalesEmpleado() {
+        return sucursalesEmpleado;
+    }
+
+    public void setSucursalesEmpleado(Set<Sucursal> sucursalesEmpleado) {
+        this.sucursalesEmpleado = sucursalesEmpleado;
+    }
+
+
+    ///  METODOS
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Usuario usuario)) return false;
+        return id != null && id.equals(usuario.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

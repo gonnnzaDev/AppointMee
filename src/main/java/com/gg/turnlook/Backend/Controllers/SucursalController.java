@@ -17,17 +17,15 @@ import java.util.Objects;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/sucursal")
+@RequestMapping("/sucursales")
 @CrossOrigin(origins = "*")
 public class SucursalController {
 
     private final SucursalService sucursalService;
-    private final UsuarioService usuarioService;
     private final SesionService sesionService;
 
     public SucursalController(SucursalService sucursalService, UsuarioService usuarioService, SesionService sesionService) {
         this.sucursalService = sucursalService;
-        this.usuarioService = usuarioService;
         this.sesionService = sesionService;
     }
 
@@ -74,7 +72,7 @@ public class SucursalController {
 
         if(!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
                 !Objects.equals((Integer) sesion.getAttribute("userId"),
-                   sucursal.get().getUsuario().getId())){
+                   sucursal.get().getEmpleador().getId())){
             return ResponseEntity.status(403).body("No tenes permisos");
         }
 

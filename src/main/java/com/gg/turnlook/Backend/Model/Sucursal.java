@@ -1,8 +1,11 @@
 package com.gg.turnlook.Backend.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "sucursales")
@@ -40,8 +43,19 @@ public class Sucursal {
     private Categoria categoria;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_id")
-    private Usuario usuario;
+    @JoinColumn(name = "empleador_id")
+    private Usuario empleador;
+
+    /// hacer el onetomany de servicios
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "sucursal_empleados",
+            joinColumns = @JoinColumn(name = "sucursal_id"),
+            inverseJoinColumns = @JoinColumn(name = "usuario_id")
+    )
+    @JsonIgnoreProperties("sucursalesEmpleado")
+    private Set<Usuario> empleados = new HashSet<>();
 
     @PrePersist
     public void prePersist() {
@@ -60,7 +74,7 @@ public class Sucursal {
         this.activo = activo;
         this.mpToken = mpToken;
         this.categoria = categoria;
-        this.usuario = usuario;
+        this.empleador = usuario;
     }
 
     public Sucursal(String nombre, String direccion, String telefono, String descripcion, Categoria categoria, Usuario usuario) {
@@ -69,7 +83,7 @@ public class Sucursal {
         this.telefono = telefono;
         this.descripcion = descripcion;
         this.categoria = categoria;
-        this.usuario = usuario;
+        this.empleador = usuario;
     }
 
     public Sucursal() {
@@ -124,12 +138,12 @@ public class Sucursal {
         this.activo = activo;
     }
 
-    public Usuario getUsuario() {
-        return usuario;
+    public Usuario getEmpleador() {
+        return empleador;
     }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
+    public void setEmpleador(Usuario empleador) {
+        this.empleador = empleador;
     }
 
     public LocalDateTime getFechaCreacion() {
@@ -154,5 +168,13 @@ public class Sucursal {
 
     public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
+    }
+
+    public Set<Usuario> getEmpleados() {
+        return empleados;
+    }
+
+    public void setEmpleados(Set<Usuario> empleados) {
+        this.empleados = empleados;
     }
 }
