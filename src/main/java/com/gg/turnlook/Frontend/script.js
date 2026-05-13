@@ -1,10 +1,47 @@
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // regla q todos los email deben cumplir
 
-
 document.querySelector("form")?.addEventListener("submit", e => e.preventDefault());
 
+getUser(1);
 
+function getUser(id) {
+    fetch(`http://localhost:8080/usuarios/${id}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+    .then(res => res.json())
+    .then(usuario => {
+        renderMyProfile(usuario);
+    })
+    .catch(error => {
+        alert(error);
+    });
 
+}
+
+function renderMyProfile(usuario) {
+
+    const infoAccountDiv = document.getElementById("info-account");
+
+    if(infoAccountDiv){
+
+    infoAccountDiv.innerHTML = `    
+    <div class="profile-card">
+    
+    
+    <img src="https://i.pinimg.com/236x/63/25/10/632510e53b3ae17f36993d7993c9fe8f.jpg" alt="">
+    <h3>Nombre: ${usuario.nombre}</h3>
+    <h3>Apellido: ${usuario.apellido}</h3>
+    <h3>Email: ${usuario.email}</h3>
+    <h3>Fecha De Creacion: ${usuario.fechaCreacion}</h3>
+    <button type="button" class="btn btn-danger">Eliminar</button>
+    
+    </div>
+    `;
+}
+    }
 
 
 
@@ -34,7 +71,7 @@ if (navbar) {
         </button>
 
         <form class="d-flex">
-                <input class="form-control me-2" type="search" placeholder="Search">
+                <input class="form-control me-2" type="search" placeholder="Busca tu proximo turno...">
 
                 <button class="btn btn-outline-success" type="submit">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
@@ -52,7 +89,7 @@ if (navbar) {
                 </li>
 
                   <li class="nav-item">
-                    <a class="nav-link " href="#">Profile</a>
+                    <a class="nav-link " href="#">Perfil</a>
                 </li>
 
                 <li class="nav-item">
@@ -78,6 +115,11 @@ getUser(1);
 function renderLogin() {
 
     const container = document.getElementById("form-login");
+
+    if(container){
+
+
+    
 
     container.innerHTML = `
       
@@ -142,20 +184,22 @@ function renderLogin() {
         });
 
     }
+    
     const registerButton = document.getElementById("register-button");
-
+    
     const botonGoogle = document.getElementById("google-button");
-
+    
     if (botonGoogle) {
-
+        
         botonGoogle.addEventListener("click", function () {
             signInWithGoogle();
         });
-
+        
     }
-
+    
     //Esto cambia la info del div y pone la info del register
     registerButton.addEventListener("click", renderRegister);
+}
 }
 
 
@@ -219,6 +263,9 @@ function userExists(mail, pass) {
 function renderRegister() {
 
     const container = document.getElementById("form-login");
+
+    if(container){
+
 
     container.innerHTML = `
         <div class="form-register">
@@ -297,7 +344,7 @@ function renderRegister() {
 
             else {
 
-                postUser(name, surname, mail, pass1)
+                postUser(name, surname, mail, pass1);
 
             }
 
@@ -314,6 +361,8 @@ function renderRegister() {
         cancelButton.addEventListener("click", renderLogin);
 
     }
+    }
+
 
 
 
@@ -342,45 +391,8 @@ function postUser(name, surname, mail, pass) {
         alert("Registrado con exito!");
     })
         .catch(error => {
-            alert(error)
+            alert(error);
         });
-}
-
-getUser(2)1
-
-
-function getUser(id) {
-
-    fetch(`http://localhost:8080/usuarios/${id}`, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json"
-        }
-    })
-    .then(res => res.json())
-    .then(usuario => {
-        renderMyProfile(usuario);
-    })
-    .catch(error => {
-        alert(error);
-    });
-
-}
-function renderMyProfile(usuario) {
-
-    const infoAccountDiv = document.getElementById("info-account");
-
-    infoAccountDiv.innerHTML = `    
-    
-    <h1>My Account</h1>
-    
-    <h3>Nombre: ${usuario.nombre}</h3>
-    <h3>Apellido: ${usuario.apellido}</h3>
-    <h3>Email: ${usuario.email}</h3>
-    <h3>Fecha De Creacion: ${usuario.fechaCreacion}</h3>
-    
-    <img src="https://i.pinimg.com/236x/63/25/10/632510e53b3ae17f36993d7993c9fe8f.jpg" alt="">
-    `;
 }
 
 
