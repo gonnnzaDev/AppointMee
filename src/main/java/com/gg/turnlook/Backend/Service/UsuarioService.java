@@ -2,6 +2,7 @@ package com.gg.turnlook.Backend.Service;
 
 import com.gg.turnlook.Backend.DTO.LoginDTO;
 import com.gg.turnlook.Backend.DTO.UsuarioModificarDTO;
+import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Model.Rol;
 import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Repository.RolRepository;
@@ -53,7 +54,7 @@ public class UsuarioService {
     }
 
     public Usuario crearUsuario(UsuarioCrearDTO u) {
-        Optional<Rol> rol = rolRepo.findByNombre("CLIENTE");
+        Optional<Rol> rol = rolRepo.findByNombre(ERol.CLIENTE.name());
         if(rol.isEmpty()) throw new RuntimeException("El rol no existe");
 
         Usuario user = new Usuario(u.getNombre(),u.getApellido(),u.getEmail(),
