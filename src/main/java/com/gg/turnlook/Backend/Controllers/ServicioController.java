@@ -4,6 +4,7 @@ import com.gg.turnlook.Backend.DTO.ServicioCrearDTO;
 import com.gg.turnlook.Backend.DTO.ServicioModificarDTO;
 import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Model.Servicio;
+import com.gg.turnlook.Backend.Model.Sucursal;
 import com.gg.turnlook.Backend.Service.ServicioService;
 import com.gg.turnlook.Backend.Service.SesionService;
 import com.gg.turnlook.Backend.Service.SucursalService;
@@ -12,6 +13,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -94,8 +97,7 @@ public class ServicioController {
         Optional<Servicio> servicio = servicioService.listarServicioPorId(servicioId);
         if(servicio.isEmpty()) return ResponseEntity.status(404).body("No se encontro el servicio");
 
-        if(sesionService.tieneRol(sesion, ERol.EMPLEADOR.name()) &&
-           !sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
+        if(!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
            !sucursalService.enSucursal((Integer) sesion.getAttribute("userId"),
              servicio.get().getSucursal().getId())){
             return ResponseEntity.status(403).body("No perteneces a esta sucursal");
@@ -109,18 +111,40 @@ public class ServicioController {
         }
     }
 
-    @GetMapping("/listar")
-    public ResponseEntity<?> listarServicios(HttpSession sesion){
+    // ver un endpoint para mostrar servicios x nombre con DTO para todo publico
+
+    @GetMapping("/listar/{idSucursal}")
+    public ResponseEntity<?> listarServicios(@PathVariable("idSucursal") Integer idSucursal,
+                                             HttpSession sesion){
 
         if(!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
 
-        // ver esto del rol
-        if(!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())){
+        if(!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
+           !sesionService.tieneRol(sesion, ERol.EMPLEADOR.name()) &&
+           !sesionService.tieneRol(sesion, ERol.EMPLEADO.name())){
             return ResponseEntity.status(403).body("No tenes permisos");
         }
 
-        try{
-            return ResponseEntity.ok().body(servicioService.listarServicios());
+        Optional<Sucursal> sucursal = sucursalService.listarSucursalPorId(idSucursal);
+        if(sucursal.isEmpty()) return ResponseEntity.status(404).body("No se encontro la sucursal");
+
+        // mirar este mejor a ver si funca bien
+        if(!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
+            !sucursalService.enSucursal((Integer) sesion.getAttribute("userId"),
+                    sucursal.get().getId())){
+            return ResponseEntity.status(403).body("No perteneces a esta sucursal");
+        }
+
+        List<?> servicios;
+       try{
+        if(sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())){
+           servicios = servicioService.listarServiciosPorSucursalAdmin(idSucursal);
+        } else{
+            // terminar este
+            servicios = servicioService.listarServiciosPorSucursal(idSucursal);
+        }
+            return ResponseEntity.ok().body(servicioService.
+                    listarServiciosPorSucursal(idSucursal));
         }catch(Exception e){
             return ResponseEntity.status(500).body("Hubo un error al listar los servicios");
         }

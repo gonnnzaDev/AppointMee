@@ -92,7 +92,7 @@ public class SucursalController {
 
         if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
 
-        if (!sesionService.tieneRol(sesion, "ADMINISTRADOR")) {
+        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
             return ResponseEntity.status(403).body("No tenes permisos");
         }
 
@@ -110,12 +110,22 @@ public class SucursalController {
 
         if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
         // ver esto del rol con twin
-        if (!sesionService.tieneRol(sesion, "ADMINISTRADOR")) {
+        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
+            !sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
             return ResponseEntity.status(403).body("No tenes permisos");
         }
 
+        List<Sucursal> sucursales;
+
+        if(!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())){
+            sucursales = sucursalService.listarSucursalesPropias(
+                    (Integer) sesion.getAttribute("userId"));
+        } else{
+            sucursales = sucursalService.listarSucursales();
+        }
+
         try {
-            return ResponseEntity.ok().body(sucursalService.listarSucursales());
+            return ResponseEntity.ok().body(sucursales);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error al listar sucursales");
         }
@@ -130,7 +140,7 @@ public class SucursalController {
 
         if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
 
-        if (!sesionService.tieneRol(sesion, "ADMINISTRADOR")) {
+        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
             return ResponseEntity.status(403).body("No tenes permisos");
         }
        try{
@@ -144,18 +154,26 @@ public class SucursalController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> sucursalPorId(@PathVariable Integer id, HttpSession sesion){
+    public ResponseEntity<?> sucursalPorId(@PathVariable("id") Integer id, HttpSession sesion){
 
         if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
 
-        if (!sesionService.tieneRol(sesion, "ADMINISTRADOR")) {
+        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
+            !sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
             return ResponseEntity.status(403).body("No tenes permisos");
         }
+
+        Optional<Sucursal> sucursal = sucursalService.listarSucursalPorId(id);
+        if(sucursal.isEmpty()) return ResponseEntity.status(404).body("No se encontro la sucursal");
+
+        if(!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
+           !Objects.equals(sucursal.get().getEmpleador().getId(),
+                   (Integer) sesion.getAttribute("userId"))){
+               return ResponseEntity.status(403).body("Esta sucursal no te pertenece");
+        }
+
        try{
-           Optional<Sucursal> sucursal = sucursalService.listarSucursalPorId(id);
-           return sucursal.isPresent() ?
-                  ResponseEntity.ok().body(sucursal.get())
-                  : ResponseEntity.status(404).body("No se encontro la sucursal");
+           return ResponseEntity.ok().body(sucursal);
        }catch (Exception e){
            return ResponseEntity.status(500).body("Error al filtrar sucursales");
        }

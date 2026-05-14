@@ -80,6 +80,10 @@ public class SucursalService {
         return sucRepo.findByActivoTrue();
     }
 
+    public List<Sucursal> listarSucursalesPropias(Integer userId){
+        return sucRepo.findByEmpleadorId(userId);
+    }
+
     public List<Sucursal> filtrarListaSucursales(String nombre, Boolean activo,
                                                  Integer catId, Integer userId) {
 

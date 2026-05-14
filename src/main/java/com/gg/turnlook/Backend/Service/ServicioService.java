@@ -2,6 +2,7 @@ package com.gg.turnlook.Backend.Service;
 
 import com.gg.turnlook.Backend.DTO.ServicioCrearDTO;
 import com.gg.turnlook.Backend.DTO.ServicioModificarDTO;
+import com.gg.turnlook.Backend.DTO.ServicioMostrarDTO;
 import com.gg.turnlook.Backend.Model.Servicio;
 import com.gg.turnlook.Backend.Model.Sucursal;
 import com.gg.turnlook.Backend.Repository.ServicioRepository;
@@ -53,8 +54,18 @@ public class ServicioService {
         servRepo.save(servicio);
     }
 
+    // ESTE seria para admin dsp ver
     public List<Servicio> listarServicios(){
         return servRepo.findByActivoTrue();
+    }
+
+    // ver lo de activo = false despues
+    public List<Servicio> listarServiciosPorSucursalAdmin(Integer idSucursal){
+        return servRepo.findBySucursalId(idSucursal);
+    }
+
+    public List<ServicioMostrarDTO> listarServiciosPorSucursal(Integer idSucursal){
+        return null;  // terminar
     }
 
     public Optional<Servicio> listarServicioPorId(Integer servicioId){
