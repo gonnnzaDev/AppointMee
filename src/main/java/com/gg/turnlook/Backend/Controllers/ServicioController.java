@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -143,8 +142,7 @@ public class ServicioController {
             // terminar este
             servicios = servicioService.listarServiciosPorSucursal(idSucursal);
         }
-            return ResponseEntity.ok().body(servicioService.
-                    listarServiciosPorSucursal(idSucursal));
+            return ResponseEntity.ok().body(servicios);
         }catch(Exception e){
             return ResponseEntity.status(500).body("Hubo un error al listar los servicios");
         }
