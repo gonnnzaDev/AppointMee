@@ -137,11 +137,11 @@ if (navbar) {
             <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll">
 
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">Home</a>
+                    <a class="nav-link active" href="Index.html">Home</a>
                 </li>
 
                   <li class="nav-item">
-                    <a class="nav-link " href="#">Perfil</a>
+                    <a class="nav-link " href="Perfil.html">Perfil</a>
                 </li>
 
                 <li class="nav-item">

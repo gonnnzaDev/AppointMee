@@ -2,6 +2,8 @@
 
     --bee-color: #f0bd03;
     --shadow-color: 0 4px 32px rgba(0, 0, 0, 0.3);
+    --color: #ffffff;
+    --color--border: gray;
 }
 
 html,
@@ -135,7 +137,7 @@ nav form {
     border: none;
     outline: none;
     background: #111;
-    color: white;
+    color: var(--color);
 }
 
 button {
@@ -143,8 +145,8 @@ button {
     border-radius: 10px;
     border: none;
     background: transparent;
-    border: 1px solid #777;
-    color: white;
+    border: 1px solid var(--color--border);
+    color: var(--color);
     cursor: pointer;
     transition: 0.3s;
 }
@@ -199,7 +201,7 @@ button:hover {
     display: flex;
     margin: 20px 40px 30px 40px;
     backdrop-filter: blur(10px) saturate(180%);
-    border: 1px solid rgba(160, 160, 160, 0.608);
+    border: 1px solid var(--color--border );
     padding: 20px;
     font-family: monospace;
     box-shadow: var(--shadow-color);
@@ -270,8 +272,8 @@ button:hover {
     border-radius: 14px;
     overflow: hidden;
     transition: 0.25s ease;
-    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.25);
-    border: gray solid 1px;
+    box-shadow: 0 10px 18px var(--shadow-color);
+    border: var(--color--border) solid 1px;
     transition: background-color 0.25s ease, transform 0.25s ease;
 }
 
@@ -293,12 +295,12 @@ button:hover {
 .turn-content h2 {
     font-size: 1rem;
     margin-bottom: 8px;
-    color: white;
+    color: var(--color);
 }
 
 .turn-content p {
     font-size: 0.85rem;
-    color: white;
+    color: var(--color);
 
 }
 
@@ -312,7 +314,7 @@ button:hover {
     width: 220px;
     top: 0px;
     height: 100vh;
-    background: rgba(12, 12, 12, 0.658);
+    background: rgba(19, 19, 19, 0.658);
     border: 2px solid rgba(27, 27, 27, 0.308);
     overflow: hidden;
     backdrop-filter: blur(10px) saturate(180%);
@@ -324,7 +326,6 @@ button:hover {
 }
 
 @media (max-width: 575px) {
-    .turn-container {}
 
     .left-container {
         padding: 30vh 0 0 0;
@@ -358,7 +359,7 @@ button:hover {
 .info-left-container {
     opacity: 1;
     padding: 20px;
-    color: white;
+    color: var(--color);
 }
 
 .info-left-container h2 {
@@ -374,13 +375,13 @@ button:hover {
     border: none;
     outline: none;
     background: #111;
-    color: white;
+    color: var(--color);
 }
 
 .category-container {}
 
 .info-left-container a {
-    color: white;
+    color: var(--color);
     text-decoration: none;
     margin-left: 20px;
 
@@ -411,7 +412,7 @@ button:hover {
     align-items: center;
     gap: 40px;
     border: 1px solid rgba(128, 128, 128, 0.466);
-    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.4);
+    box-shadow: 0px 0px 20px var(--shadow-color);
 }
 
 .profile-card img {
@@ -485,7 +486,7 @@ button:hover {
 }
 
 .info-error {
-    color: white;
+    color: var(--color);
 
 }
 
