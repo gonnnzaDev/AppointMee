@@ -37,4 +37,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleForbidden(ForbiddenException e){
         return ResponseEntity.status(403).body(e.getMessage());
     }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<?> handleConflict(ConflictException e){
+        return ResponseEntity.status(409).body(e.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleGeneral(Exception e){
+        return ResponseEntity.status(500).body("Error interno del servidor");
+    }
 }

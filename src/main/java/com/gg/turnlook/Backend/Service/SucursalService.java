@@ -2,6 +2,10 @@ package com.gg.turnlook.Backend.Service;
 
 import com.gg.turnlook.Backend.DTO.SucursalCrearDTO;
 import com.gg.turnlook.Backend.DTO.SucursalModificarDTO;
+import com.gg.turnlook.Backend.DTO.SucursalMostrarDTO;
+import com.gg.turnlook.Backend.DTO.UsuarioMostrarDTO;
+import com.gg.turnlook.Backend.Excepciones.ConflictException;
+import com.gg.turnlook.Backend.Excepciones.NotFoundException;
 import com.gg.turnlook.Backend.Model.Categoria;
 import com.gg.turnlook.Backend.Model.Sucursal;
 import com.gg.turnlook.Backend.Model.Usuario;
@@ -10,8 +14,11 @@ import com.gg.turnlook.Backend.Repository.SucursalRepository;
 import com.gg.turnlook.Backend.Repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class SucursalService {
@@ -19,69 +26,112 @@ public class SucursalService {
     private final SucursalRepository sucRepo;
     private final CategoriaRepository catRepo;
     private final UsuarioRepository userRepo;
+    private final UsuarioService usuarioService;
 
-    public SucursalService(SucursalRepository sucRepo, CategoriaRepository catRepo, UsuarioRepository userRepo) {
+    public SucursalService(SucursalRepository sucRepo, CategoriaRepository catRepo, UsuarioRepository userRepo, UsuarioService usuarioService) {
         this.sucRepo = sucRepo;
         this.catRepo = catRepo;
         this.userRepo = userRepo;
+        this.usuarioService = usuarioService;
     }
 
 
     /// METODOS
 
-    public boolean enSucursal(Integer idUsuario, Integer idSucursal){
+    public boolean enSucursal(Integer idUsuario, Integer idSucursal) {
         Optional<Sucursal> sucursal = sucRepo.findById(idSucursal);
-        if(sucursal.isEmpty()) return false;
+        if (sucursal.isEmpty()) return false;
         Optional<Usuario> usuario = userRepo.findById(idUsuario);
-        if(usuario.isEmpty()) return false;
+        if (usuario.isEmpty()) return false;
 
         return sucursal.get().getEmpleados().contains(usuario.get()) ||
-               sucursal.get().getEmpleador().equals(usuario.get());
+                sucursal.get().getEmpleador().equals(usuario.get());
     }
 
-    public Optional<Sucursal> crearSucursal(SucursalCrearDTO sucursal, Integer userId) {
+    public void crearSucursal(SucursalCrearDTO sucursal, Integer userId) {
 
-        Optional<Categoria> cat = catRepo.findById(sucursal.getCategoriaId());
-        if (cat.isEmpty()) return Optional.empty();
+        Categoria cat = catRepo.findById(sucursal.getCategoriaId()).
+                orElseThrow(() -> new NotFoundException("No se encontró la categoria"));
 
-        Usuario twin = userRepo.findById(userId).get(); // no hace falta opt acA
+        Usuario empleador = usuarioService.listarUsuarioPorId(userId);
         Sucursal suc = new Sucursal(sucursal.getNombre(), sucursal.getDireccion(),
                 sucursal.getTelefono(), sucursal.getDescripcion(),
-                cat.get(), twin);
-        return Optional.of(sucRepo.save(suc));
+                cat, empleador);
+
+        sucRepo.save(suc);
     }
 
-    public Optional<Sucursal> modificarSucursal(SucursalModificarDTO sucursal, Sucursal suc){
+    public void modificarSucursal(SucursalModificarDTO sucursal, Sucursal suc) {
 
-        if(sucursal.getCategoriaId() != null){
-            Optional<Categoria> cat = catRepo.findById(sucursal.getCategoriaId());
-            if(cat.isEmpty()) return Optional.empty();
-            suc.setCategoria(cat.get());
+        if (sucursal.getCategoriaId() != null) {
+            Categoria cat = catRepo.findById(sucursal.getCategoriaId()).
+                    orElseThrow(() -> new NotFoundException("No se encontró la categoria"));
+            suc.setCategoria(cat);
         }
-        if(sucursal.getNombre() != null) suc.setNombre(sucursal.getNombre());
-        if(sucursal.getDireccion() != null) suc.setDireccion(sucursal.getDireccion());
-        if(sucursal.getTelefono() != null) suc.setTelefono(sucursal.getTelefono());
-        if(sucursal.getDescripcion() != null) suc.setDescripcion(sucursal.getDescripcion());
+        if (sucursal.getNombre() != null) suc.setNombre(sucursal.getNombre());
+        if (sucursal.getDireccion() != null &&
+                !sucursal.getDireccion().equalsIgnoreCase(suc.getDireccion())) {
+            if (sucRepo.existsByDireccionIgnoreCase(sucursal.getDireccion())) {
+                throw new ConflictException("La direccion ingresada ya existe");
+            }
+            suc.setDireccion(sucursal.getDireccion());
+        }
+        if (sucursal.getTelefono() != null) suc.setTelefono(sucursal.getTelefono());
+        if (sucursal.getDescripcion() != null) suc.setDescripcion(sucursal.getDescripcion());
 
-        return Optional.of(sucRepo.save(suc));
+        sucRepo.save(suc);
     }
 
-    public boolean eliminarSucursal(Integer id) {
-        Optional<Sucursal> sucursal = sucRepo.findById(id);
-        if (sucursal.isEmpty()) return false;
-
+    public void eliminarSucursal(Integer id) {
+        Sucursal sucursal = listarSucursalPorId(id);
         //sucRepo.delete(sucursal.get());  ver si dejo este o el de activo -> false
-        sucursal.get().setActivo(false);
-        sucRepo.save(sucursal.get());
-        return true;
+        sucursal.setActivo(false);
+        sucRepo.save(sucursal);
     }
 
     public List<Sucursal> listarSucursales() {
         return sucRepo.findByActivoTrue();
     }
 
-    public List<Sucursal> listarSucursalesPropias(Integer userId){
-        return sucRepo.findByEmpleadorId(userId);
+    public List<SucursalMostrarDTO> listarSucursalesPropias(Integer userId) {
+        List<Sucursal> sucursales = sucRepo.findByEmpleadorIdAndActivoTrue(userId);
+        return mapearSucursales(sucursales);
+    }
+
+    public SucursalMostrarDTO mapearSucursal(Sucursal suc) {
+        SucursalMostrarDTO dto = new SucursalMostrarDTO();
+        dto.setNombre(suc.getNombre());
+        dto.setDireccion(suc.getDireccion());
+        dto.setTelefono(suc.getTelefono());
+        dto.setDescripcion(suc.getDescripcion());
+        dto.setFechaCreacion(suc.getFechaCreacion());
+        dto.setCategoria(suc.getCategoria().getCategoria());
+
+        UsuarioMostrarDTO empleador = new UsuarioMostrarDTO(
+                suc.getEmpleador().getNombre(),
+                suc.getEmpleador().getApellido(),
+                suc.getEmpleador().getEmail()
+        );
+        dto.setEmpleador(empleador);
+
+        Set<UsuarioMostrarDTO> empleadosDTO = suc.getEmpleados()
+                .stream()
+                .map(u -> new UsuarioMostrarDTO(
+                        u.getNombre(),
+                        u.getApellido(),
+                        u.getEmail()
+                ))
+                .collect(Collectors.toSet());
+        dto.setEmpleados(empleadosDTO);
+
+        return dto;
+    }
+
+    public List<SucursalMostrarDTO> mapearSucursales(List<Sucursal> sucursales){
+        List<SucursalMostrarDTO> sucursalesDTO = new ArrayList<>();
+        return sucursales.stream()
+                .map(suc -> mapearSucursal(suc))
+                .toList();
     }
 
     public List<Sucursal> filtrarListaSucursales(String nombre, Boolean activo,
@@ -95,7 +145,8 @@ public class SucursalService {
                 toList();
     }
 
-    public Optional<Sucursal> listarSucursalPorId(Integer id){
-        return sucRepo.findById(id);
+    public Sucursal listarSucursalPorId(Integer id) {
+        return sucRepo.findById(id).
+                orElseThrow(() -> new NotFoundException("No se encontró la sucursal"));
     }
 }

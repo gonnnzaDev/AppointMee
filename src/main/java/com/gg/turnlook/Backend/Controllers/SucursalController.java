@@ -3,6 +3,7 @@ package com.gg.turnlook.Backend.Controllers;
 import com.gg.turnlook.Backend.DTO.SucursalCrearDTO;
 import com.gg.turnlook.Backend.DTO.SucursalModificarDTO;
 import com.gg.turnlook.Backend.Enum.ERol;
+import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
 import com.gg.turnlook.Backend.Model.Sucursal;
 import com.gg.turnlook.Backend.Service.SesionService;
 import com.gg.turnlook.Backend.Service.SucursalService;
@@ -32,104 +33,78 @@ public class SucursalController {
 
     /// ENDPOINTS
 
-    // ver si dsp cambio a spring security para validar sin http sesion manual
+    // dsp cambiar a spring security para validar sin http sesion manual
     @PostMapping("/crear")
     public ResponseEntity<?> crearSucursal(
             @Valid @RequestBody SucursalCrearDTO sucursal,
             HttpSession sesion) {
 
-        if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+        sesionService.isLogged(sesion);
 
-        // ver si dsp agrego admin (no creo pq no tiene sentido)
         if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
-            return ResponseEntity.status(403).body("No tenes permisos");
+            throw new ForbiddenException("No tenes permisos");
         }
 
-        try {
-            return sucursalService.crearSucursal(sucursal,
-                    (Integer) sesion.getAttribute("userId")).isPresent() ?
-                    ResponseEntity.ok().body("Se creo la sucursal")
-                    : ResponseEntity.status(404).body("No se encontro la categoria deseada");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error al crear la sucursal");
-        }
+        sucursalService.crearSucursal(sucursal, sesionService.getUsuarioId(sesion));
+        return ResponseEntity.ok().body("Se creó la sucursal");
     }
+
 
     @PatchMapping("/modificar/{id}")
     public ResponseEntity<?> modificarSucursal(@PathVariable("id") Integer id,
-                                               @Valid @RequestBody SucursalModificarDTO suc,
-                                               HttpSession sesion){
+                                               @Valid @RequestBody SucursalModificarDTO sucursal,
+                                               HttpSession sesion) {
 
-        if(!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+        sesionService.isLogged(sesion);
+        boolean esAdmin = sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name());
 
-        if(!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name()) &&
-           !sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())){
-            return ResponseEntity.status(403).body("No tenes permisos");
+        if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name()) && !esAdmin) {
+            throw new ForbiddenException("No tenes permisos");
         }
 
-        Optional<Sucursal> sucursal = sucursalService.listarSucursalPorId(id);
-        if(sucursal.isEmpty()) return ResponseEntity.status(404).body("No se encontro la sucursal");
+        Sucursal suc = sucursalService.listarSucursalPorId(id);
 
-        if(!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
-                !Objects.equals((Integer) sesion.getAttribute("userId"),
-                   sucursal.get().getEmpleador().getId())){
-            return ResponseEntity.status(403).body("No tenes permisos");
+        if (!esAdmin && !Objects.equals(sesionService.getUsuarioId(sesion), suc.getEmpleador().getId())) {
+            throw new ForbiddenException("No tenes permisos");
         }
 
-        try{
-            return sucursalService.modificarSucursal(suc, sucursal.get()).isPresent() ?
-                    ResponseEntity.ok().body("Se modifico la sucursal")
-                    : ResponseEntity.status(404).body("No se encontro la categoria deseada");
-        }catch(Exception e){
-            return ResponseEntity.status(500).body("Error al modificar la sucursal");
-        }
+        sucursalService.modificarSucursal(sucursal, suc);
+        return ResponseEntity.ok().body("Se modificó la sucursal");
     }
-
 
 
     @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<?> eliminarSucursal(@PathVariable Integer id, HttpSession sesion) {
+    public ResponseEntity<?> eliminarSucursal(@PathVariable("id") Integer id, HttpSession sesion) {
 
-        if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+        sesionService.isLogged(sesion);
 
         if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
-            return ResponseEntity.status(403).body("No tenes permisos");
+            throw new ForbiddenException("No tenes permisos");
         }
 
-        try {
-            return sucursalService.eliminarSucursal(id) ?
-                    ResponseEntity.ok().body("Se elimino la sucursal") :
-                    ResponseEntity.status(404).body("No se encontro la sucursal a eliminar");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error al eliminar la sucursal");
-        }
+        sucursalService.eliminarSucursal(id);
+        return ResponseEntity.ok().body("Se eliminó la sucursal");
     }
+
 
     @GetMapping("/listar")
     public ResponseEntity<?> listarSucursales(HttpSession sesion) {
 
-        if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
-        // ver esto del rol con twin
+        sesionService.isLogged(sesion);
+
         if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
-            !sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
-            return ResponseEntity.status(403).body("No tenes permisos");
+                !sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
+            throw new ForbiddenException("No tenes permisos");
         }
 
-        List<Sucursal> sucursales;
-
-        if(!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())){
-            sucursales = sucursalService.listarSucursalesPropias(
-                    (Integer) sesion.getAttribute("userId"));
-        } else{
-            sucursales = sucursalService.listarSucursales();
-        }
-
-        try {
-            return ResponseEntity.ok().body(sucursales);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error al listar sucursales");
+        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
+            Integer empleadorId = sesionService.getUsuarioId(sesion);
+            return ResponseEntity.ok().body(sucursalService.listarSucursalesPropias(empleadorId));
+        } else {
+            return ResponseEntity.ok().body(sucursalService.listarSucursales());
         }
     }
+
 
     @GetMapping("/listar/filtrar")
     public ResponseEntity<?> filtrarListaSucursales(@RequestParam(required = false) String nombre,
@@ -138,46 +113,34 @@ public class SucursalController {
                                                     @RequestParam(required = false) Integer userId,
                                                     HttpSession sesion) {
 
-        if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+        sesionService.isLogged(sesion);
 
         if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
-            return ResponseEntity.status(403).body("No tenes permisos");
+            throw new ForbiddenException("No tenes permisos");
         }
-       try{
-           List<Sucursal> sucursales = sucursalService.filtrarListaSucursales(nombre, activo, catId, userId);
-           return !sucursales.isEmpty() ?
-                   ResponseEntity.ok().body(sucursales)
-                   : ResponseEntity.status(404).body("No se encontraron sucursales");
-       }catch(Exception e){
-           return ResponseEntity.status(500).body("Error al filtrar sucursales");
-       }
+
+        return ResponseEntity.ok().body(sucursalService.filtrarListaSucursales(nombre, activo, catId, userId));
     }
+
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> sucursalPorId(@PathVariable("id") Integer id, HttpSession sesion){
+    public ResponseEntity<?> sucursalPorId(@PathVariable("id") Integer id, HttpSession sesion) {
 
-        if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+        sesionService.isLogged(sesion);
+        boolean esAdmin = sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name());
 
-        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
-            !sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
-            return ResponseEntity.status(403).body("No tenes permisos");
+        if (!esAdmin && !sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
+            throw new ForbiddenException("No tenes permisos");
         }
 
-        Optional<Sucursal> sucursal = sucursalService.listarSucursalPorId(id);
-        if(sucursal.isEmpty()) return ResponseEntity.status(404).body("No se encontro la sucursal");
+        Sucursal sucursal = sucursalService.listarSucursalPorId(id);
 
-        if(!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
-           !Objects.equals(sucursal.get().getEmpleador().getId(),
-                   (Integer) sesion.getAttribute("userId"))){
-               return ResponseEntity.status(403).body("Esta sucursal no te pertenece");
+        if (!esAdmin && !Objects.equals(sucursal.getEmpleador().getId(),
+               sesionService.getUsuarioId(sesion))) {
+            throw new ForbiddenException("Esta sucursal no te pertenece");
         }
 
-       try{
-           return ResponseEntity.ok().body(sucursal);
-       }catch (Exception e){
-           return ResponseEntity.status(500).body("Error al filtrar sucursales");
-       }
+        return esAdmin ? ResponseEntity.ok().body(sucursal)
+                : ResponseEntity.ok().body(sucursalService.mapearSucursal(sucursal));
     }
-
-
 }

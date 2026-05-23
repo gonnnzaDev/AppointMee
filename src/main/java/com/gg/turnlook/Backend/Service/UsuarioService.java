@@ -3,7 +3,9 @@ package com.gg.turnlook.Backend.Service;
 import com.gg.turnlook.Backend.DTO.LoginDTO;
 import com.gg.turnlook.Backend.DTO.UsuarioModificarDTO;
 import com.gg.turnlook.Backend.Enum.ERol;
+import com.gg.turnlook.Backend.Excepciones.ConflictException;
 import com.gg.turnlook.Backend.Excepciones.NotFoundException;
+import com.gg.turnlook.Backend.Excepciones.UnauthorizedException;
 import com.gg.turnlook.Backend.Model.Rol;
 import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Repository.RolRepository;
@@ -25,86 +27,107 @@ public class UsuarioService {
     private final RolRepository rolRepo;
     private final PasswordEncoder passEncoder;
 
-    public UsuarioService(UsuarioRepository usRepo,RolRepository rolRepo, PasswordEncoder passEncoder) {
+    public UsuarioService(UsuarioRepository usRepo, RolRepository rolRepo, PasswordEncoder passEncoder) {
         this.usRepo = usRepo;
         this.rolRepo = rolRepo;
         this.passEncoder = passEncoder;
     }
 
 
-    public Optional<Usuario> inicioSesion(LoginDTO login){
+    /// METODOS
 
-            Optional<Usuario> u = usRepo.findByEmail(login.getEmail());
 
-            if(u.isEmpty()) return u;
+    public Usuario inicioSesion(LoginDTO login) {
 
-            if(!passEncoder.matches(login.getPass(), u.get().getPassword())) return Optional.empty();
+        Usuario u = usRepo.findByEmail(login.getEmail())
+                .orElseThrow(() -> new UnauthorizedException("Credenciales incorrectas"));
 
-            return u;
+        if (!passEncoder.matches(login.getPass(), u.getPassword())) {
+            throw new UnauthorizedException("Credenciales incorrectas");
+        }
+
+        return u;
     }
 
-    public Set<String> setRolesComoString(Usuario u){
+
+    public Set<String> setRolesComoString(Usuario u) {
         return u.getRoles().stream()
                 .map(r -> r.getRol().name())
                 .collect(Collectors.toSet());
     }
 
+
     public Usuario crearUsuario(UsuarioCrearDTO u) {
         Rol rol = rolRepo.findByRol(ERol.CLIENTE)
                 .orElseThrow(() -> new NotFoundException("Rol no encontrado"));
 
-        Usuario user = new Usuario(u.getNombre(),u.getApellido(),u.getEmail(),
-                                   passEncoder.encode(u.getPassword()));
+        Usuario user = new Usuario(u.getNombre(), u.getApellido(), u.getEmail(),
+                passEncoder.encode(u.getPassword()));
         user.getRoles().add(rol);
         return usRepo.save(user);
     }
 
-    public boolean eliminarUsuario(Integer id){
-        Optional<Usuario> u = usRepo.findById(id);
-        if(u.isEmpty()) return false;
-        // usRepo.delete(u.get());  ver si dejo el delete o el activo -> false
-        u.get().setActivo(false);
-        usRepo.save(u.get());
-        return true;
+
+    public void eliminarUsuario(Integer id) {
+        Usuario u = listarUsuarioPorId(id);
+        // usRepo.delete(u);  ver si dejo el delete o el activo -> false
+        u.setActivo(false);
+        usRepo.save(u);
     }
 
-    public void modificarUsuario(UsuarioModificarDTO usuario, Usuario user){
+
+    public void modificarUsuario(UsuarioModificarDTO usuario, Integer userId) {
+
+        Usuario user = listarUsuarioPorId(userId);
 
         if (usuario.getNombre() != null) user.setNombre(usuario.getNombre());
         if (usuario.getApellido() != null) user.setApellido(usuario.getApellido());
-        if (usuario.getEmail() != null) user.setEmail(usuario.getEmail());
+        if (usuario.getEmail() != null && !usuario.getEmail().equals(user.getEmail())) {
+            if (usRepo.existsByEmail(usuario.getEmail())) {
+                throw new ConflictException("El email ingresado ya esta en uso");
+            }
+            user.setEmail(usuario.getEmail());
+        }
         if (usuario.getPassword() != null) user.setPassword(passEncoder.encode(usuario.getPassword()));
 
         usRepo.save(user);
     }
 
-    public List<Usuario> listarUsuarios(){
+
+    public List<Usuario> listarUsuarios() {
         return usRepo.findByActivoTrue();
     }
 
-    public List<Usuario> filtrarListaUsuarios(String nombre, String apellido, Boolean activo){
-        List<Usuario> filtro = usRepo.findAll();
-        return filtro.stream()
+
+    public List<Usuario> listarUsuariosEliminados() {
+        return usRepo.findByActivoFalse();
+    }
+
+
+    public List<Usuario> filtrarListaUsuarios(String nombre, String apellido, Boolean activo) {
+        return usRepo.findAll().stream()
                 .filter(u -> nombre == null || u.getNombre().equalsIgnoreCase(nombre))
                 .filter(u -> apellido == null || u.getApellido().equalsIgnoreCase(apellido))
                 .filter(u -> activo == null || u.isActivo() == activo)
                 .toList();
     }
 
-    public Optional<Usuario> listarUsuariosPorEmailAdmin(String email){
-        return usRepo.findByEmail(email);
+
+    public Usuario listarUsuariosPorEmailAdmin(String email) {
+        return usRepo.findByEmail(email).
+                orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
     }
 
-    public Optional<UsuarioMostrarDTO> listarUsuariosPorEmailEmpleador(String email){
-        Optional<Usuario> aux =  usRepo.findByEmail(email);
-        if(aux.isEmpty()) return Optional.empty();
 
-        UsuarioMostrarDTO u =  new UsuarioMostrarDTO(aux.get().getNombre(), aux.get().getApellido(),
-                                                     aux.get().getEmail());
-        return Optional.of(u);
+    public UsuarioMostrarDTO listarUsuariosPorEmailEmpleador(String email) {
+        Usuario aux = listarUsuariosPorEmailAdmin(email);
+        return new UsuarioMostrarDTO(aux.getNombre(), aux.getApellido(), aux.getEmail());
     }
 
-    public Optional<Usuario> listarUsuarioPorId(Integer id){
-        return usRepo.findById(id);
+
+    public Usuario listarUsuarioPorId(Integer id) {
+        return usRepo.findById(id).
+                orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
     }
 }
+
