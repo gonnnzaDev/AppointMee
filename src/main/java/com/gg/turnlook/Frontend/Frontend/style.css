@@ -95,7 +95,7 @@ nav form {
 }
 
 #info-register input {
-    width: 100%;
+    width: 95%;
 
 }
 
@@ -116,7 +116,8 @@ nav form {
 .credentials-form button {
 
     width: 100%;
-    margin: 10px;
+    margin: 3px;
+    height: 7vh;
 
 }
 .form h1 {
@@ -242,9 +243,9 @@ button:hover {
     }
 
     #info-register input {
-        width: 90%;
+        width: 80%;
     }
-    ..credentials-form button{
+    .credentials-form button{
         width: 90%;
     }
 }
