@@ -1,7 +1,9 @@
 package com.gg.turnlook.Backend.DTO;
 
 import jakarta.validation.constraints.*;
+import lombok.Data;
 
+@Data
 public class SucursalCrearDTO {
 
 
@@ -27,56 +29,5 @@ public class SucursalCrearDTO {
     @Positive(message = "El ID de categoria debe ser positivo")
     private Integer categoriaId;
 
-    /// CONSTRUCTORES
-    public SucursalCrearDTO(String nombre, String direccion, String telefono, String descripcion, Integer categoriaId) {
-        this.nombre = nombre;
-        this.direccion = direccion;
-        this.telefono = telefono;
-        this.descripcion = descripcion;
-        this.categoriaId = categoriaId;
-    }
 
-    public SucursalCrearDTO() {
-    }
-
-    /// GETTERS AND SETTERS
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getDireccion() {
-        return direccion;
-    }
-
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
-    }
-
-    public String getTelefono() {
-        return telefono;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public Integer getCategoriaId() {
-        return categoriaId;
-    }
-
-    public void setCategoriaId(Integer categoriaId) {
-        this.categoriaId = categoriaId;
-    }
 }

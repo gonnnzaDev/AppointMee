@@ -1,6 +1,10 @@
 package com.gg.turnlook.Backend.Model;
 
+import com.gg.turnlook.Backend.Enum.ERol;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
 
 import java.util.HashSet;
@@ -8,6 +12,9 @@ import java.util.Set;
 
 @Entity
 @Table(name = "roles")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Rol {
 
     /// ATRIBUTOS
@@ -16,50 +23,12 @@ public class Rol {
     private Integer id;
     /// (PK BDD)
 
-    @Column(unique = true, nullable = false)
-    private String nombre;
+    @Enumerated(EnumType.STRING)
+    private ERol rol;
 
     @ManyToMany(mappedBy = "roles")
     @JsonIgnore
     private Set<Usuario> usuarios = new HashSet<>();
-
-    /// CONSTRUCTORES
-    public Rol(Integer id, String nombre) {
-        this.id = id;
-        this.nombre = nombre;
-    }
-
-    public Rol(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public Rol() {
-    }
-
-    /// GETTERS AND SETTERS
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public Set<Usuario> getUsuarios() {
-        return usuarios;
-    }
-
-    public void setUsuarios(Set<Usuario> usuarios) {
-        this.usuarios = usuarios;
-    }
 
     /// METODOS
     @Override

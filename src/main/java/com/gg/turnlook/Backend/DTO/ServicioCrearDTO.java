@@ -1,9 +1,11 @@
 package com.gg.turnlook.Backend.DTO;
 
 import jakarta.validation.constraints.*;
+import lombok.Data;
 
 import java.math.BigDecimal;
 
+@Data
 public class ServicioCrearDTO {
 
     @NotBlank(message = "El nombre es obligatorio")
@@ -33,57 +35,4 @@ public class ServicioCrearDTO {
     private Integer sucursalId;
 
 
-    /// CONSTRUCTORES
-    public ServicioCrearDTO(String nombre, String descripcion, Integer duracion, BigDecimal precio, Integer sucursalId) {
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.duracion = duracion;
-        this.precio = precio;
-        this.sucursalId = sucursalId;
-    }
-
-    public ServicioCrearDTO() {
-    }
-
-
-    /// GETTERS AND SETTERS
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public Integer getDuracion() {
-        return duracion;
-    }
-
-    public void setDuracion(Integer duracion) {
-        this.duracion = duracion;
-    }
-
-    public BigDecimal getPrecio() {
-        return precio;
-    }
-
-    public void setPrecio(BigDecimal precio) {
-        this.precio = precio;
-    }
-
-    public Integer getSucursalId() {
-        return sucursalId;
-    }
-
-    public void setSucursalId(Integer sucursalId) {
-        this.sucursalId = sucursalId;
-    }
 }

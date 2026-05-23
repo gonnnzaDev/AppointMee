@@ -4,10 +4,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
 import java.math.BigDecimal;
 
+@Data
 public class PagoDTO {
 
     @NotBlank(message = "El titulo es obligatorio")
@@ -28,47 +30,5 @@ public class PagoDTO {
 
     // aca el token
 
-    /// CONSTRUCTORES
-    public PagoDTO(String titulo, String descripcion, Integer cantidad, BigDecimal precio) {
-        this.titulo = titulo;
-        this.descripcion = descripcion;
-        this.cantidad = cantidad;
-        this.precio = precio;
-    }
 
-    public PagoDTO() {
-    }
-
-    ///  GETTERS AND SETTERS
-    public String getTitulo() {
-        return titulo;
-    }
-
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public Integer getCantidad() {
-        return cantidad;
-    }
-
-    public void setCantidad(Integer cantidad) {
-        this.cantidad = cantidad;
-    }
-
-    public BigDecimal getPrecio() {
-        return precio;
-    }
-
-    public void setPrecio(BigDecimal precio) {
-        this.precio = precio;
-    }
 }

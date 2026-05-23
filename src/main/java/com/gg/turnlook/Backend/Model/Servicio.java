@@ -1,11 +1,17 @@
 package com.gg.turnlook.Backend.Model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "servicios")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Servicio {
 
     /// ATRIBUTOS
@@ -35,16 +41,6 @@ public class Servicio {
 
 
     /// CONSTRUCTORES
-    public Servicio(Integer id, String nombre, String descripcion, Integer duracion, BigDecimal precio, boolean activo, Sucursal sucursal) {
-        this.id = id;
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.duracion = duracion;
-        this.precio = precio;
-        this.activo = activo;
-        this.sucursal = sucursal;
-    }
-
     public Servicio(String nombre, String descripcion, Integer duracion, BigDecimal precio, Sucursal sucursal) {
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -53,64 +49,4 @@ public class Servicio {
         this.sucursal = sucursal;
     }
 
-    public Servicio() {
-    }
-
-
-    /// GETTERS AND SETTERS
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public Integer getDuracion() {
-        return duracion;
-    }
-
-    public void setDuracion(Integer duracion) {
-        this.duracion = duracion;
-    }
-
-    public BigDecimal getPrecio() {
-        return precio;
-    }
-
-    public void setPrecio(BigDecimal precio) {
-        this.precio = precio;
-    }
-
-    public boolean isActivo() {
-        return activo;
-    }
-
-    public void setActivo(boolean activo) {
-        this.activo = activo;
-    }
-
-    public Sucursal getSucursal() {
-        return sucursal;
-    }
-
-    public void setSucursal(Sucursal sucursal) {
-        this.sucursal = sucursal;
-    }
 }

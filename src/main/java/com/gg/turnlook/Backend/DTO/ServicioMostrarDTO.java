@@ -1,7 +1,14 @@
 package com.gg.turnlook.Backend.DTO;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ServicioMostrarDTO {
 
      /// ATRIBUTOS
@@ -10,44 +17,4 @@ public class ServicioMostrarDTO {
      private Integer duracion;
      private BigDecimal precio;
 
-     /// CONSTRUCTORES
-    public ServicioMostrarDTO(String nombre, String descripcion, Integer duracion, BigDecimal precio) {
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.duracion = duracion;
-        this.precio = precio;
-    }
-
-    /// GETTERS AND SETTERS
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public Integer getDuracion() {
-        return duracion;
-    }
-
-    public void setDuracion(Integer duracion) {
-        this.duracion = duracion;
-    }
-
-    public BigDecimal getPrecio() {
-        return precio;
-    }
-
-    public void setPrecio(BigDecimal precio) {
-        this.precio = precio;
-    }
 }

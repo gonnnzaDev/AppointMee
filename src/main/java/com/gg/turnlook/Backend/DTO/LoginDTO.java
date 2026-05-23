@@ -1,8 +1,9 @@
 package com.gg.turnlook.Backend.DTO;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 
-
+@Data
 public class LoginDTO {
 
     /// ATRIBUTOS
@@ -23,20 +24,5 @@ public class LoginDTO {
     public LoginDTO() {
     }
 
-    /// GETTERS AND SETTERS
-    public String getEmail() {
-        return email;
-    }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPass() {
-        return pass;
-    }
-
-    public void setPass(String pass) {
-        this.pass = pass;
-    }
 }
