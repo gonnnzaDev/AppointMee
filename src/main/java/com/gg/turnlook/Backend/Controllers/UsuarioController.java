@@ -47,12 +47,10 @@ public class UsuarioController {
 
     @PostMapping("/crear")
     public ResponseEntity<?> crearUsuario(@Valid @RequestBody UsuarioCrearDTO u) {
-        try {
+
             usuarioService.crearUsuario(u);
             return ResponseEntity.ok().body("Se creo al usuario");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error al crear usuario");
-        }
+
     }
 
     @PatchMapping("/modificar/{id}")

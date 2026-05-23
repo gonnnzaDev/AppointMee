@@ -2,6 +2,9 @@ package com.gg.turnlook.Backend.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -9,6 +12,9 @@ import java.util.Set;
 
 @Entity
 @Table(name = "sucursales")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Sucursal {
 
     /// ATRIBUTOS
@@ -64,19 +70,6 @@ public class Sucursal {
 
 
     /// CONSTRUCTORES
-    public Sucursal(Integer id, String nombre, String direccion, String telefono, String descripcion, LocalDateTime fechaCreacion, boolean activo, String mpToken, Categoria categoria, Usuario usuario) {
-        this.id = id;
-        this.nombre = nombre;
-        this.direccion = direccion;
-        this.telefono = telefono;
-        this.descripcion = descripcion;
-        this.fechaCreacion = fechaCreacion;
-        this.activo = activo;
-        this.mpToken = mpToken;
-        this.categoria = categoria;
-        this.empleador = usuario;
-    }
-
     public Sucursal(String nombre, String direccion, String telefono, String descripcion, Categoria categoria, Usuario usuario) {
         this.nombre = nombre;
         this.direccion = direccion;
@@ -86,95 +79,4 @@ public class Sucursal {
         this.empleador = usuario;
     }
 
-    public Sucursal() {
-    }
-
-    /// GETTERS AND SETTERS
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getDireccion() {
-        return direccion;
-    }
-
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
-    }
-
-    public String getTelefono() {
-        return telefono;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public boolean isActivo() {
-        return activo;
-    }
-
-    public void setActivo(boolean activo) {
-        this.activo = activo;
-    }
-
-    public Usuario getEmpleador() {
-        return empleador;
-    }
-
-    public void setEmpleador(Usuario empleador) {
-        this.empleador = empleador;
-    }
-
-    public LocalDateTime getFechaCreacion() {
-        return fechaCreacion;
-    }
-
-    public void setFechaCreacion(LocalDateTime fechaCreacion) {
-        this.fechaCreacion = fechaCreacion;
-    }
-
-    public String getMpToken() {
-        return mpToken;
-    }
-
-    public void setMpToken(String mpToken) {
-        this.mpToken = mpToken;
-    }
-
-    public Categoria getCategoria() {
-        return categoria;
-    }
-
-    public void setCategoria(Categoria categoria) {
-        this.categoria = categoria;
-    }
-
-    public Set<Usuario> getEmpleados() {
-        return empleados;
-    }
-
-    public void setEmpleados(Set<Usuario> empleados) {
-        this.empleados = empleados;
-    }
 }

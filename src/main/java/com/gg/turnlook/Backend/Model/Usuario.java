@@ -2,6 +2,9 @@ package com.gg.turnlook.Backend.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -9,6 +12,9 @@ import java.util.Set;
 
 @Entity
 @Table(name = "usuarios")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Usuario {
 
 
@@ -60,15 +66,7 @@ public class Usuario {
     }
 
     /// CONSTRUCTORES
-    public Usuario(Integer id, String nombre, String apellido, String email, String password, LocalDateTime fechaCreacion, boolean activo) {
-        this.id = id;
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.email = email;
-        this.password = password;
-        this.fechaCreacion = fechaCreacion;
-        this.activo = activo;
-    }
+
 
     public Usuario(String nombre, String apellido, String email, String password) {
         this.nombre = nombre;
@@ -76,83 +74,6 @@ public class Usuario {
         this.email = email;
         this.password = password;
     }
-
-    public Usuario() {
-    }
-
-    /// GETTERS AND SETTERS
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getApellido() {
-        return apellido;
-    }
-
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public LocalDateTime getFechaCreacion() {
-        return fechaCreacion;
-    }
-
-    public void setFechaCreacion(LocalDateTime fechaCreacion) {
-        this.fechaCreacion = fechaCreacion;
-    }
-
-    public boolean isActivo() {
-        return activo;
-    }
-
-    public void setActivo(boolean activo) {
-        this.activo = activo;
-    }
-
-    public Set<Rol> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<Rol> roles) {
-        this.roles = roles;
-    }
-
-    public Set<Sucursal> getSucursalesEmpleado() {
-        return sucursalesEmpleado;
-    }
-
-    public void setSucursalesEmpleado(Set<Sucursal> sucursalesEmpleado) {
-        this.sucursalesEmpleado = sucursalesEmpleado;
-    }
-
 
     ///  METODOS
     @Override
@@ -166,4 +87,8 @@ public class Usuario {
     public int hashCode() {
         return getClass().hashCode();
     }
+
 }
+
+
+

@@ -3,6 +3,7 @@ package com.gg.turnlook.Backend.Service;
 import com.gg.turnlook.Backend.DTO.LoginDTO;
 import com.gg.turnlook.Backend.DTO.UsuarioModificarDTO;
 import com.gg.turnlook.Backend.Enum.ERol;
+import com.gg.turnlook.Backend.Excepciones.NotFoundException;
 import com.gg.turnlook.Backend.Model.Rol;
 import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Repository.RolRepository;
@@ -33,11 +34,6 @@ public class UsuarioService {
 
     public Optional<Usuario> inicioSesion(LoginDTO login){
 
-            if(login.getEmail() == null || login.getEmail().isBlank() ||
-               login.getPass() == null || login.getPass().isBlank()){
-                return Optional.empty();
-            }
-
             Optional<Usuario> u = usRepo.findByEmail(login.getEmail());
 
             if(u.isEmpty()) return u;
@@ -49,17 +45,17 @@ public class UsuarioService {
 
     public Set<String> setRolesComoString(Usuario u){
         return u.getRoles().stream()
-                .map(r -> r.getNombre())
+                .map(r -> r.getRol().name())
                 .collect(Collectors.toSet());
     }
 
     public Usuario crearUsuario(UsuarioCrearDTO u) {
-        Optional<Rol> rol = rolRepo.findByNombre(ERol.CLIENTE.name());
-        if(rol.isEmpty()) throw new RuntimeException("El rol no existe");
+        Rol rol = rolRepo.findByRol(ERol.CLIENTE)
+                .orElseThrow(() -> new NotFoundException("Rol no encontrado"));
 
         Usuario user = new Usuario(u.getNombre(),u.getApellido(),u.getEmail(),
                                    passEncoder.encode(u.getPassword()));
-        user.getRoles().add(rol.get());
+        user.getRoles().add(rol);
         return usRepo.save(user);
     }
 
