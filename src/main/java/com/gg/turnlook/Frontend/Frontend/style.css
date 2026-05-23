@@ -15,6 +15,7 @@ body {
     color: var(--text-main);
 
 }
+
 body {
     color: white;
 }
@@ -70,25 +71,19 @@ nav form {
 }
 
 
+
+
 .form-container {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-    justify-content: center;
-    align-items: center;
-
-
-}
-
-.login-container {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    max-height: 100vh;
     padding: 20px;
 }
 
-#info-login {
+#info-login,
+#info-register {
     display: flex;
     width: 900px;
     max-width: 95vw;
@@ -96,15 +91,20 @@ nav form {
     border-radius: 20px;
     overflow: hidden;
     backdrop-filter: blur(10px);
-    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
 }
 
-.login img {
+#info-register input {
+    width: 100%;
+
+}
+
+.form img {
     width: 50%;
     object-fit: cover;
 }
 
-.login-form {
+.credentials-form {
     width: 50%;
     padding: 40px;
     display: flex;
@@ -112,7 +112,14 @@ nav form {
     justify-content: center;
 }
 
-.login h1 {
+
+.credentials-form button {
+
+    width: 100%;
+    margin: 10px;
+
+}
+.form h1 {
     position: absolute;
     top: 30px;
     left: 40px;
@@ -147,47 +154,44 @@ button:hover {
 
 
 
-/* responsive */
 @media (max-width: 768px) {
-    #info-login {
+
+    #info-login,
+    #info-register {
         flex-direction: column;
     }
 
-    .login img {
+    .form img {
         width: 100%;
         height: 200px;
     }
 
-    .login-form {
+    .credentials-form {
         width: 100%;
         padding: 25px;
     }
 
-    .login h1 {
+    .form h1 {
         position: static;
         margin-bottom: 15px;
         text-align: center;
     }
+
 }
 
 @media (max-width: 400px) {
-    .login-form {
+    .credentials-form {
         padding: 15px;
     }
 
     button {
         font-size: 14px;
     }
-}
-
-
-
-
-.form-register {
-    height: 70%;
-    min-width: 50vw;
 
 }
+
+
+
 
 .about-container {
 
@@ -236,6 +240,13 @@ button:hover {
     .turn-container {
         margin: 0px 5% 0px 30%;
     }
+
+    #info-register input {
+        width: 90%;
+    }
+    ..credentials-form button{
+        width: 90%;
+    }
 }
 
 @media (max-width: 645px) {
@@ -243,6 +254,14 @@ button:hover {
     .turn-container {
         margin: 0px 3% 0px 37%;
     }
+
+    #info-register input {
+        width: 80%;
+    }
+    .credentials-form button{
+        width: 80%;
+    }
+
 }
 
 .turn-article {
@@ -376,7 +395,7 @@ button:hover {
 
 #info-account {
     width: auto;
-    max-width: 90vw ;
+    max-width: 90vw;
     display: flex;
     justify-content: center;
 }
@@ -400,6 +419,7 @@ button:hover {
     flex-shrink: 0;
 
 }
+
 @media (max-width: 992px) {
     .profile-card {
         padding: 30px;
@@ -449,31 +469,30 @@ button:hover {
         font-size: 12px;
     }
 }
+
 .profile-info h1 {
     font-size: 70px;
-    margin-bottom: 30px;     
+    margin-bottom: 30px;
     margin: 15px 0;
 }
 
-.error-container{
+.error-container {
     width: 100%;
     height: 100vh;
 }
 
 .info-error {
     color: white;
-    
+
 }
 
-.info-error img 
-{
+.info-error img {
     margin: 10vh 0 0 0;
     width: 100%;
     max-height: 70vh;
 }
 
-.info-error h1 
-{
+.info-error h1 {
     margin: 5vh 0 0 10px;
     font-family: monospace;
 }

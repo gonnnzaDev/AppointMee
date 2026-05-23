@@ -43,7 +43,26 @@ function renderMyProfile(usuario) {
     }
 }
 
+const cancelButton = document.getElementById("cancel-button");
 
+
+if (cancelButton) {
+
+    cancelButton.addEventListener("click",  () => {
+        window.location.href = "Login.html";
+    }
+        
+    );
+}
+
+const registerButton = document.getElementById("register-button");
+
+if(registerButton){
+
+registerButton.addEventListener("click", () => {
+    window.location.href = "Register.html";
+});
+}
 
 
 const navbar = document.getElementById("navbar");
@@ -155,28 +174,8 @@ if (botonGoogle) {
 
 }
 
-const registerButton = document.getElementById("register-button");
-
-if(registerButton){
-
-registerButton.addEventListener("click", () => {
-    window.location.href = "Register.html";
-});
-}
 
 
-const cancelButton = document.getElementById("cancel-button");
-
-
-if (cancelButton) {
-
-    cancelButton.addEventListener("click",  () => {
-        window.location.href = "Login.html";
-    }
-        
-    );
-
-}
 
 
 //esta funcion la llama el boton de google es el funcionamiento
