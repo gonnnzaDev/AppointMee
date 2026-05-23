@@ -47,7 +47,7 @@ El proyecto incluye autenticación de usuarios, manejo de roles y sistema de pag
 * Autenticación basada en sesiones
 * Control de acceso por roles
 
-## Base De datos
+## Base de datos
 * PostgreSQL (SupaBase)
 
 # Autor
