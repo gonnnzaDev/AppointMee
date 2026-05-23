@@ -3,6 +3,7 @@ package com.gg.turnlook.Backend.Controllers;
 import com.gg.turnlook.Backend.DTO.LoginDTO;
 import com.gg.turnlook.Backend.DTO.UsuarioModificarDTO;
 import com.gg.turnlook.Backend.Enum.ERol;
+import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
 import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Service.SesionService;
 import com.gg.turnlook.Backend.Service.UsuarioService;
@@ -35,81 +36,77 @@ public class UsuarioController {
     @PostMapping("/inicio_sesion")
     public ResponseEntity<?> iniciarSesion(@RequestBody LoginDTO login,
                                            HttpSession sesion) {
-        Optional<Usuario> u = usuarioService.inicioSesion(login);
-        if (u.isPresent()) {
-            sesion.setAttribute("userId", u.get().getId());
-            sesion.setAttribute("userRoles", usuarioService.setRolesComoString(u.get()));
-        }
-        return u.isPresent() ? ResponseEntity.ok().body("Has iniciado sesion")
-                : ResponseEntity.status(401).body("Credenciales incorrectas");
+        Usuario u = usuarioService.inicioSesion(login);
+
+        sesion.setAttribute("userId", u.getId());
+        sesion.setAttribute("userRoles", usuarioService.setRolesComoString(u));
+
+        return ResponseEntity.ok().body("Has iniciado sesion");
     }
 
 
     @PostMapping("/crear")
     public ResponseEntity<?> crearUsuario(@Valid @RequestBody UsuarioCrearDTO u) {
-
-            usuarioService.crearUsuario(u);
-            return ResponseEntity.ok().body("Se creo al usuario");
-
+        usuarioService.crearUsuario(u);
+        return ResponseEntity.ok().body("Se creo al usuario");
     }
+
 
     @PatchMapping("/modificar/{id}")
     public ResponseEntity<?> modificarUsuario(@PathVariable("id") Integer id,
                                               @Valid @RequestBody UsuarioModificarDTO usuario,
                                               HttpSession sesion) {
 
-        if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+        Usuario user = sesionService.getUsuarioLogged(sesion);
 
-        Optional<Usuario> user = usuarioService.listarUsuarioPorId(id);
-        if(user.isEmpty()) return ResponseEntity.status(404).body("No existe el usuario");
-
-        if(!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())
-           && !Objects.equals((Integer) sesion.getAttribute("userId"), user.get().getId())){
-            return ResponseEntity.status(403).body("No tenes permisos");
+        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())
+                && !Objects.equals(id, user.getId())) {
+            throw new ForbiddenException("No tenes permisos");
         }
 
-        try {
-            usuarioService.modificarUsuario(usuario, user.get());
-            return ResponseEntity.ok().body("Usuario modificado");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error al modificar usuario");
-        }
+        usuarioService.modificarUsuario(usuario, id);
+        return ResponseEntity.ok().body("Usuario modificado");
     }
+
 
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<?> eliminarUsuario(@PathVariable("id") Integer id,
                                              HttpSession sesion) {
 
-        if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+        sesionService.isLogged(sesion);
 
         if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
-            return ResponseEntity.status(403).body("No tenes permisos");
+            throw new ForbiddenException("No tenes permisos");
         }
 
-        try {
-            return usuarioService.eliminarUsuario(id) ?
-                    ResponseEntity.ok().body("Se elimino al usuario")
-                    : ResponseEntity.status(404).body("No se encontro al usuario");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error al eliminar usuario");
-        }
+        usuarioService.eliminarUsuario(id);
+        return ResponseEntity.ok().body("Se elimino al usuario");
     }
 
 
     @GetMapping("/listar")
     public ResponseEntity<?> listarUsuarios(HttpSession sesion) {
 
-        if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+        sesionService.isLogged(sesion);
 
         if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
-            return ResponseEntity.status(403).body("No tenes permisos");
+            throw new ForbiddenException("No tenes permisos");
         }
 
-        try {
-            return ResponseEntity.ok().body(usuarioService.listarUsuarios());
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error al listar usuarios");
+        return ResponseEntity.ok().body(usuarioService.listarUsuarios());
+    }
+
+
+    @GetMapping("/listar/eliminados")
+    public ResponseEntity<?> listarUsuariosEliminados(HttpSession sesion) {
+
+        sesionService.isLogged(sesion);
+
+        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
+            throw new ForbiddenException("No tenes permisos");
         }
+
+        return ResponseEntity.ok().body(usuarioService.listarUsuariosEliminados());
     }
 
 
@@ -120,59 +117,41 @@ public class UsuarioController {
             @RequestParam(required = false) Boolean activo,
             HttpSession sesion) {
 
-        if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+        sesionService.isLogged(sesion);
 
         if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
-            return ResponseEntity.status(403).body("No tenes permisos");
+            throw new ForbiddenException("No tenes permisos");
         }
 
-        try {
-            List<Usuario> usuarios = usuarioService.filtrarListaUsuarios(nombre, apellido, activo);
-            return !usuarios.isEmpty() ? ResponseEntity.ok().body(usuarios)
-                    : ResponseEntity.status(404).body("No se encontraron usuarios");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error al filtrar usuarios");
-        }
+        return ResponseEntity.ok().body(usuarioService.filtrarListaUsuarios(nombre, apellido, activo));
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<?> filtrarUsuariosId(@PathVariable Integer id, HttpSession sesion) {
 
-        if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+        sesionService.isLogged(sesion);
 
         if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
-            return ResponseEntity.status(403).body("No tenes permisos");
+            throw new ForbiddenException("No tenes permisos");
         }
 
-        try {
-            Optional<Usuario> u = usuarioService.listarUsuarioPorId(id);
-            return u.isPresent() ?
-                    ResponseEntity.ok().body(u.get())
-                    : ResponseEntity.status(404).body("No se encontro a ningun usuario");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error al filtrar usuarios");
-        }
+        Usuario u = usuarioService.listarUsuarioPorId(id);
+        return ResponseEntity.ok().body(u);
     }
+
 
     @GetMapping("/email/{email}")
     public ResponseEntity<?> filtrarUsuariosEmail(@PathVariable String email, HttpSession sesion) {
 
-        Optional<?> u;
-        try {
-            if (!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+        sesionService.isLogged(sesion);
 
-            if (sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
-                u = usuarioService.listarUsuariosPorEmailAdmin(email);
-            } else if (sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
-                u = usuarioService.listarUsuariosPorEmailEmpleador(email);
-            } else {
-                return ResponseEntity.status(403).body("No tenes permisos");
-            }
-            return u.isPresent() ?
-                    ResponseEntity.ok().body(u.get())
-                    : ResponseEntity.status(404).body("No se encontro a ningun usuario");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error al filtrar usuarios");
+        if (sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
+            return ResponseEntity.ok().body(usuarioService.listarUsuariosPorEmailAdmin(email));
+        } else if (sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
+            return ResponseEntity.ok().body(usuarioService.listarUsuariosPorEmailEmpleador(email));
+        } else {
+            throw new ForbiddenException("No tenes permisos");
         }
     }
 }

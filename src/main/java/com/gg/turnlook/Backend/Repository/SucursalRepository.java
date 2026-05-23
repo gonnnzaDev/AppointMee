@@ -10,5 +10,6 @@ public interface SucursalRepository extends JpaRepository<Sucursal, Integer> {
 
     Optional<Sucursal> findByNombre(String nombre);
     List<Sucursal> findByActivoTrue();
-    List<Sucursal> findByEmpleadorId(Integer empleadorId);
+    List<Sucursal> findByEmpleadorIdAndActivoTrue(Integer empleadorId);
+    boolean existsByDireccionIgnoreCase(String direccion);
 }

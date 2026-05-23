@@ -3,6 +3,7 @@ package com.gg.turnlook.Backend.Controllers;
 import com.gg.turnlook.Backend.DTO.ServicioCrearDTO;
 import com.gg.turnlook.Backend.DTO.ServicioModificarDTO;
 import com.gg.turnlook.Backend.Enum.ERol;
+import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
 import com.gg.turnlook.Backend.Model.Servicio;
 import com.gg.turnlook.Backend.Model.Sucursal;
 import com.gg.turnlook.Backend.Service.ServicioService;
@@ -36,134 +37,105 @@ public class ServicioController {
 
     @PostMapping("/crear")
     public ResponseEntity<?> crearServicio(@Valid @RequestBody ServicioCrearDTO servicio,
-                                           HttpSession sesion){
-        if(!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+                                           HttpSession sesion) {
 
-        if(!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name()) &&
-           !sesionService.tieneRol(sesion, ERol.EMPLEADO.name())){
-            return ResponseEntity.status(403).body("No tenes permisos");
+        sesionService.isLogged(sesion);
+
+        if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name()) &&
+                !sesionService.tieneRol(sesion, ERol.EMPLEADO.name())) {
+            throw new ForbiddenException("No tenes permisos");
         }
 
-        if(!sucursalService.enSucursal((Integer) sesion.getAttribute("userId"),
-            servicio.getSucursalId())){
-            return ResponseEntity.status(403).body("No perteneces a esta sucursal");
+        if (!sucursalService.enSucursal(sesionService.getUsuarioId(sesion), servicio.getSucursalId())) {
+            throw new ForbiddenException("No perteneces a esta sucursal");
         }
 
-        try{
-            servicioService.crearServicio(servicio);
-            return ResponseEntity.ok().body("Se creo el servicio");
-        }catch(Exception e){
-            return ResponseEntity.status(500).body("Hubo un error al crear el servicio");
-        }
+        servicioService.crearServicio(servicio);
+        return ResponseEntity.ok().body("Se creo el servicio");
     }
+
 
     @PatchMapping("/modificar/{id}")
-    public ResponseEntity<?> modificarServicio(@PathVariable("id") Integer servicioId,
+    public ResponseEntity<?> modificarServicio(@PathVariable("id") Integer id,
                                                @Valid @RequestBody ServicioModificarDTO servicio,
-                                               HttpSession sesion){
-        if(!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+                                               HttpSession sesion) {
+        sesionService.isLogged(sesion);
 
-        // ver si dsp admin tmb haria esto
-        if(!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name()) &&
-                !sesionService.tieneRol(sesion, ERol.EMPLEADO.name())){
-            return ResponseEntity.status(403).body("No tenes permisos");
+        if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name()) &&
+                !sesionService.tieneRol(sesion, ERol.EMPLEADO.name())) {
+            throw new ForbiddenException("No tenes permisos");
         }
 
-        if(!sucursalService.enSucursal((Integer) sesion.getAttribute("userId"),
-                servicio.getSucursalId())){
-            return ResponseEntity.status(403).body("No perteneces a esta sucursal");
+        if (!sucursalService.enSucursal(sesionService.getUsuarioId(sesion), servicio.getSucursalId())) {
+            throw new ForbiddenException("No perteneces a esta sucursal");
         }
 
-        try{
-            return servicioService.modificarServicio(servicio, servicioId).isPresent() ?
-                    ResponseEntity.ok().body("Se modifico el servicio correctamente")
-                  : ResponseEntity.status(404).body("No se encontro el servicio");
-        }catch(Exception e){
-            return ResponseEntity.status(500).body("Hubo un error al modificar el servicio");
-        }
+        servicioService.modificarServicio(servicio, id);
+        return ResponseEntity.ok().body("Se modificó el servicio correctamente");
     }
 
+
     @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<?> eliminarServicio(@PathVariable("id") Integer servicioId,
-                                              HttpSession sesion){
-        if(!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+    public ResponseEntity<?> eliminarServicio(@PathVariable("id") Integer id,
+                                              HttpSession sesion) {
+        sesionService.isLogged(sesion);
+        boolean esAdmin = sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name());
 
-        if(!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name()) &&
-                !sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())){
-            return ResponseEntity.status(403).body("No tenes permisos");
+        if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name()) && !esAdmin) {
+            throw new ForbiddenException("No tenes permisos");
         }
 
-        Optional<Servicio> servicio = servicioService.listarServicioPorId(servicioId);
-        if(servicio.isEmpty()) return ResponseEntity.status(404).body("No se encontro el servicio");
+        Servicio servicio = servicioService.listarServicioPorId(id);
 
-        if(!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
-           !sucursalService.enSucursal((Integer) sesion.getAttribute("userId"),
-             servicio.get().getSucursal().getId())){
-            return ResponseEntity.status(403).body("No perteneces a esta sucursal");
+        if (!esAdmin && !sucursalService.enSucursal(sesionService.getUsuarioId(sesion),
+                servicio.getSucursal().getId())) {
+            throw new ForbiddenException("No perteneces a esta sucursal");
         }
 
-        try{
-            servicioService.eliminarServicio(servicio.get());
-            return ResponseEntity.ok().body("Se elimino el servicio correctamente");
-        }catch (Exception e){
-            return ResponseEntity.status(500).body("Hubo un error al eliminar el servicio");
-        }
+        servicioService.eliminarServicio(servicio);
+        return ResponseEntity.ok().body("Se elimino el servicio correctamente");
     }
 
     // ver un endpoint para mostrar servicios x nombre con DTO para todo publico
 
     @GetMapping("/listar/{idSucursal}")
     public ResponseEntity<?> listarServicios(@PathVariable("idSucursal") Integer idSucursal,
-                                             HttpSession sesion){
+                                             HttpSession sesion) {
 
-        if(!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+        sesionService.isLogged(sesion);
+        boolean esAdmin = sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name());
 
-        if(!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
-           !sesionService.tieneRol(sesion, ERol.EMPLEADOR.name()) &&
-           !sesionService.tieneRol(sesion, ERol.EMPLEADO.name())){
-            return ResponseEntity.status(403).body("No tenes permisos");
+        if (!esAdmin && !sesionService.tieneRol(sesion, ERol.EMPLEADOR.name()) &&
+                !sesionService.tieneRol(sesion, ERol.EMPLEADO.name())) {
+            throw new ForbiddenException("No tenes permisos");
         }
 
-        Optional<Sucursal> sucursal = sucursalService.listarSucursalPorId(idSucursal);
-        if(sucursal.isEmpty()) return ResponseEntity.status(404).body("No se encontro la sucursal");
+        Sucursal sucursal = sucursalService.listarSucursalPorId(idSucursal);
 
         // mirar este mejor a ver si funca bien
-        if(!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
-            !sucursalService.enSucursal((Integer) sesion.getAttribute("userId"),
-                    sucursal.get().getId())){
-            return ResponseEntity.status(403).body("No perteneces a esta sucursal");
+        if (!esAdmin && !sucursalService.enSucursal(sesionService.getUsuarioId(sesion),
+                sucursal.getId())) {
+            throw new ForbiddenException("No perteneces a esta sucursal");
         }
 
-        List<?> servicios;
-       try{
-        if(sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())){
-           servicios = servicioService.listarServiciosPorSucursalAdmin(idSucursal);
-        } else{
-            // terminar este
-            servicios = servicioService.listarServiciosPorSucursal(idSucursal);
-        }
-            return ResponseEntity.ok().body(servicios);
-        }catch(Exception e){
-            return ResponseEntity.status(500).body("Hubo un error al listar los servicios");
+        if (esAdmin) {
+            return ResponseEntity.ok().body(servicioService.listarServiciosPorSucursalAdmin(idSucursal));
+        } else {
+            return ResponseEntity.ok().body(servicioService.listarServiciosPorSucursalPropia(idSucursal));
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> listarServiciosPorId(@PathVariable("id") Integer id, HttpSession sesion){
+    public ResponseEntity<?> listarServiciosPorId(@PathVariable("id") Integer id, HttpSession sesion) {
 
-        if(!sesionService.isLogged(sesion)) return ResponseEntity.status(401).body("No estas logeado");
+        sesionService.isLogged(sesion);
 
-        if(!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())){
-            return ResponseEntity.status(403).body("No tenes permisos");
+        // ver con twin dsp para q cada empleador vea el suyo
+        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
+            throw new ForbiddenException("No tenes permisos");
         }
 
-        try{
-            Optional<Servicio> servicio = servicioService.listarServicioPorId(id);
-            return servicio.isPresent() ?
-                   ResponseEntity.ok().body(servicio.get())
-                 : ResponseEntity.status(404).body("No se encontro el servicio");
-        }catch(Exception e){
-            return ResponseEntity.status(500).body("Hubo un error al listar los servicios");
-        }
+        Servicio servicio = servicioService.listarServicioPorId(id);
+        return ResponseEntity.ok().body(servicio);
     }
 }

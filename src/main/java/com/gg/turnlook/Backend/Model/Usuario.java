@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,7 +37,7 @@ public class Usuario {
     private String password;
 
     @Column(name = "fecha_creacion", nullable = false)
-    private LocalDateTime fechaCreacion;
+    private LocalDate fechaCreacion;
 
     @Column(nullable = false)
     private boolean activo = true;
@@ -59,7 +59,7 @@ public class Usuario {
 
     @PrePersist
     public void prePersist() {
-        this.fechaCreacion = LocalDateTime.now();
+        this.fechaCreacion = LocalDate.now();
         if (email != null) {
             email = email.toLowerCase();
         }

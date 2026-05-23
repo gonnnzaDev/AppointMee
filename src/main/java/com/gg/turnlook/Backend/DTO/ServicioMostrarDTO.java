@@ -16,5 +16,7 @@ public class ServicioMostrarDTO {
      private String descripcion;
      private Integer duracion;
      private BigDecimal precio;
-
+     private String nombreSucursal;
+     private String direccionSucursal;
+     private String categoriaSucursal;
 }
