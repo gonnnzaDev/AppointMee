@@ -43,25 +43,58 @@ function renderMyProfile(usuario) {
     }
 }
 
+const botonLogin = document.getElementById("login-button");
+
+if (botonLogin) {
+    /*
+        botonLogin.addEventListener("click", function () {
+    
+    
+            const mail = document.getElementById("login-mail-input");
+            const pass = document.getElementById("password-mail-input");
+    
+            if (!emailRegex.test(mail.value)) {
+                alert("Mail inválido");
+            } else if (pass.value.length < 4) {
+                alert("La contraseña debe tener al menos 4 caracteres");
+            } else {
+    
+                userExists(mail, pass)
+    
+            }
+    
+    
+    
+        });
+    */
+
+
+    botonLogin.addEventListener("click", () => {
+        window.location.href = "Index.html";
+
+    });
+
+}
+
 const cancelButton = document.getElementById("cancel-button");
 
 
 if (cancelButton) {
 
-    cancelButton.addEventListener("click",  () => {
+    cancelButton.addEventListener("click", () => {
         window.location.href = "Login.html";
     }
-        
+
     );
 }
 
 const registerButton = document.getElementById("register-button");
 
-if(registerButton){
+if (registerButton) {
 
-registerButton.addEventListener("click", () => {
-    window.location.href = "Register.html";
-});
+    registerButton.addEventListener("click", () => {
+        window.location.href = "Register.html";
+    });
 }
 
 
@@ -133,32 +166,6 @@ getUser();
 //renderiza todo el login 
 
 
-
-const botonLogin = document.getElementById("login-button");
-
-if (botonLogin) {
-
-    botonLogin.addEventListener("click", function () {
-
-
-        const mail = document.getElementById("login-mail-input");
-        const pass = document.getElementById("password-mail-input");
-
-        if (!emailRegex.test(mail.value)) {
-            alert("Mail inválido");
-        } else if (pass.value.length < 4) {
-            alert("La contraseña debe tener al menos 4 caracteres");
-        } else {
-
-            userExists(mail, pass)
-
-        }
-
-
-
-    });
-
-}
 
 
 

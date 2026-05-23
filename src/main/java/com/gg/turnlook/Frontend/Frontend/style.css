@@ -246,7 +246,7 @@ button:hover {
         width: 80%;
     }
     .credentials-form button{
-        width: 90%;
+        width: 95%;
     }
 }
 
@@ -260,7 +260,7 @@ button:hover {
         width: 80%;
     }
     .credentials-form button{
-        width: 80%;
+        width: 85%;
     }
 
 }
@@ -298,7 +298,8 @@ button:hover {
 
 .turn-content p {
     font-size: 0.85rem;
-    color: #cbd5e1;
+    color: white;
+
 }
 
 .turn-container a {
@@ -368,10 +369,11 @@ button:hover {
 .info-left-container input {
     width: 100%;
     padding: 12px;
-    margin-bottom: 15px;
-    border: none;
+    margin-bottom: 10px;
     border-radius: 10px;
-    background: #1e293b;
+    border: none;
+    outline: none;
+    background: #111;
     color: white;
 }
 
