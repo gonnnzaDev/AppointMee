@@ -11,13 +11,13 @@ function getUser(id) {
             "Content-Type": "application/json"
         }
     })
-    .then(res => res.json())
-    .then(usuario => {
-        renderMyProfile(usuario);
-    })
-    .catch(error => {
-        alert(error);
-    });
+        .then(res => res.json())
+        .then(usuario => {
+            renderMyProfile(usuario);
+        })
+        .catch(error => {
+            alert(error);
+        });
 
 }
 
@@ -25,9 +25,9 @@ function renderMyProfile(usuario) {
 
     const infoAccountDiv = document.getElementById("info-account");
 
-    if(infoAccountDiv){
+    if (infoAccountDiv) {
 
-    infoAccountDiv.innerHTML = `    
+        infoAccountDiv.innerHTML = `    
     <div class="profile-card">
     
     
@@ -40,8 +40,8 @@ function renderMyProfile(usuario) {
     
     </div>
     `;
-}
     }
+}
 
 
 
@@ -109,100 +109,74 @@ if (navbar) {
 //Esto carga la parte principal O Login de una
 renderLogin();
 
-getUser(1);
+getUser();
 
 //renderiza todo el login 
-function renderLogin() {
-
-    const container = document.getElementById("form-login");
-
-    if(container){
-
-
-    
-
-    container.innerHTML = `
-      
-
- <div class="login" id="info-login">
-                    <img src="https://cdn.discordapp.com/attachments/1492334072901533747/1502155047633424504/content.png?ex=69feae68&is=69fd5ce8&hm=373d791a61c3ae304c7d324ffe6da30d02ae77d062898b8284aacd23271ea4fb"
-                        alt="Login">
-
-                    <h1>AppointMee</h1>
-                    <div class="login-form">
-                        <div class="input-group mb-1">
-                            <input type="text" class="form-control" placeholder="Mail" aria-label="Username"
-                                aria-describedby="basic-addon1" id="login-mail-input">
-                        </div>
-                        <div class="input-group mb-1">
-                            <input type="password" class="form-control" placeholder="Password" aria-label="Password"
-                                aria-describedby="basic-addon1" id="password-mail-input">
-                        </div>
-
-
-                        <div class="vstack gap-1 mb-3">
-                            <button type="button" id="login-button">Login</button>
-                            
-                            <button type="button" id="google-button"><svg xmlns="http://www.w3.org/2000/svg" width="16"
-                                    height="16" fill="currentColor" class="bi bi-google" viewBox="0 0 16 16">
-                                    <path
-                                        d="M15.545 6.558a9.4 9.4 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.7 7.7 0 0 1 5.352 2.082l-2.284 2.284A4.35 4.35 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.8 4.8 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.7 3.7 0 0 0 1.599-2.431H8v-3.08z" />
-                                </svg>
-                            </button>
-                            <hr>
-                            <button type="button" id="register-button">Register</button>
-
-                        </div>
-                    </div>
-                </div>
-    `;
 
 
 
-    const botonLogin = document.getElementById("login-button");
+const botonLogin = document.getElementById("login-button");
 
-    if (botonLogin) {
+if (botonLogin) {
 
-        botonLogin.addEventListener("click", function () {
-
-
-            const mail = document.getElementById("login-mail-input");
-            const pass = document.getElementById("password-mail-input");
-
-            if (!emailRegex.test(mail.value)) {
-                alert("Mail inválido");
-            } else if (pass.value.length < 4) {
-                alert("La contraseña debe tener al menos 4 caracteres");
-            } else {
-
-                userExists(mail, pass)
-
-            }
+    botonLogin.addEventListener("click", function () {
 
 
+        const mail = document.getElementById("login-mail-input");
+        const pass = document.getElementById("password-mail-input");
 
-        });
+        if (!emailRegex.test(mail.value)) {
+            alert("Mail inválido");
+        } else if (pass.value.length < 4) {
+            alert("La contraseña debe tener al menos 4 caracteres");
+        } else {
 
-    }
-    
-    const registerButton = document.getElementById("register-button");
-    
-    const botonGoogle = document.getElementById("google-button");
-    
-    if (botonGoogle) {
-        
-        botonGoogle.addEventListener("click", function () {
-            signInWithGoogle();
-        });
-        
-    }
-    
-    //Esto cambia la info del div y pone la info del register
-    registerButton.addEventListener("click", renderRegister);
-}
+            userExists(mail, pass)
+
+        }
+
+
+
+    });
+
 }
 
 
+
+
+
+const botonGoogle = document.getElementById("google-button");
+
+if (botonGoogle) {
+
+    botonGoogle.addEventListener("click", function () {
+        signInWithGoogle();
+    });
+
+}
+
+const registerButton = document.getElementById("register-button");
+
+if(registerButton){
+
+registerButton.addEventListener("click", () => {
+    window.location.href = "Register.html";
+});
+}
+
+
+const cancelButton = document.getElementById("cancel-button");
+
+
+if (cancelButton) {
+
+    cancelButton.addEventListener("click",  () => {
+        window.location.href = "Login.html";
+    }
+        
+    );
+
+}
 
 
 //esta funcion la llama el boton de google es el funcionamiento
@@ -257,118 +231,56 @@ function userExists(mail, pass) {
 
 
 
-
-
 //render de register para que funcione en la misma pagina q el login
-function renderRegister() {
+const registerPerson = document.getElementById("register-person");
 
-    const container = document.getElementById("form-login");
+if (registerPerson) {
 
-    if(container){
+    registerPerson.addEventListener("click", function () {
 
-
-    container.innerHTML = `
-        <div class="form-register">
-
-                            <div class="input-group mb-1">
-                                <input type="text" class="form-control" placeholder="Name" aria-label="Username"
-                                    aria-describedby="basic-addon1" id="register-name-input">
-                            </div>
-                            <div class="input-group mb-1">
-                                <input type="text" class="form-control" placeholder="Surname" aria-label="Username"
-                                    aria-describedby="basic-addon1" id="register-surname-input">
-                            </div>
-                            <div class="input-group mb-1">
-                                <input type="text" class="form-control" placeholder="Mail" aria-label="Username"
-                                    aria-describedby="basic-addon1" id="register-mail-input">
-                            </div>
-                            <div class="input-group mb-1">
-                                <input type="password" class="form-control" placeholder="Password" aria-label="Password"
-                                    aria-describedby="basic-addon1" id="register-password1-input">
-                            </div>
-
-                            <div class="input-group mb-1">
-                                <input type="password" class="form-control" placeholder="Confirm Password"
-                                    aria-label="Password" aria-describedby="basic-addon1" id="register-password2-input">
-                            </div>
+        const name = document.getElementById("register-name-input").value;
+        const surname = document.getElementById("register-surname-input").value;
+        const mail = document.getElementById("register-mail-input").value;
+        const pass1 = document.getElementById("register-password1-input").value;
+        const pass2 = document.getElementById("register-password2-input").value;
 
 
-                            <div class="vstack gap-1 mb-3">
-                                <button type="button" id="register-person">  > </button>
+        if (
+            name.trim() === "" ||
+            surname.trim() === "" ||
+            mail.trim() === "" ||
+            pass1.trim() === "" ||
+            pass2.trim() === ""
+        ) {
+            alert("Completá todos los campos");
+        }
 
-                            </div>
-                               <div class="vstack gap-1 mb-3">
-                                <button type="button" id="cancel-button">Cancel</button>
+        else if (!emailRegex.test(mail)) {
+            alert("Mail inválido");
+        }
 
-                            </div>
-                        </div>
-    `;
+        else if (pass1.length < 8) {
+            alert("La contraseña debe tener mínimo 8 caracteres");
+        }
 
+        else if (pass1 !== pass2) {
+            alert("Las contraseñas no coinciden");
+        }
 
-    //Aca esta la autenticacion previa a registrar una persona
+        else {
 
-    const registerPerson = document.getElementById("register-person");
+            postUser(name, surname, mail, pass1);
 
-    if (registerPerson) {
-
-        registerPerson.addEventListener("click", function () {
-
-            const name = document.getElementById("register-name-input").value;
-            const surname = document.getElementById("register-surname-input").value;
-            const mail = document.getElementById("register-mail-input").value;
-            const pass1 = document.getElementById("register-password1-input").value;
-            const pass2 = document.getElementById("register-password2-input").value;
-
-
-            if (
-                name.trim() === "" ||
-                surname.trim() === "" ||
-                mail.trim() === "" ||
-                pass1.trim() === "" ||
-                pass2.trim() === ""
-            ) {
-                alert("Completá todos los campos");
-            }
-
-            else if (!emailRegex.test(mail)) {
-                alert("Mail inválido");
-            }
-
-            else if (pass1.length < 8) {
-                alert("La contraseña debe tener mínimo 8 caracteres");
-            }
-
-            else if (pass1 !== pass2) {
-                alert("Las contraseñas no coinciden");
-            }
-
-            else {
-
-                postUser(name, surname, mail, pass1);
-
-            }
+        }
 
 
 
-        });
-
-    }
-    const cancelButton = document.getElementById("cancel-button");
-
-
-    if (cancelButton) {
-
-        cancelButton.addEventListener("click", renderLogin);
-
-    }
-    }
-
-
-
-
-
+    });
 
 }
+
+
+
 
 //esto hace el post de usuarios desde el login
 
