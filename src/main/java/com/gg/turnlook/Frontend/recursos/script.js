@@ -25,14 +25,37 @@ function renderMyProfile(usuario) {
     `;
     }
 }
+
+function renderSucursal(sucursal) {
+
+    const infoSucursalDiv = document.getElementById("info-sucursal");
+
+    if (infoSucursalDiv) {
+        /*
+                infoSucursalDiv.innerHTML = `    
+            <div class="profile-card">
+            
+            
+            <img src="https://i.pinimg.com/236x/63/25/10/632510e53b3ae17f36993d7993c9fe8f.jpg" alt="">
+            <h3>Nombre: ${sucursal.nombre}</h3>
+            <h3>Direccion: ${sucursal.direccion}</h3>
+            <h3>Telefono: ${sucursal.telefono}</h3>
+            <h3>Descripcion: ${sucursal.descripcion}</h3>
+            <h3>Categoria: ${sucursal.categoria}</h3>
+            <h3>Empleador: ${sucursal.empleador.nombre}</h3>
+            </div>
+            `;
+        */
+    }
+}
+
+
 function getUser(id) {
     fetch(`http://localhost:8080/usuarios/${id}`)
         .then(async res => {
-
             if (!res.ok) {
                 throw new Error("Error del servidor");
             }
-
             return res.json();
         })
         .then(usuario => {
