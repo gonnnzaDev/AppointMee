@@ -2,7 +2,7 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // regla q todos los email debe
 
 document.querySelector("form")?.addEventListener("submit", e => e.preventDefault());
 
-getUser(1);
+getUser(0);
 
 function getUser(id) {
     fetch(`http://localhost:8080/usuarios/${id}`, {
@@ -312,5 +312,4 @@ function postUser(name, surname, mail, pass) {
             alert(error);
         });
 }
-
 
