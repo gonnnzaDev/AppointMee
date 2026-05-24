@@ -433,6 +433,7 @@ button:hover {
         padding: 20px;
     }
 
+   
     .profile-card {
         flex-direction: column;
         text-align: center;
@@ -449,7 +450,13 @@ button:hover {
         margin-left: 10px;
         font-size: 14px;
     }
+     .about-container {
+        margin: 0px;
+    }
+
 }
+
+
 
 @media (max-width: 400px) {
     .profile-card {

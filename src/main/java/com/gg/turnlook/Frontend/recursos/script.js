@@ -2,24 +2,7 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // regla q todos los email debe
 
 document.querySelector("form")?.addEventListener("submit", e => e.preventDefault());
 
-getUser(0);
-
-function getUser(id) {
-    fetch(`http://localhost:8080/usuarios/${id}`, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json"
-        }
-    })
-        .then(res => res.json())
-        .then(usuario => {
-            renderMyProfile(usuario);
-        })
-        .catch(error => {
-            alert(error);
-        });
-
-}
+getUser(1);
 
 function renderMyProfile(usuario) {
 
@@ -42,37 +25,59 @@ function renderMyProfile(usuario) {
     `;
     }
 }
+function getUser(id) {
+    fetch(`http://localhost:8080/usuarios/${id}`)
+        .then(async res => {
+
+            if (!res.ok) {
+                throw new Error("Error del servidor");
+            }
+
+            return res.json();
+        })
+        .then(usuario => {
+            renderMyProfile(usuario);
+        })
+        .catch(error => {
+            alert(error);
+        });
+}
+
+
 
 const botonLogin = document.getElementById("login-button");
 
 if (botonLogin) {
-    /*
-        botonLogin.addEventListener("click", function () {
-    
-    
-            const mail = document.getElementById("login-mail-input");
-            const pass = document.getElementById("password-mail-input");
-    
-            if (!emailRegex.test(mail.value)) {
-                alert("Mail inválido");
-            } else if (pass.value.length < 4) {
-                alert("La contraseña debe tener al menos 4 caracteres");
+    botonLogin.addEventListener("click", async function () {
+
+        const mail = document.getElementById("login-mail-input");
+        const pass = document.getElementById("password-mail-input");
+
+        if (!emailRegex.test(mail.value)) {
+
+            alert("Mail inválido");
+
+        } else if (pass.value.length < 4) {
+
+            alert("La contraseña debe tener al menos 4 caracteres");
+
+        } else {
+
+            const existe = await userExists(mail, pass);
+
+            if (existe) {
+
+                window.location.href = "Index.html";
+
             } else {
-    
-                userExists(mail, pass)
-    
+
+                alert("Usuario o contraseña incorrectos");
+
             }
-    
-    
-    
-        });
-    */
-
-
-    botonLogin.addEventListener("click", () => {
-        window.location.href = "Index.html";
-
+        }
     });
+
+
 
 }
 
@@ -158,12 +163,6 @@ if (navbar) {
 `;
 }
 
-//Esto carga la parte principal O Login de una
-renderLogin();
-
-getUser();
-
-//renderiza todo el login 
 
 
 
@@ -228,14 +227,35 @@ window.renderGoogleButton = function () {
 
 
 
-//este verifica q el usuario exista
+async function userExists(mail, pass) {
 
-function userExists(mail, pass) {
+    try {
 
-    return alert("Paso!");
+        const response = await fetch(
+            "http://localhost:8080/usuarios/inicio_sesion",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: mail.value,
+                    pass: pass.value
+                })
+            }
+        );
+
+        if (!response.ok) {
+            return false;
+        }
+
+        return true;
+
+    } catch (error) {
+        alert(error.message);
+        return false;
+    }
 }
-
-
 
 //render de register para que funcione en la misma pagina q el login
 const registerPerson = document.getElementById("register-person");
@@ -285,6 +305,47 @@ if (registerPerson) {
 
 }
 
+const realizarRegistroBoton = document.getElementById("realizar-registro-button");
+
+if (realizarRegistroBoton) {
+    realizarRegistroBoton.addEventListener("click", cargarUsuarios);
+}
+
+
+
+function cargarUsuarios() {
+
+
+    const name = document.getElementById("register-name-input").value;
+    const surname = document.getElementById("register-surname-input").value;
+    const mail = document.getElementById("register-mail-input").value;
+    const pass1 = document.getElementById("register-password1-input").value;
+    const pass2 = document.getElementById("register-password2-input").value;
+
+    if (pass1 !== pass2) {
+        alert("Las contraseñas no coinciden");
+        return;
+    }
+    if (name.trim() === "") {
+        alert("El nombre no puede estar vacio");
+        return;
+    }
+    if (surname.trim() === "") {
+        alert("El apellido no puede estar vacio");
+        return;
+    }
+    if (mail.trim() === "") {
+        alert("El mail no puede estar vacio");
+        return;
+    }
+    if (pass1.trim() === "") {
+        alert("La contraseña no puede estar vacia");
+        return;
+    }
+
+    postUser(name, surname, mail, pass1);
+
+}
 
 
 
