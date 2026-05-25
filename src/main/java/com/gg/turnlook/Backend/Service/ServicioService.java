@@ -1,8 +1,8 @@
 package com.gg.turnlook.Backend.Service;
 
-import com.gg.turnlook.Backend.DTO.ServicioCrearDTO;
-import com.gg.turnlook.Backend.DTO.ServicioModificarDTO;
-import com.gg.turnlook.Backend.DTO.ServicioMostrarDTO;
+import com.gg.turnlook.Backend.DTO.Servicio.ServicioCrearDTO;
+import com.gg.turnlook.Backend.DTO.Servicio.ServicioModificarDTO;
+import com.gg.turnlook.Backend.DTO.Servicio.ServicioMostrarDTO;
 import com.gg.turnlook.Backend.Excepciones.ConflictException;
 import com.gg.turnlook.Backend.Excepciones.NotFoundException;
 import com.gg.turnlook.Backend.Model.Servicio;
@@ -10,10 +10,8 @@ import com.gg.turnlook.Backend.Model.Sucursal;
 import com.gg.turnlook.Backend.Repository.ServicioRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class ServicioService {

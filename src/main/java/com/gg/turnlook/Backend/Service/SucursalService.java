@@ -1,9 +1,9 @@
 package com.gg.turnlook.Backend.Service;
 
-import com.gg.turnlook.Backend.DTO.SucursalCrearDTO;
-import com.gg.turnlook.Backend.DTO.SucursalModificarDTO;
-import com.gg.turnlook.Backend.DTO.SucursalMostrarDTO;
-import com.gg.turnlook.Backend.DTO.UsuarioMostrarDTO;
+import com.gg.turnlook.Backend.DTO.Sucursal.SucursalCrearDTO;
+import com.gg.turnlook.Backend.DTO.Sucursal.SucursalModificarDTO;
+import com.gg.turnlook.Backend.DTO.Sucursal.SucursalMostrarDTO;
+import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmpleadorResponseDTO;
 import com.gg.turnlook.Backend.Excepciones.ConflictException;
 import com.gg.turnlook.Backend.Excepciones.NotFoundException;
 import com.gg.turnlook.Backend.Model.Categoria;
@@ -107,16 +107,16 @@ public class SucursalService {
         dto.setFechaCreacion(suc.getFechaCreacion());
         dto.setCategoria(suc.getCategoria().getCategoria());
 
-        UsuarioMostrarDTO empleador = new UsuarioMostrarDTO(
+        UsuarioEmpleadorResponseDTO empleador = new UsuarioEmpleadorResponseDTO(
                 suc.getEmpleador().getNombre(),
                 suc.getEmpleador().getApellido(),
                 suc.getEmpleador().getEmail()
         );
         dto.setEmpleador(empleador);
 
-        Set<UsuarioMostrarDTO> empleadosDTO = suc.getEmpleados()
+        Set<UsuarioEmpleadorResponseDTO> empleadosDTO = suc.getEmpleados()
                 .stream()
-                .map(u -> new UsuarioMostrarDTO(
+                .map(u -> new UsuarioEmpleadorResponseDTO(
                         u.getNombre(),
                         u.getApellido(),
                         u.getEmail()

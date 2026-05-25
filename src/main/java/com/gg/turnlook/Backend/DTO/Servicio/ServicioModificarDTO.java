@@ -1,4 +1,4 @@
-package com.gg.turnlook.Backend.DTO;
+package com.gg.turnlook.Backend.DTO.Servicio;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;

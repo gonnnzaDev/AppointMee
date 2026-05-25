@@ -1,5 +1,6 @@
-package com.gg.turnlook.Backend.DTO;
+package com.gg.turnlook.Backend.DTO.Sucursal;
 
+import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmpleadorResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,6 @@ public class SucursalMostrarDTO {
      private String descripcion;
      private LocalDate fechaCreacion;
      private String categoria;
-     private UsuarioMostrarDTO empleador;
-     private Set<UsuarioMostrarDTO> empleados;
+     private UsuarioEmpleadorResponseDTO empleador;
+     private Set<UsuarioEmpleadorResponseDTO> empleados;
 }
