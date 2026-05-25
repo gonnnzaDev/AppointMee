@@ -1,5 +1,6 @@
 package com.gg.turnlook.Backend.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -42,8 +43,6 @@ public class Usuario {
     @Column(nullable = false)
     private boolean activo = true;
 
-    // ver si dsp meto el onetomany de sucursales(list) para mostrar mas piola
-
     @ManyToMany()
     @JoinTable(
             name = "usuario_roles",
@@ -54,7 +53,7 @@ public class Usuario {
     private Set<Rol> roles = new HashSet<>();
 
     @ManyToMany(mappedBy = "empleados")
-    @JsonIgnoreProperties("empleados")
+    @JsonIgnore
     private Set<Sucursal> sucursalesEmpleado = new HashSet<>();
 
     @PrePersist

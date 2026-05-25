@@ -1,7 +1,7 @@
 package com.gg.turnlook.Backend.Controllers;
 
-import com.gg.turnlook.Backend.DTO.SucursalCrearDTO;
-import com.gg.turnlook.Backend.DTO.SucursalModificarDTO;
+import com.gg.turnlook.Backend.DTO.Sucursal.SucursalCrearDTO;
+import com.gg.turnlook.Backend.DTO.Sucursal.SucursalModificarDTO;
 import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
 import com.gg.turnlook.Backend.Model.Sucursal;
@@ -13,9 +13,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/sucursales")

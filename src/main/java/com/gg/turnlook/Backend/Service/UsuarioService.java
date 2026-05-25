@@ -1,7 +1,8 @@
 package com.gg.turnlook.Backend.Service;
 
 import com.gg.turnlook.Backend.DTO.LoginDTO;
-import com.gg.turnlook.Backend.DTO.UsuarioModificarDTO;
+import com.gg.turnlook.Backend.DTO.Sucursal.SucursalMiniDTO;
+import com.gg.turnlook.Backend.DTO.Usuario.*;
 import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Excepciones.ConflictException;
 import com.gg.turnlook.Backend.Excepciones.NotFoundException;
@@ -10,13 +11,10 @@ import com.gg.turnlook.Backend.Model.Rol;
 import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Repository.RolRepository;
 import com.gg.turnlook.Backend.Repository.UsuarioRepository;
-import com.gg.turnlook.Backend.DTO.UsuarioCrearDTO;
-import com.gg.turnlook.Backend.DTO.UsuarioMostrarDTO;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -39,7 +37,7 @@ public class UsuarioService {
 
     public Usuario inicioSesion(LoginDTO login) {
 
-        Usuario u = usRepo.findByEmail(login.getEmail())
+        Usuario u = usRepo.findByEmailAndActivoTrue(login.getEmail())
                 .orElseThrow(() -> new UnauthorizedException("Credenciales incorrectas"));
 
         if (!passEncoder.matches(login.getPass(), u.getPassword())) {
@@ -94,16 +92,19 @@ public class UsuarioService {
     }
 
 
-    public List<Usuario> listarUsuarios() {
-        return usRepo.findByActivoTrue();
+    public List<UsuarioAdminResponseDTO> listarUsuarios() {
+        return usRepo.findByActivoTrue().stream()
+                .map(u -> new UsuarioAdminResponseDTO(
+                        u.getId(), u.getNombre(), u.getApellido(), u.isActivo()))
+                .toList();
     }
 
-
+    // ver si despues lo saco
     public List<Usuario> listarUsuariosEliminados() {
         return usRepo.findByActivoFalse();
     }
 
-
+    // ver si despues lo saco
     public List<Usuario> filtrarListaUsuarios(String nombre, String apellido, Boolean activo) {
         return usRepo.findAll().stream()
                 .filter(u -> nombre == null || u.getNombre().equalsIgnoreCase(nombre))
@@ -113,21 +114,43 @@ public class UsuarioService {
     }
 
 
-    public Usuario listarUsuariosPorEmailAdmin(String email) {
-        return usRepo.findByEmail(email).
+    public UsuarioAdminResponseDTO listarUsuariosPorEmailAdmin(String email) {
+        Usuario u = usRepo.findByEmailAndActivoTrue(email).
                 orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+
+        return new UsuarioAdminResponseDTO(u.getId(), u.getNombre(),
+                u.getApellido(), u.isActivo());
     }
 
 
-    public UsuarioMostrarDTO listarUsuariosPorEmailEmpleador(String email) {
-        Usuario aux = listarUsuariosPorEmailAdmin(email);
-        return new UsuarioMostrarDTO(aux.getNombre(), aux.getApellido(), aux.getEmail());
+    public UsuarioEmpleadorResponseDTO listarUsuariosPorEmailEmpleador(String email) {
+        Usuario u = usRepo.findByEmailAndActivoTrue(email).
+                orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+
+        return new UsuarioEmpleadorResponseDTO(u.getNombre(), u.getApellido(), u.getEmail());
     }
 
 
     public Usuario listarUsuarioPorId(Integer id) {
         return usRepo.findById(id).
                 orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+    }
+
+    public UsuarioPerfilResponseDTO verPerfilPorId(Integer id) {
+        Usuario u = listarUsuarioPorId(id);
+        UsuarioPerfilResponseDTO uPerfil = new UsuarioPerfilResponseDTO();
+
+        uPerfil.setId(u.getId());
+        uPerfil.setNombre(u.getNombre());
+        uPerfil.setApellido(u.getApellido());
+        uPerfil.setEmail(u.getEmail());
+        uPerfil.setFechaCreacion(u.getFechaCreacion());
+        uPerfil.setRoles(setRolesComoString(u));
+        uPerfil.setSucursalesEmpleado(u.getSucursalesEmpleado().stream()
+                .map(suc -> new SucursalMiniDTO(suc.getId(), suc.getNombre(),
+                        suc.getCategoria().getCategoria())).collect(Collectors.toSet()));
+
+        return uPerfil;
     }
 }
 

@@ -1,21 +1,19 @@
 package com.gg.turnlook.Backend.Controllers;
 
 import com.gg.turnlook.Backend.DTO.LoginDTO;
-import com.gg.turnlook.Backend.DTO.UsuarioModificarDTO;
+import com.gg.turnlook.Backend.DTO.Usuario.UsuarioModificarDTO;
 import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
 import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Service.SesionService;
 import com.gg.turnlook.Backend.Service.UsuarioService;
-import com.gg.turnlook.Backend.DTO.UsuarioCrearDTO;
+import com.gg.turnlook.Backend.DTO.Usuario.UsuarioCrearDTO;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -132,12 +130,12 @@ public class UsuarioController {
 
         sesionService.isLogged(sesion);
 
-        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
+        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
+            !Objects.equals(id, sesionService.getUsuarioId(sesion))) {
             throw new ForbiddenException("No tenes permisos");
         }
 
-        Usuario u = usuarioService.listarUsuarioPorId(id);
-        return ResponseEntity.ok().body(u);
+        return ResponseEntity.ok().body(usuarioService.verPerfilPorId(id));
     }
 
 
