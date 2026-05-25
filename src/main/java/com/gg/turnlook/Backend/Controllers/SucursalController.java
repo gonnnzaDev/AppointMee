@@ -31,6 +31,8 @@ public class SucursalController {
 
     /// ENDPOINTS
 
+    // endpoint para empezar a crear tu sucursal (dsp lo hag)
+
     // dsp cambiar a spring security para validar sin http sesion manual
     @PostMapping("/crear")
     public ResponseEntity<?> crearSucursal(
@@ -90,20 +92,10 @@ public class SucursalController {
 
         sesionService.isLogged(sesion);
 
-        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
-                !sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
-            throw new ForbiddenException("No tenes permisos");
-        }
-
-        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
-            Integer empleadorId = sesionService.getUsuarioId(sesion);
-            return ResponseEntity.ok().body(sucursalService.listarSucursalesPropias(empleadorId));
-        } else {
-            return ResponseEntity.ok().body(sucursalService.listarSucursales());
-        }
+        return ResponseEntity.ok().body(sucursalService.listarSucursales());
     }
 
-
+    // mejorar este dsp q ahora es bastante inutil
     @GetMapping("/listar/filtrar")
     public ResponseEntity<?> filtrarListaSucursales(@RequestParam(required = false) String nombre,
                                                     @RequestParam(required = false) Boolean activo,
@@ -125,20 +117,27 @@ public class SucursalController {
     public ResponseEntity<?> sucursalPorId(@PathVariable("id") Integer id, HttpSession sesion) {
 
         sesionService.isLogged(sesion);
+
+        return ResponseEntity.ok().body(sucursalService.verSucursalPorId(id));
+    }
+
+    @GetMapping("/empleados/{sucursalId}")
+    public ResponseEntity<?> empleadosPorSucursal(@PathVariable("sucursalId") Integer sucursalId,
+                                                  HttpSession sesion){
+        sesionService.isLogged(sesion);
         boolean esAdmin = sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name());
 
-        if (!esAdmin && !sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
+        if(!esAdmin && !sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())){
             throw new ForbiddenException("No tenes permisos");
         }
 
-        Sucursal sucursal = sucursalService.listarSucursalPorId(id);
+        Sucursal suc = sucursalService.listarSucursalPorId(sucursalId);
 
-        if (!esAdmin && !Objects.equals(sucursal.getEmpleador().getId(),
-               sesionService.getUsuarioId(sesion))) {
-            throw new ForbiddenException("Esta sucursal no te pertenece");
+        if (!esAdmin && !Objects.equals(sesionService.getUsuarioId(sesion), suc.getEmpleador().getId())) {
+            throw new ForbiddenException("No tenes permisos");
         }
 
-        return esAdmin ? ResponseEntity.ok().body(sucursal)
-                : ResponseEntity.ok().body(sucursalService.mapearSucursal(sucursal));
+        return esAdmin ? ResponseEntity.ok().body(sucursalService.verEmpleadosAdmin(sucursalId))
+                : ResponseEntity.ok().body(sucursalService.verEmpleadosEmpleador(sucursalId));
     }
 }

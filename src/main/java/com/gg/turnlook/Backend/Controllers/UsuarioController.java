@@ -1,6 +1,6 @@
 package com.gg.turnlook.Backend.Controllers;
 
-import com.gg.turnlook.Backend.DTO.LoginDTO;
+import com.gg.turnlook.Backend.DTO.Usuario.LoginDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioModificarDTO;
 import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Excepciones.ForbiddenException;

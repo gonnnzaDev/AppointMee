@@ -1,6 +1,6 @@
 package com.gg.turnlook.Backend.Service;
 
-import com.gg.turnlook.Backend.DTO.LoginDTO;
+import com.gg.turnlook.Backend.DTO.Usuario.LoginDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalMiniDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.*;
 import com.gg.turnlook.Backend.Enum.ERol;
@@ -136,7 +136,13 @@ public class UsuarioService {
                 orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
     }
 
+
     public UsuarioPerfilResponseDTO verPerfilPorId(Integer id) {
+        return mapearUsuario(id);
+    }
+
+
+    public UsuarioPerfilResponseDTO mapearUsuario(Integer id){
         Usuario u = listarUsuarioPorId(id);
         UsuarioPerfilResponseDTO uPerfil = new UsuarioPerfilResponseDTO();
 

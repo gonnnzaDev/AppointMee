@@ -1,9 +1,12 @@
 package com.gg.turnlook.Backend.Service;
 
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalCrearDTO;
+import com.gg.turnlook.Backend.DTO.Sucursal.SucursalMiniDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalModificarDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalMostrarDTO;
+import com.gg.turnlook.Backend.DTO.Usuario.UsuarioAdminResponseDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmpleadorResponseDTO;
+import com.gg.turnlook.Backend.DTO.Usuario.UsuarioMiniDTO;
 import com.gg.turnlook.Backend.Excepciones.ConflictException;
 import com.gg.turnlook.Backend.Excepciones.NotFoundException;
 import com.gg.turnlook.Backend.Model.Categoria;
@@ -48,6 +51,7 @@ public class SucursalService {
                 sucursal.get().getEmpleador().equals(usuario.get());
     }
 
+
     public void crearSucursal(SucursalCrearDTO sucursal, Integer userId) {
 
         Categoria cat = catRepo.findById(sucursal.getCategoriaId()).
@@ -60,6 +64,7 @@ public class SucursalService {
 
         sucRepo.save(suc);
     }
+
 
     public void modificarSucursal(SucursalModificarDTO sucursal, Sucursal suc) {
 
@@ -82,6 +87,7 @@ public class SucursalService {
         sucRepo.save(suc);
     }
 
+
     public void eliminarSucursal(Integer id) {
         Sucursal sucursal = listarSucursalPorId(id);
         //sucRepo.delete(sucursal.get());  ver si dejo este o el de activo -> false
@@ -89,14 +95,23 @@ public class SucursalService {
         sucRepo.save(sucursal);
     }
 
-    public List<Sucursal> listarSucursales() {
-        return sucRepo.findByActivoTrue();
+
+    public List<SucursalMiniDTO> listarSucursales() {
+        return sucRepo.findByActivoTrue().stream()
+                .map(suc -> new SucursalMiniDTO(suc.getId(), suc.getNombre(),
+                        suc.getCategoria().getCategoria()))
+                .toList();
     }
 
-    public List<SucursalMostrarDTO> listarSucursalesPropias(Integer userId) {
-        List<Sucursal> sucursales = sucRepo.findByEmpleadorIdAndActivoTrue(userId);
-        return mapearSucursales(sucursales);
+
+    // ver si hago endpoint para listar sucursales eliminadas
+
+
+    public SucursalMostrarDTO verSucursalPorId(Integer id) {
+        Sucursal sucursal = listarSucursalPorId(id);
+        return mapearSucursal(sucursal);
     }
+
 
     public SucursalMostrarDTO mapearSucursal(Sucursal suc) {
         SucursalMostrarDTO dto = new SucursalMostrarDTO();
@@ -107,19 +122,17 @@ public class SucursalService {
         dto.setFechaCreacion(suc.getFechaCreacion());
         dto.setCategoria(suc.getCategoria().getCategoria());
 
-        UsuarioEmpleadorResponseDTO empleador = new UsuarioEmpleadorResponseDTO(
+        UsuarioMiniDTO empleador = new UsuarioMiniDTO(
                 suc.getEmpleador().getNombre(),
-                suc.getEmpleador().getApellido(),
-                suc.getEmpleador().getEmail()
+                suc.getEmpleador().getApellido()
         );
         dto.setEmpleador(empleador);
 
-        Set<UsuarioEmpleadorResponseDTO> empleadosDTO = suc.getEmpleados()
+        Set<UsuarioMiniDTO> empleadosDTO = suc.getEmpleados()
                 .stream()
-                .map(u -> new UsuarioEmpleadorResponseDTO(
+                .map(u -> new UsuarioMiniDTO(
                         u.getNombre(),
-                        u.getApellido(),
-                        u.getEmail()
+                        u.getApellido()
                 ))
                 .collect(Collectors.toSet());
         dto.setEmpleados(empleadosDTO);
@@ -127,12 +140,6 @@ public class SucursalService {
         return dto;
     }
 
-    public List<SucursalMostrarDTO> mapearSucursales(List<Sucursal> sucursales){
-        List<SucursalMostrarDTO> sucursalesDTO = new ArrayList<>();
-        return sucursales.stream()
-                .map(suc -> mapearSucursal(suc))
-                .toList();
-    }
 
     public List<Sucursal> filtrarListaSucursales(String nombre, Boolean activo,
                                                  Integer catId, Integer userId) {
@@ -145,8 +152,27 @@ public class SucursalService {
                 toList();
     }
 
+
     public Sucursal listarSucursalPorId(Integer id) {
         return sucRepo.findById(id).
                 orElseThrow(() -> new NotFoundException("No se encontró la sucursal"));
+    }
+
+
+    public Set<UsuarioAdminResponseDTO> verEmpleadosAdmin(Integer sucursalId) {
+        Sucursal suc = listarSucursalPorId(sucursalId);
+        return suc.getEmpleados().stream().
+                map(u -> new UsuarioAdminResponseDTO(u.getId(),
+                        u.getNombre(), u.getApellido(), u.isActivo()))
+                .collect(Collectors.toSet());
+    }
+
+
+    public Set<UsuarioEmpleadorResponseDTO> verEmpleadosEmpleador(Integer sucursalId) {
+        Sucursal suc = listarSucursalPorId(sucursalId);
+        return suc.getEmpleados().stream().
+                map(u -> new UsuarioEmpleadorResponseDTO(u.getNombre(),
+                        u.getApellido(), u.getEmail()))
+                .collect(Collectors.toSet());
     }
 }
