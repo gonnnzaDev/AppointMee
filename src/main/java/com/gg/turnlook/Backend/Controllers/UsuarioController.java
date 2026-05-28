@@ -32,7 +32,7 @@ public class UsuarioController {
 
 
     @PostMapping("/inicio_sesion")
-    public ResponseEntity<?> iniciarSesion(@RequestBody LoginDTO login,
+    public ResponseEntity<?> iniciarSesion(@Valid @RequestBody LoginDTO login,
                                            HttpSession sesion) {
         Usuario u = usuarioService.inicioSesion(login);
 
