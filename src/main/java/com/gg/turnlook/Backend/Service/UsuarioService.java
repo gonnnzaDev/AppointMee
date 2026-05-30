@@ -114,20 +114,24 @@ public class UsuarioService {
     }
 
 
-    public UsuarioAdminResponseDTO listarUsuariosPorEmailAdmin(String email) {
-        Usuario u = usRepo.findByEmailAndActivoTrue(email).
-                orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+    public UsuarioAdminResponseDTO listarUsuariosPorEmailAdmin(UsuarioEmailDTO email) {
+        Usuario u = listarUsuarioPorEmail(email.getEmail());
 
         return new UsuarioAdminResponseDTO(u.getId(), u.getNombre(),
                 u.getApellido(), u.isActivo());
     }
 
 
-    public UsuarioEmpleadorResponseDTO listarUsuariosPorEmailEmpleador(String email) {
-        Usuario u = usRepo.findByEmailAndActivoTrue(email).
-                orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+    public UsuarioEmpleadorResponseDTO listarUsuariosPorEmailEmpleador(UsuarioEmailDTO email) {
+        Usuario u = listarUsuarioPorEmail(email.getEmail());
 
         return new UsuarioEmpleadorResponseDTO(u.getNombre(), u.getApellido(), u.getEmail());
+    }
+
+
+    public Usuario listarUsuarioPorEmail(String email){
+        return usRepo.findByEmailAndActivoTrue(email).
+                orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
     }
 
 

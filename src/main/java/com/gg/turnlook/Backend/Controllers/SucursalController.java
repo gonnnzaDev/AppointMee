@@ -2,6 +2,7 @@ package com.gg.turnlook.Backend.Controllers;
 
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalCrearDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalModificarDTO;
+import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmailDTO;
 import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
 import com.gg.turnlook.Backend.Model.Sucursal;
@@ -121,7 +122,7 @@ public class SucursalController {
         return ResponseEntity.ok().body(sucursalService.verSucursalPorId(id));
     }
 
-    @GetMapping("/empleados/{sucursalId}")
+    @GetMapping("/{sucursalId}/empleados")
     public ResponseEntity<?> empleadosPorSucursal(@PathVariable("sucursalId") Integer sucursalId,
                                                   HttpSession sesion){
         sesionService.isLogged(sesion);
@@ -139,5 +140,45 @@ public class SucursalController {
 
         return esAdmin ? ResponseEntity.ok().body(sucursalService.verEmpleadosAdmin(sucursalId))
                 : ResponseEntity.ok().body(sucursalService.verEmpleadosEmpleador(sucursalId));
+    }
+
+    @PostMapping("/{sucursalId}/empleados")
+    public ResponseEntity<?> agregarEmpleado(@PathVariable("sucursalId") Integer sucursalId,
+                                             @Valid @RequestBody UsuarioEmailDTO userEmail,
+                                             HttpSession sesion){
+        sesionService.isLogged(sesion);
+
+        if(!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())){
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        Sucursal suc = sucursalService.listarSucursalPorId(sucursalId);
+        if(!Objects.equals(sesionService.getUsuarioId(sesion), suc.getEmpleador().getId())){
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        // dsp cambiar a "se envió una notificación" o algo asi cuando tenga hecho lo de notif
+        sucursalService.agregarEmpleado(suc, userEmail);
+        return ResponseEntity.ok().body("Se agregó al empleado correctamente");
+    }
+
+
+    @DeleteMapping("/{sucursalId}/empleados/{empleadoId}")
+    public ResponseEntity<?> eliminarEmpleado(@PathVariable("sucursalId") Integer sucursalId,
+                                              @PathVariable("empleadoId") Integer empleadoId,
+                                              HttpSession sesion){
+        sesionService.isLogged(sesion);
+
+        if(!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())){
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        Sucursal suc = sucursalService.listarSucursalPorId(sucursalId);
+        if(!Objects.equals(sesionService.getUsuarioId(sesion), suc.getEmpleador().getId())){
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        sucursalService.eliminarEmpleado(suc, empleadoId);
+        return ResponseEntity.ok().body("Se eliminó al empleado correctamente");
     }
 }

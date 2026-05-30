@@ -5,6 +5,7 @@ import com.gg.turnlook.Backend.DTO.Sucursal.SucursalMiniDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalModificarDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalMostrarDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioAdminResponseDTO;
+import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmailDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmpleadorResponseDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioMiniDTO;
 import com.gg.turnlook.Backend.Excepciones.ConflictException;
@@ -28,13 +29,11 @@ public class SucursalService {
 
     private final SucursalRepository sucRepo;
     private final CategoriaRepository catRepo;
-    private final UsuarioRepository userRepo;
     private final UsuarioService usuarioService;
 
-    public SucursalService(SucursalRepository sucRepo, CategoriaRepository catRepo, UsuarioRepository userRepo, UsuarioService usuarioService) {
+    public SucursalService(SucursalRepository sucRepo, CategoriaRepository catRepo, UsuarioService usuarioService) {
         this.sucRepo = sucRepo;
         this.catRepo = catRepo;
-        this.userRepo = userRepo;
         this.usuarioService = usuarioService;
     }
 
@@ -42,13 +41,18 @@ public class SucursalService {
     /// METODOS
 
     public boolean enSucursal(Integer idUsuario, Integer idSucursal) {
-        Optional<Sucursal> sucursal = sucRepo.findById(idSucursal);
-        if (sucursal.isEmpty()) return false;
-        Optional<Usuario> usuario = userRepo.findById(idUsuario);
-        if (usuario.isEmpty()) return false;
 
-        return sucursal.get().getEmpleados().contains(usuario.get()) ||
-                sucursal.get().getEmpleador().equals(usuario.get());
+        Sucursal sucursal;
+        Usuario usuario;
+        try {
+            sucursal = listarSucursalPorId(idSucursal);
+            usuario = usuarioService.listarUsuarioPorId(idUsuario);
+        } catch (NotFoundException e) {
+            return false;
+        }
+
+        return sucursal.getEmpleados().contains(usuario) ||
+                sucursal.getEmpleador().equals(usuario);
     }
 
 
@@ -171,8 +175,24 @@ public class SucursalService {
     public Set<UsuarioEmpleadorResponseDTO> verEmpleadosEmpleador(Integer sucursalId) {
         Sucursal suc = listarSucursalPorId(sucursalId);
         return suc.getEmpleados().stream().
-                map(u -> new UsuarioEmpleadorResponseDTO(u.getNombre(),
+                map(u -> new UsuarioEmpleadorResponseDTO(u.getId() ,u.getNombre(),
                         u.getApellido(), u.getEmail()))
                 .collect(Collectors.toSet());
+    }
+
+
+    public void agregarEmpleado(Sucursal sucursal, UsuarioEmailDTO userEmail) {
+
+        Usuario usuario = usuarioService.listarUsuarioPorEmail(userEmail.getEmail());
+        sucursal.getEmpleados().add(usuario);  // dsp ver lo de notificaciones
+        sucRepo.save(sucursal);
+    }
+
+
+    public void eliminarEmpleado(Sucursal sucursal, Integer userId){
+
+        Usuario usuario = usuarioService.listarUsuarioPorId(userId);
+        sucursal.getEmpleados().remove(usuario);   // dsp ver lo de notificacion
+        sucRepo.save(sucursal);
     }
 }

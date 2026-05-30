@@ -1,6 +1,7 @@
 package com.gg.turnlook.Backend.Controllers;
 
 import com.gg.turnlook.Backend.DTO.Usuario.LoginDTO;
+import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmailDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioModificarDTO;
 import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
@@ -139,15 +140,16 @@ public class UsuarioController {
     }
 
 
-    @GetMapping("/email/{email}")
-    public ResponseEntity<?> filtrarUsuariosEmail(@PathVariable String email, HttpSession sesion) {
+    @GetMapping("/email")
+    public ResponseEntity<?> filtrarUsuariosEmail(@Valid @RequestBody UsuarioEmailDTO userEmail,
+                                                  HttpSession sesion) {
 
         sesionService.isLogged(sesion);
 
         if (sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
-            return ResponseEntity.ok().body(usuarioService.listarUsuariosPorEmailAdmin(email));
+            return ResponseEntity.ok().body(usuarioService.listarUsuariosPorEmailAdmin(userEmail));
         } else if (sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
-            return ResponseEntity.ok().body(usuarioService.listarUsuariosPorEmailEmpleador(email));
+            return ResponseEntity.ok().body(usuarioService.listarUsuariosPorEmailEmpleador(userEmail));
         } else {
             throw new ForbiddenException("No tenes permisos");
         }

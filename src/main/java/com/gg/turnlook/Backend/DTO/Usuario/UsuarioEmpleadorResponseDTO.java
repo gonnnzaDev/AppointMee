@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UsuarioEmpleadorResponseDTO {
 
+    private Integer id;
     private String nombre;
     private String apellido;
     private String email;
