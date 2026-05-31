@@ -1,8 +1,10 @@
 package com.gg.turnlook.Backend.Service;
 
 import com.gg.turnlook.Backend.DTO.Servicio.ServicioCrearDTO;
+import com.gg.turnlook.Backend.DTO.Servicio.ServicioMiniDTO;
 import com.gg.turnlook.Backend.DTO.Servicio.ServicioModificarDTO;
 import com.gg.turnlook.Backend.DTO.Servicio.ServicioMostrarDTO;
+import com.gg.turnlook.Backend.Excepciones.BadRequestException;
 import com.gg.turnlook.Backend.Excepciones.ConflictException;
 import com.gg.turnlook.Backend.Excepciones.NotFoundException;
 import com.gg.turnlook.Backend.Model.Servicio;
@@ -26,6 +28,11 @@ public class ServicioService {
 
 
     public void crearServicio(ServicioCrearDTO servicio) {
+
+        if(servicio.getDuracion() % 30 != 0){
+            throw new BadRequestException("La duracion tiene que ser en intervalos de 30 minutos");
+        }
+
         Sucursal sucursal = sucService.listarSucursalPorId(servicio.getSucursalId());
         Servicio serv = new Servicio(
                 servicio.getNombre(), servicio.getDescripcion(), servicio.getDuracion(),
@@ -34,45 +41,52 @@ public class ServicioService {
         servRepo.save(serv);
     }
 
-    public void modificarServicio(ServicioModificarDTO servicio, Integer servicioId) {
 
-        Servicio servOld = listarServicioPorId(servicioId);
-
-        if (!Objects.equals(servOld.getSucursal().getId(), servicio.getSucursalId())) {
-            throw new ConflictException("No se puede cambiar la sucursal del servicio");
-        }
+    public void modificarServicio(ServicioModificarDTO servicio, Servicio servOld) {
 
         if (servicio.getNombre() != null) servOld.setNombre(servicio.getNombre());
         if (servicio.getDescripcion() != null) servOld.setDescripcion(servicio.getDescripcion());
         if (servicio.getDuracion() != null) servOld.setDuracion(servicio.getDuracion());
         if (servicio.getPrecio() != null) servOld.setPrecio(servicio.getPrecio());
 
+        if(servOld.getDuracion() % 30 != 0){
+            throw new BadRequestException("La duracion tiene que ser en intervalos de 30 minutos");
+        }
+
         servRepo.save(servOld);
     }
+
 
     public void eliminarServicio(Servicio servicio) {
         servicio.setActivo(false);
         servRepo.save(servicio);
     }
 
-    // ESTE seria para admin dsp ver
+
+    // ESTE seria para admin dsp ver (sacar seguramente)
     public List<Servicio> listarServicios() {
         return servRepo.findByActivoTrue();
     }
 
-    // ver lo de activo = false despues
-    public List<Servicio> listarServiciosPorSucursalAdmin(Integer idSucursal) {
-        return servRepo.findBySucursalId(idSucursal);
+
+    public List<ServicioMiniDTO> listarServiciosSucursal(Integer sucursalId){
+        sucService.listarSucursalPorId(sucursalId);  //validacion
+        return servRepo.findBySucursalId(sucursalId).stream()
+                .map(s -> new ServicioMiniDTO(s.getId(), s.getNombre(),
+                        s.getDuracion()))
+                .toList();
     }
 
-    public List<ServicioMostrarDTO> listarServiciosPorSucursalPropia(Integer idSucursal) {
-        List<Servicio> servicios = listarServiciosPorSucursalAdmin(idSucursal);
-        return mapearServicios(servicios);
+
+    public ServicioMostrarDTO verServicioPorId(Integer idServicio) {
+        return mapearServicio(listarServicioPorId(idServicio));
     }
+
 
     public ServicioMostrarDTO mapearServicio(Servicio s) {
         ServicioMostrarDTO dto = new ServicioMostrarDTO();
 
+        dto.setId(s.getId());
         dto.setNombre(s.getNombre());
         dto.setDescripcion(s.getDescripcion());
         dto.setDuracion(s.getDuracion());
@@ -85,11 +99,6 @@ public class ServicioService {
         return dto;
     }
 
-    public List<ServicioMostrarDTO> mapearServicios(List<Servicio> servicios) {
-        return servicios.stream()
-                .map(serv -> mapearServicio(serv))
-                .toList();
-    }
 
     public Servicio listarServicioPorId(Integer servicioId) {
         return servRepo.findById(servicioId).

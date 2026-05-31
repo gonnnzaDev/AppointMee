@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 public class ServicioMostrarDTO {
 
      /// ATRIBUTOS
+     private Integer id;
      private String nombre;
      private String descripcion;
      private Integer duracion;

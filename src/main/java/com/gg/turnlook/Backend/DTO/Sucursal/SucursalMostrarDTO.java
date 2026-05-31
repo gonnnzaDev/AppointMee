@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Set;
 
 @Data
@@ -20,6 +21,8 @@ public class SucursalMostrarDTO {
      private String descripcion;
      private LocalDate fechaCreacion;
      private String categoria;
+     private LocalTime horaApertura;
+     private LocalTime horaCierre;
      private UsuarioMiniDTO empleador;
      private Set<UsuarioMiniDTO> empleados;
 }

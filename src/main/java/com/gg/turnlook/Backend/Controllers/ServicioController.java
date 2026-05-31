@@ -44,7 +44,7 @@ public class ServicioController {
         }
 
         if (!sucursalService.enSucursal(sesionService.getUsuarioId(sesion), servicio.getSucursalId())) {
-            throw new ForbiddenException("No perteneces a esta sucursal");
+            throw new ForbiddenException("No tenes permisos");
         }
 
         servicioService.crearServicio(servicio);
@@ -63,11 +63,12 @@ public class ServicioController {
             throw new ForbiddenException("No tenes permisos");
         }
 
-        if (!sucursalService.enSucursal(sesionService.getUsuarioId(sesion), servicio.getSucursalId())) {
+        Servicio s = servicioService.listarServicioPorId(id);
+        if (!sucursalService.enSucursal(sesionService.getUsuarioId(sesion), s.getSucursal().getId())){
             throw new ForbiddenException("No perteneces a esta sucursal");
         }
 
-        servicioService.modificarServicio(servicio, id);
+        servicioService.modificarServicio(servicio, s);
         return ResponseEntity.ok().body("Se modificó el servicio correctamente");
     }
 
@@ -93,46 +94,20 @@ public class ServicioController {
         return ResponseEntity.ok().body("Se elimino el servicio correctamente");
     }
 
-    // ver un endpoint para mostrar servicios x nombre con DTO para todo publico
 
-    @GetMapping("/listar/{idSucursal}")
+    @GetMapping("/listar/sucursal/{idSucursal}")
     public ResponseEntity<?> listarServicios(@PathVariable("idSucursal") Integer idSucursal,
                                              HttpSession sesion) {
 
         sesionService.isLogged(sesion);
-        boolean esAdmin = sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name());
-
-        if (!esAdmin && !sesionService.tieneRol(sesion, ERol.EMPLEADOR.name()) &&
-                !sesionService.tieneRol(sesion, ERol.EMPLEADO.name())) {
-            throw new ForbiddenException("No tenes permisos");
-        }
-
-        Sucursal sucursal = sucursalService.listarSucursalPorId(idSucursal);
-
-        // mirar este mejor a ver si funca bien
-        if (!esAdmin && !sucursalService.enSucursal(sesionService.getUsuarioId(sesion),
-                sucursal.getId())) {
-            throw new ForbiddenException("No perteneces a esta sucursal");
-        }
-
-        if (esAdmin) {
-            return ResponseEntity.ok().body(servicioService.listarServiciosPorSucursalAdmin(idSucursal));
-        } else {
-            return ResponseEntity.ok().body(servicioService.listarServiciosPorSucursalPropia(idSucursal));
-        }
+        return ResponseEntity.ok().body(servicioService.listarServiciosSucursal(idSucursal));
     }
 
+
     @GetMapping("/{id}")
-    public ResponseEntity<?> listarServiciosPorId(@PathVariable("id") Integer id, HttpSession sesion) {
+    public ResponseEntity<?> listarServiciosPorId(@PathVariable("id")Integer id, HttpSession sesion) {
 
         sesionService.isLogged(sesion);
-
-        // ver con twin dsp para q cada empleador vea el suyo
-        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
-            throw new ForbiddenException("No tenes permisos");
-        }
-
-        Servicio servicio = servicioService.listarServicioPorId(id);
-        return ResponseEntity.ok().body(servicio);
+        return ResponseEntity.ok().body(servicioService.verServicioPorId(id));
     }
 }

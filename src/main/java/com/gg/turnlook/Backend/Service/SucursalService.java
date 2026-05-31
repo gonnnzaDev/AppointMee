@@ -8,6 +8,7 @@ import com.gg.turnlook.Backend.DTO.Usuario.UsuarioAdminResponseDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmailDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmpleadorResponseDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioMiniDTO;
+import com.gg.turnlook.Backend.Excepciones.BadRequestException;
 import com.gg.turnlook.Backend.Excepciones.ConflictException;
 import com.gg.turnlook.Backend.Excepciones.NotFoundException;
 import com.gg.turnlook.Backend.Model.Categoria;
@@ -58,13 +59,17 @@ public class SucursalService {
 
     public void crearSucursal(SucursalCrearDTO sucursal, Integer userId) {
 
+        if (!sucursal.getHoraCierre().isAfter(sucursal.getHoraApertura())) {
+            throw new BadRequestException("El horario de cierre tiene que ser posterior al de apertura");
+        }
+
         Categoria cat = catRepo.findById(sucursal.getCategoriaId()).
                 orElseThrow(() -> new NotFoundException("No se encontró la categoria"));
 
         Usuario empleador = usuarioService.listarUsuarioPorId(userId);
         Sucursal suc = new Sucursal(sucursal.getNombre(), sucursal.getDireccion(),
                 sucursal.getTelefono(), sucursal.getDescripcion(),
-                cat, empleador);
+                sucursal.getHoraApertura(), sucursal.getHoraCierre(), cat, empleador);
 
         sucRepo.save(suc);
     }
@@ -87,6 +92,12 @@ public class SucursalService {
         }
         if (sucursal.getTelefono() != null) suc.setTelefono(sucursal.getTelefono());
         if (sucursal.getDescripcion() != null) suc.setDescripcion(sucursal.getDescripcion());
+        if(sucursal.getHoraApertura() != null) suc.setHoraApertura(sucursal.getHoraApertura());
+        if(sucursal.getHoraCierre() != null) suc.setHoraCierre(sucursal.getHoraCierre());
+
+        if (!suc.getHoraCierre().isAfter(suc.getHoraApertura())) {
+            throw new BadRequestException("El horario de cierre tiene que ser posterior al de apertura");
+        }
 
         sucRepo.save(suc);
     }
@@ -108,7 +119,7 @@ public class SucursalService {
     }
 
 
-    // ver si hago endpoint para listar sucursales eliminadas
+    // ver si hago endpoint para listar sucursales eliminadas (no creo)
 
 
     public SucursalMostrarDTO verSucursalPorId(Integer id) {
@@ -125,6 +136,8 @@ public class SucursalService {
         dto.setDescripcion(suc.getDescripcion());
         dto.setFechaCreacion(suc.getFechaCreacion());
         dto.setCategoria(suc.getCategoria().getCategoria());
+        dto.setHoraApertura(suc.getHoraApertura());
+        dto.setHoraCierre(suc.getHoraCierre());
 
         UsuarioMiniDTO empleador = new UsuarioMiniDTO(
                 suc.getEmpleador().getNombre(),

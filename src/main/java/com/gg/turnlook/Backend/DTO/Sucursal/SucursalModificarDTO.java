@@ -1,7 +1,10 @@
 package com.gg.turnlook.Backend.DTO.Sucursal;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+
+import java.time.LocalTime;
 
 @Data
 public class SucursalModificarDTO {
@@ -29,4 +32,10 @@ public class SucursalModificarDTO {
     private Integer categoriaId;
 
 
+    @JsonFormat(pattern = "HH:mm")
+    private LocalTime horaApertura;
+
+
+    @JsonFormat(pattern = "HH:mm")
+    private LocalTime horaCierre;
 }

@@ -1,7 +1,10 @@
 package com.gg.turnlook.Backend.DTO.Sucursal;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+
+import java.time.LocalTime;
 
 @Data
 public class SucursalCrearDTO {
@@ -29,5 +32,12 @@ public class SucursalCrearDTO {
     @Positive(message = "El ID de categoria debe ser positivo")
     private Integer categoriaId;
 
+    @NotNull(message = "La hora de apertura es obligatoria")
+    @JsonFormat(pattern = "HH:mm")
+    private LocalTime horaApertura;
+
+    @NotNull(message = "La hora de cierre es obligatoria")
+    @JsonFormat(pattern = "HH:mm")
+    private LocalTime horaCierre;
 
 }

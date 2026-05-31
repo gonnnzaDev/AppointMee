@@ -19,7 +19,7 @@ public class ServicioCrearDTO {
     private String descripcion;
 
     @NotNull(message = "La duracion es obligatoria")
-    @Min(value = 10, message = "La duracion minima es de 10 minutos")
+    @Min(value = 30, message = "La duracion minima es de 30 minutos")
     @Max(value = 360, message = "La duracion maxima es de 360 minutos (6 horas)")
     private Integer duracion;
 

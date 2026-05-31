@@ -16,7 +16,7 @@ public class ServicioModificarDTO {
     @Size(min = 10, max = 500, message = "La descripcion debe estar entre 10 y 500 caracteres")
     private String descripcion;
 
-    @Min(value = 10, message = "La duracion minima es de 10 minutos")
+    @Min(value = 30, message = "La duracion minima es de 30 minutos")
     @Max(value = 360, message = "La duracion maxima es de 360 minutos (6 horas)")
     private Integer duracion;
 
@@ -25,9 +25,5 @@ public class ServicioModificarDTO {
     @Digits(integer = 6, fraction = 2,
             message = "El precio debe tener a lo sumo 6 enteros y 2 decimales")
     private BigDecimal precio;
-
-    @Positive(message = "El ID de sucursal debe ser positivo")
-    private Integer sucursalId;
-
 
 }

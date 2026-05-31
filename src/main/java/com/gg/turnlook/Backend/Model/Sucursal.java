@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,6 +38,12 @@ public class Sucursal {
 
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDate fechaCreacion;
+
+    @Column(name = "hora_apertura", nullable = false)
+    private LocalTime horaApertura;
+
+    @Column(name = "hora_cierre", nullable = false)
+    private LocalTime horaCierre;
 
     @Column(nullable = false)
     private boolean activo = true;
@@ -70,13 +77,14 @@ public class Sucursal {
 
 
     /// CONSTRUCTORES
-    public Sucursal(String nombre, String direccion, String telefono, String descripcion, Categoria categoria, Usuario usuario) {
+    public Sucursal(String nombre, String direccion, String telefono, String descripcion, LocalTime horaApertura, LocalTime horaCierre, Categoria categoria, Usuario empleador) {
         this.nombre = nombre;
         this.direccion = direccion;
         this.telefono = telefono;
         this.descripcion = descripcion;
+        this.horaApertura = horaApertura;
+        this.horaCierre = horaCierre;
         this.categoria = categoria;
-        this.empleador = usuario;
+        this.empleador = empleador;
     }
-
 }
