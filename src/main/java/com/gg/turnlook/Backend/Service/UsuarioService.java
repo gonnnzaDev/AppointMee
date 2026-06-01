@@ -146,7 +146,7 @@ public class UsuarioService {
     }
 
 
-    public UsuarioPerfilResponseDTO mapearUsuario(Integer id){
+    private UsuarioPerfilResponseDTO mapearUsuario(Integer id){
         Usuario u = listarUsuarioPorId(id);
         UsuarioPerfilResponseDTO uPerfil = new UsuarioPerfilResponseDTO();
 

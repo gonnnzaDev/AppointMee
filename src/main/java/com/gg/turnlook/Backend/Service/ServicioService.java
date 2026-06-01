@@ -83,7 +83,7 @@ public class ServicioService {
     }
 
 
-    public ServicioMostrarDTO mapearServicio(Servicio s) {
+    private ServicioMostrarDTO mapearServicio(Servicio s) {
         ServicioMostrarDTO dto = new ServicioMostrarDTO();
 
         dto.setId(s.getId());

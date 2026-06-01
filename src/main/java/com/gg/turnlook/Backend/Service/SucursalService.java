@@ -128,7 +128,7 @@ public class SucursalService {
     }
 
 
-    public SucursalMostrarDTO mapearSucursal(Sucursal suc) {
+    private SucursalMostrarDTO mapearSucursal(Sucursal suc) {
         SucursalMostrarDTO dto = new SucursalMostrarDTO();
         dto.setNombre(suc.getNombre());
         dto.setDireccion(suc.getDireccion());
@@ -158,6 +158,7 @@ public class SucursalService {
     }
 
 
+    // ver si dsp out
     public List<Sucursal> filtrarListaSucursales(String nombre, Boolean activo,
                                                  Integer catId, Integer userId) {
 
