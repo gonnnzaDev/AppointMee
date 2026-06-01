@@ -2,10 +2,12 @@ package com.gg.turnlook.Backend.Service;
 
 import com.gg.turnlook.Backend.DTO.Turno.DisponibilidadDTO;
 import com.gg.turnlook.Backend.DTO.Turno.TurnoCrearDTO;
+import com.gg.turnlook.Backend.DTO.Turno.TurnoMiniDTO;
 import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Enum.EstadoTurno;
 import com.gg.turnlook.Backend.Excepciones.BadRequestException;
 import com.gg.turnlook.Backend.Excepciones.ConflictException;
+import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
 import com.gg.turnlook.Backend.Excepciones.NotFoundException;
 import com.gg.turnlook.Backend.Model.Servicio;
 import com.gg.turnlook.Backend.Model.Sucursal;
@@ -150,7 +152,22 @@ public class TurnoService {
     // uno para cancelar y reservar uno nuevo x cambio
 
 
-    public List<>
+    // ver uno para pendientes
+    public List<TurnoMiniDTO> listarTurnosRealizadosPorSucursal(
+            Integer sucursalId, Usuario empleador){
+
+        Sucursal sucursal = sucursalService.listarSucursalPorId(sucursalId);
+
+        if(!sucursalService.enSucursal(empleador.getId(), sucursal.getId())){
+            throw new ForbiddenException("No perteneces a esta sucursal");
+        }
+
+        return turnoRepo.findByServicioSucursalIdAndEstado(sucursal.getId(),
+                EstadoTurno.REALIZADO).stream()
+                .map(t-> new TurnoMiniDTO(t.getServicio().getNombre(),
+                        t.getFechaHora().toLocalDate()))
+                .toList();
+    }
 
 
     public Turno listarTurnoPorId(Integer id) {
