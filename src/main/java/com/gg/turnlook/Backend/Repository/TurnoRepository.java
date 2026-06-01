@@ -14,4 +14,6 @@ public interface TurnoRepository extends JpaRepository<Turno, Integer> {
                                                   LocalDateTime inicioDia, LocalDateTime finDia);
 
     List<Turno> findByEstado(EstadoTurno estadoTurno);
+
+    List<Turno> findByServicioSucursalIdAndEstado(Integer sucursalId, EstadoTurno estadoTurno);
 }

@@ -3,6 +3,7 @@ package com.gg.turnlook.Backend.Controllers;
 import com.gg.turnlook.Backend.DTO.Turno.TurnoCrearDTO;
 import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
+import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Service.SesionService;
 import com.gg.turnlook.Backend.Service.TurnoService;
 import jakarta.servlet.http.HttpSession;
@@ -70,5 +71,22 @@ public class TurnoController {
 
         turnoService.cancelarTurno(turnoId);
         return ResponseEntity.ok().body("Se canceló el turno correctamente");
+    }
+
+
+
+    @GetMapping("/realizados/sucursal/{sucursalId}")
+    public ResponseEntity<?> listarTurnosRealizadosPorSucursal(
+                @PathVariable("sucursalId") Integer sucursalId, HttpSession sesion){
+
+        Usuario empleador = sesionService.getUsuarioLogged(sesion);
+
+        // ver si admin tmb
+        if(!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())){
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        return ResponseEntity.ok().body(turnoService.listarTurnosRealizadosPorSucursal(
+                sucursalId, empleador));
     }
 }

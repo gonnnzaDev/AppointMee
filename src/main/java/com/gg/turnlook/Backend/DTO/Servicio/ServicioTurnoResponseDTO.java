@@ -10,9 +10,10 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServicioTurnoResponse {
+public class ServicioTurnoResponseDTO {
 
     private Integer id;
+    private String nombre;
     private BigDecimal precio;
-    // seguir
+    private Integer duracion;
 }
