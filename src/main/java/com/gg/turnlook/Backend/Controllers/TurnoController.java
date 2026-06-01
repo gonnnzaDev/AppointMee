@@ -56,4 +56,19 @@ public class TurnoController {
 
         return ResponseEntity.ok().body(turnoService.verDisponibilidad(empleadoId, servicioId));
     }
+
+
+    @DeleteMapping("/cancelar/{turnoId}")
+    public ResponseEntity<?> cancelarTurno(@PathVariable("turnoId") Integer turnoId,
+                                           HttpSession sesion){
+
+        sesionService.isLogged(sesion);
+
+        if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())){
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        turnoService.cancelarTurno(turnoId);
+        return ResponseEntity.ok().body("Se canceló el turno correctamente");
+    }
 }

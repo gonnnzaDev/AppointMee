@@ -3,8 +3,10 @@ package com.gg.turnlook.Backend.Service;
 import com.gg.turnlook.Backend.DTO.Turno.DisponibilidadDTO;
 import com.gg.turnlook.Backend.DTO.Turno.TurnoCrearDTO;
 import com.gg.turnlook.Backend.Enum.ERol;
+import com.gg.turnlook.Backend.Enum.EstadoTurno;
 import com.gg.turnlook.Backend.Excepciones.BadRequestException;
 import com.gg.turnlook.Backend.Excepciones.ConflictException;
+import com.gg.turnlook.Backend.Excepciones.NotFoundException;
 import com.gg.turnlook.Backend.Model.Servicio;
 import com.gg.turnlook.Backend.Model.Sucursal;
 import com.gg.turnlook.Backend.Model.Turno;
@@ -57,7 +59,7 @@ public class TurnoService {
         List<Turno> turnosDia = turnoRepo.findByEmpleadoAndFechaHoraBetween(
                 empleado, dia.atStartOfDay(), dia.atTime(LocalTime.MAX));
 
-        if(!estaDisponible(turno.getFechaHora(), servicio.getDuracion(), turnosDia)){
+        if (!estaDisponible(turno.getFechaHora(), servicio.getDuracion(), turnosDia)) {
             throw new ConflictException("Ya hay un turno registrado en ese horario");
         }
 
@@ -130,5 +132,29 @@ public class TurnoService {
         }
 
         return true;
+    }
+
+    // ver si faltan mas validaciones
+    public void cancelarTurno(Integer turnoId) {
+        Turno turno = listarTurnoPorId(turnoId);
+
+        if (turno.getEstado() == EstadoTurno.REALIZADO) {
+            throw new ConflictException("El turno ya se realizó");
+        }
+
+        turno.setEstado(EstadoTurno.CANCELADO);
+        turnoRepo.save(turno);
+    }
+
+
+    // uno para cancelar y reservar uno nuevo x cambio
+
+
+    public List<>
+
+
+    public Turno listarTurnoPorId(Integer id) {
+        return turnoRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("No se encontró el turno"));
     }
 }
