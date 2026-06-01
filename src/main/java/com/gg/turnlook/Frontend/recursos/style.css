@@ -363,11 +363,12 @@ button:hover {
 }
 
 .sucursal-container {
+
     display: flex;
     align-items: center;
     min-height: 100vh;
     padding: 20px;
-    margin: 10px 20px;
+    margin: 20vh 20px;
     backdrop-filter: blur(10px);
     box-shadow: var(--shadow-color);
 
@@ -427,6 +428,63 @@ button:hover {
 .interior-imagenes-sucursal img:hover {
     transform: scale(1.02);
 }
+
+
+#btn-volver {
+
+    padding: 10px;
+    margin: 40px 0 30px 5%;
+
+
+}
+
+.info-sucursal {
+
+
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 20px;
+    padding: 20px;
+    border: 1px solid rgba(128, 128, 128, 0.466);
+    box-shadow: var(--shadow-color);
+}
+
+.info-sucursal h3 {
+    text-align: left;
+    font-size: 5rem;
+
+}
+#btn-reservar {
+    width: 100%;
+    background: #1e293b;
+    max-width: 900px;
+    margin:0 auto;
+    
+}
+
+#btn-reservar:hover {
+    background: #1a2433;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @media (max-width: 992px) {
