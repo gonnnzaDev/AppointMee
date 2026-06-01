@@ -439,13 +439,12 @@ button:hover {
 }
 
 .info-sucursal {
-
-
     background: rgba(0, 0, 0, 0.4);
     border-radius: 20px;
     padding: 20px;
     border: 1px solid rgba(128, 128, 128, 0.466);
     box-shadow: var(--shadow-color);
+    margin: 20px 5%;
 }
 
 .info-sucursal h3 {
@@ -454,23 +453,30 @@ button:hover {
 
 }
 #btn-reservar {
-    width: 100%;
+    width: 50%;
     background: #1e293b;
-    max-width: 900px;
-    margin:0 auto;
-    
+
 }
 
 #btn-reservar:hover {
     background: #1a2433;
 }
 
+.botones-sucursal {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
 
 
 
+.acciones-sucursal{
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    margin: 20px 0
 
-
-
+}
 
 
 
