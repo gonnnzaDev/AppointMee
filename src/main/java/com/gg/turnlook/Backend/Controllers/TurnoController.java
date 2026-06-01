@@ -1,10 +1,16 @@
 package com.gg.turnlook.Backend.Controllers;
 
+import com.gg.turnlook.Backend.DTO.Turno.TurnoCrearDTO;
+import com.gg.turnlook.Backend.Enum.ERol;
+import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
+import com.gg.turnlook.Backend.Service.SesionService;
 import com.gg.turnlook.Backend.Service.TurnoService;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/turnos")
@@ -12,13 +18,42 @@ import org.springframework.web.bind.annotation.RestController;
 public class TurnoController {
 
     private final TurnoService turnoService;
+    private final SesionService sesionService;
 
-    public TurnoController(TurnoService turnoService) {
+    public TurnoController(TurnoService turnoService, SesionService sesionService) {
         this.turnoService = turnoService;
+        this.sesionService = sesionService;
     }
 
 
     /// ENDPOINTS
 
 
+    @PostMapping("/registrar")
+    // solo clientes
+    public ResponseEntity<?> registrarTurno(@Valid @RequestBody TurnoCrearDTO turno,
+                                            HttpSession sesion){
+        sesionService.isLogged(sesion);
+
+        if(!sesionService.tieneRol(sesion, ERol.CLIENTE.name())){
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        if(!Objects.equals(turno.getClienteId(), sesionService.getUsuarioId(sesion))){
+            throw new ForbiddenException("No podes reservar turnos para otros usuarios");
+        }
+
+        turnoService.registrarTurno(turno);
+        return ResponseEntity.ok().body("Se reservó el turno correctamente");
+    }
+
+
+    @GetMapping("/disponibilidad/empleado/{empleadoId}/servicio/{servicioId}")
+    public ResponseEntity<?> verDisponibilidad(@PathVariable("empleadoId") Integer empleadoId,
+                                               @PathVariable("servicioId") Integer servicioId,
+                                               HttpSession sesion){
+        sesionService.isLogged(sesion);
+
+        return ResponseEntity.ok().body(turnoService.verDisponibilidad(empleadoId, servicioId));
+    }
 }

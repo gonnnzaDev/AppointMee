@@ -28,7 +28,7 @@ public class Turno {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private EstadoTurno estado;
+    private EstadoTurno estado = EstadoTurno.PENDIENTE;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id")
@@ -49,9 +49,8 @@ public class Turno {
     }
 
     /// CONSTRUCTOR
-    public Turno(LocalDateTime fechaHora, EstadoTurno estado, Usuario cliente, Usuario empleado, Servicio servicio) {
+    public Turno(LocalDateTime fechaHora, Usuario cliente, Usuario empleado, Servicio servicio) {
         this.fechaHora = fechaHora;
-        this.estado = estado;
         this.cliente = cliente;
         this.empleado = empleado;
         this.servicio = servicio;

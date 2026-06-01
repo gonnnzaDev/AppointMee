@@ -125,7 +125,7 @@ public class UsuarioService {
     public UsuarioEmpleadorResponseDTO listarUsuariosPorEmailEmpleador(UsuarioEmailDTO email) {
         Usuario u = listarUsuarioPorEmail(email.getEmail());
 
-        return new UsuarioEmpleadorResponseDTO(u.getNombre(), u.getApellido(), u.getEmail());
+        return new UsuarioEmpleadorResponseDTO(u.getId() ,u.getNombre(), u.getApellido(), u.getEmail());
     }
 
 
