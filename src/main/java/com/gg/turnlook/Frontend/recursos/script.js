@@ -2,7 +2,7 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // regla q todos los email debe
 
 document.querySelector("form")?.addEventListener("submit", e => e.preventDefault());
 
-getUser(1);
+getUser();
 
 function renderMyProfile(usuario) {
 
@@ -372,7 +372,7 @@ function cargarUsuarios() {
 
 
 
-//esto hace el post de usuarios desde el login
+//esto hace el post de usuarios desde el register
 
 function postUser(name, surname, mail, pass) {
 

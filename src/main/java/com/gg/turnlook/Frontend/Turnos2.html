@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paso 2</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="recursos/style.css">
+
+</head>
+
+<body>
+
+    <div class="agendarTurno-info">
+        <div class="turno-container">
+
+            <div class="turno-header">
+                <h1>¿Cuándo querés venir?</h1>
+            </div>
+
+            <div class="cal-nav">
+                <button class="cal-nav-btn" id="btn-prev">&#8249;</button>
+                <span class="cal-mes-nombre" id="cal-mes-nombre"></span>
+                <button class="cal-nav-btn" id="btn-next">&#8250;</button>
+            </div>
+
+            <div class="cal-semana">
+                <div class="cal-semana-label">DO</div>
+                <div class="cal-semana-label">LU</div>
+                <div class="cal-semana-label">MA</div>
+                <div class="cal-semana-label">MI</div>
+                <div class="cal-semana-label">JU</div>
+                <div class="cal-semana-label">VI</div>
+                <div class="cal-semana-label">SA</div>
+            </div>
+
+            <div class="cal-grid" id="cal-grid"></div>
+
+            <p class="turno-horarios-titulo" id="horarios-titulo">Horarios disponibles</p>
+            <div class="turno-horarios-grid" id="horarios-grid">
+                <span class="turno-sin-dia">Seleccioná un día para ver los horarios.</span>
+            </div>
+
+            <div class="turno-resumen" id="turno-resumen">
+                <span class="turno-resumen-texto" id="turno-resumen-texto"></span>
+            </div>
+
+            <div class="turno-footer">
+                <button class="turno-btn-siguiente" id="btn-siguiente-turno-1" disabled>
+                    Confirmar turno <span>→</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="recursos/script.js"></script>
+    <script src="turno2.js"></script>
+</body>
+
+</html>
