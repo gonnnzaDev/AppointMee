@@ -12,7 +12,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SucursalMostrarDTO {
+public class SucursalResponseDTO {
 
      private Integer id;  // ver si dsp lo saco
      private String nombre;

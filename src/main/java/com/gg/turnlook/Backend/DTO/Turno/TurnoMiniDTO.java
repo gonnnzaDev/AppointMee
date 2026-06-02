@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class TurnoMiniDTO {
 
+    private Integer id;
     private String nombreServicio;
     private LocalDate fechaTurno;
 }

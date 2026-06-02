@@ -3,9 +3,8 @@ package com.gg.turnlook.Backend.Service;
 import com.gg.turnlook.Backend.DTO.Servicio.ServicioCrearDTO;
 import com.gg.turnlook.Backend.DTO.Servicio.ServicioMiniDTO;
 import com.gg.turnlook.Backend.DTO.Servicio.ServicioModificarDTO;
-import com.gg.turnlook.Backend.DTO.Servicio.ServicioMostrarDTO;
+import com.gg.turnlook.Backend.DTO.Servicio.ServicioResponseDTO;
 import com.gg.turnlook.Backend.Excepciones.BadRequestException;
-import com.gg.turnlook.Backend.Excepciones.ConflictException;
 import com.gg.turnlook.Backend.Excepciones.NotFoundException;
 import com.gg.turnlook.Backend.Model.Servicio;
 import com.gg.turnlook.Backend.Model.Sucursal;
@@ -13,7 +12,6 @@ import com.gg.turnlook.Backend.Repository.ServicioRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class ServicioService {
@@ -78,13 +76,13 @@ public class ServicioService {
     }
 
 
-    public ServicioMostrarDTO verServicioPorId(Integer idServicio) {
+    public ServicioResponseDTO verServicioPorId(Integer idServicio) {
         return mapearServicio(listarServicioPorId(idServicio));
     }
 
 
-    private ServicioMostrarDTO mapearServicio(Servicio s) {
-        ServicioMostrarDTO dto = new ServicioMostrarDTO();
+    private ServicioResponseDTO mapearServicio(Servicio s) {
+        ServicioResponseDTO dto = new ServicioResponseDTO();
 
         dto.setId(s.getId());
         dto.setNombre(s.getNombre());

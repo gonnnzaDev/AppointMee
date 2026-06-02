@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServicioMostrarDTO {
+public class ServicioResponseDTO {
 
      /// ATRIBUTOS
      private Integer id;

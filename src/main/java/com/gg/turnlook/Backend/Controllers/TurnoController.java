@@ -74,7 +74,6 @@ public class TurnoController {
     }
 
 
-
     @GetMapping("/realizados/sucursal/{sucursalId}")
     public ResponseEntity<?> listarTurnosRealizadosPorSucursal(
                 @PathVariable("sucursalId") Integer sucursalId, HttpSession sesion){

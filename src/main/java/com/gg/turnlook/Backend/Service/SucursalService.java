@@ -3,7 +3,7 @@ package com.gg.turnlook.Backend.Service;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalCrearDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalMiniDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalModificarDTO;
-import com.gg.turnlook.Backend.DTO.Sucursal.SucursalMostrarDTO;
+import com.gg.turnlook.Backend.DTO.Sucursal.SucursalResponseDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioAdminResponseDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmailDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmpleadorResponseDTO;
@@ -16,12 +16,9 @@ import com.gg.turnlook.Backend.Model.Sucursal;
 import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Repository.CategoriaRepository;
 import com.gg.turnlook.Backend.Repository.SucursalRepository;
-import com.gg.turnlook.Backend.Repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -122,14 +119,14 @@ public class SucursalService {
     // ver si hago endpoint para listar sucursales eliminadas (no creo)
 
 
-    public SucursalMostrarDTO verSucursalPorId(Integer id) {
+    public SucursalResponseDTO verSucursalPorId(Integer id) {
         Sucursal sucursal = listarSucursalPorId(id);
         return mapearSucursal(sucursal);
     }
 
 
-    private SucursalMostrarDTO mapearSucursal(Sucursal suc) {
-        SucursalMostrarDTO dto = new SucursalMostrarDTO();
+    private SucursalResponseDTO mapearSucursal(Sucursal suc) {
+        SucursalResponseDTO dto = new SucursalResponseDTO();
         dto.setNombre(suc.getNombre());
         dto.setDireccion(suc.getDireccion());
         dto.setTelefono(suc.getTelefono());

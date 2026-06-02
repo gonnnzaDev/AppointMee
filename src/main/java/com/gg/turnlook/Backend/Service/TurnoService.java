@@ -164,7 +164,7 @@ public class TurnoService {
 
         return turnoRepo.findByServicioSucursalIdAndEstado(sucursal.getId(),
                 EstadoTurno.REALIZADO).stream()
-                .map(t-> new TurnoMiniDTO(t.getServicio().getNombre(),
+                .map(t-> new TurnoMiniDTO(t.getId(), t.getServicio().getNombre(),
                         t.getFechaHora().toLocalDate()))
                 .toList();
     }
