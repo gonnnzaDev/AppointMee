@@ -50,6 +50,6 @@ El proyecto incluye autenticación de usuarios, manejo de roles y sistema de pag
 ## Base de datos
 * PostgreSQL (SupaBase)
 
-# Autor
+# Equipo
 * Backend : **Giovanni Morro Bai**.
 * Frontend : **Gonzalo Leonel Lopez**.
