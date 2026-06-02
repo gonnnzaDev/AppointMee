@@ -18,7 +18,7 @@ public class TurnoMostrarDTO {
 
     private Integer id;
     private LocalDateTime fechaReserva;
-    private LocalDate fechaTurno;
+    private LocalDateTime fechaTurno;
     private UsuarioMiniDTO cliente;
     private UsuarioEmpleadorResponseDTO empleado;
     private ServicioTurnoResponseDTO servicio;

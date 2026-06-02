@@ -1,8 +1,13 @@
 package com.gg.turnlook.Backend.Service;
 
+
+import com.gg.turnlook.Backend.DTO.Servicio.ServicioTurnoResponseDTO;
 import com.gg.turnlook.Backend.DTO.Turno.DisponibilidadDTO;
 import com.gg.turnlook.Backend.DTO.Turno.TurnoCrearDTO;
 import com.gg.turnlook.Backend.DTO.Turno.TurnoMiniDTO;
+import com.gg.turnlook.Backend.DTO.Turno.TurnoMostrarDTO;
+import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmpleadorResponseDTO;
+import com.gg.turnlook.Backend.DTO.Usuario.UsuarioMiniDTO;
 import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Enum.EstadoTurno;
 import com.gg.turnlook.Backend.Excepciones.BadRequestException;
@@ -153,20 +158,50 @@ public class TurnoService {
 
 
     // ver uno para pendientes
-    public List<TurnoMiniDTO> listarTurnosRealizadosPorSucursal(
-            Integer sucursalId, Usuario empleador){
+    public List<TurnoMiniDTO> listarTurnosPorSucursalYEstado(
+            Integer sucursalId, Usuario empleador, EstadoTurno estadoTurno) {
 
         Sucursal sucursal = sucursalService.listarSucursalPorId(sucursalId);
 
-        if(!sucursalService.enSucursal(empleador.getId(), sucursal.getId())){
+        if (!sucursalService.enSucursal(empleador.getId(), sucursal.getId())) {
             throw new ForbiddenException("No perteneces a esta sucursal");
         }
 
         return turnoRepo.findByServicioSucursalIdAndEstado(sucursal.getId(),
-                EstadoTurno.REALIZADO).stream()
-                .map(t-> new TurnoMiniDTO(t.getId(), t.getServicio().getNombre(),
-                        t.getFechaHora().toLocalDate()))
+                        estadoTurno).stream()
+                .map(t -> new TurnoMiniDTO(t.getId(), t.getServicio().getNombre(),
+                        t.getFechaHora()))
                 .toList();
+    }
+
+
+    public TurnoMostrarDTO verDetalleTurnoRealizado(Integer turnoId, Integer sucursalId,
+                                                    Usuario empleador) {
+
+        Sucursal sucursal = sucursalService.listarSucursalPorId(sucursalId);
+
+        if (!sucursalService.enSucursal(empleador.getId(), sucursal.getId())) {
+            throw new ForbiddenException("No perteneces a esta sucursal");
+        }
+
+        Turno t = listarTurnoPorId(turnoId);
+
+        if(t.getEstado() != EstadoTurno.REALIZADO){
+            throw new BadRequestException("El turno solicitado no figura como realizado");
+        }
+
+        Usuario c = t.getCliente();
+        Usuario e = t.getEmpleado();
+        Servicio s = t.getServicio();
+
+        UsuarioMiniDTO cliente = new UsuarioMiniDTO(c.getNombre(), c.getApellido());
+        UsuarioEmpleadorResponseDTO empleado = new UsuarioEmpleadorResponseDTO(
+                e.getId(), e.getNombre(), e.getApellido(), e.getEmail());
+        ServicioTurnoResponseDTO servicio = new ServicioTurnoResponseDTO(
+                s.getId(), s.getNombre(), s.getPrecio(), s.getDuracion());
+
+        return new TurnoMostrarDTO(
+                t.getId(), t.getFechaReserva(), t.getFechaHora(), cliente, empleado, servicio);
     }
 
 

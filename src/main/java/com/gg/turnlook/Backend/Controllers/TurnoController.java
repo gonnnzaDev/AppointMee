@@ -2,6 +2,7 @@ package com.gg.turnlook.Backend.Controllers;
 
 import com.gg.turnlook.Backend.DTO.Turno.TurnoCrearDTO;
 import com.gg.turnlook.Backend.Enum.ERol;
+import com.gg.turnlook.Backend.Enum.EstadoTurno;
 import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
 import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Service.SesionService;
@@ -33,14 +34,14 @@ public class TurnoController {
     @PostMapping("/registrar")
     // solo clientes
     public ResponseEntity<?> registrarTurno(@Valid @RequestBody TurnoCrearDTO turno,
-                                            HttpSession sesion){
+                                            HttpSession sesion) {
         sesionService.isLogged(sesion);
 
-        if(!sesionService.tieneRol(sesion, ERol.CLIENTE.name())){
+        if (!sesionService.tieneRol(sesion, ERol.CLIENTE.name())) {
             throw new ForbiddenException("No tenes permisos");
         }
 
-        if(!Objects.equals(turno.getClienteId(), sesionService.getUsuarioId(sesion))){
+        if (!Objects.equals(turno.getClienteId(), sesionService.getUsuarioId(sesion))) {
             throw new ForbiddenException("No podes reservar turnos para otros usuarios");
         }
 
@@ -52,7 +53,7 @@ public class TurnoController {
     @GetMapping("/disponibilidad/empleado/{empleadoId}/servicio/{servicioId}")
     public ResponseEntity<?> verDisponibilidad(@PathVariable("empleadoId") Integer empleadoId,
                                                @PathVariable("servicioId") Integer servicioId,
-                                               HttpSession sesion){
+                                               HttpSession sesion) {
         sesionService.isLogged(sesion);
 
         return ResponseEntity.ok().body(turnoService.verDisponibilidad(empleadoId, servicioId));
@@ -61,11 +62,11 @@ public class TurnoController {
 
     @DeleteMapping("/cancelar/{turnoId}")
     public ResponseEntity<?> cancelarTurno(@PathVariable("turnoId") Integer turnoId,
-                                           HttpSession sesion){
+                                           HttpSession sesion) {
 
         sesionService.isLogged(sesion);
 
-        if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())){
+        if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
             throw new ForbiddenException("No tenes permisos");
         }
 
@@ -74,18 +75,36 @@ public class TurnoController {
     }
 
 
-    @GetMapping("/realizados/sucursal/{sucursalId}")
-    public ResponseEntity<?> listarTurnosRealizadosPorSucursal(
-                @PathVariable("sucursalId") Integer sucursalId, HttpSession sesion){
+    @GetMapping("/{estadoTurno}/sucursal/{sucursalId}")
+    public ResponseEntity<?> listarTurnosPorSucursal(
+            @PathVariable("estadoTurno") EstadoTurno estadoTurno,
+            @PathVariable("sucursalId") Integer sucursalId, HttpSession sesion) {
 
         Usuario empleador = sesionService.getUsuarioLogged(sesion);
 
         // ver si admin tmb
-        if(!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())){
+        if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
             throw new ForbiddenException("No tenes permisos");
         }
 
-        return ResponseEntity.ok().body(turnoService.listarTurnosRealizadosPorSucursal(
-                sucursalId, empleador));
+        return ResponseEntity.ok().body(turnoService.listarTurnosPorSucursalYEstado(
+                sucursalId, empleador, estadoTurno));
+    }
+
+
+    @GetMapping("/{turnoId}/sucursal/{sucursalId}")
+    public ResponseEntity<?> verDetallesTurnos(
+            @PathVariable("turnoId") Integer turnoId,
+            @PathVariable("sucursalId") Integer sucursalId, HttpSession sesion) {
+
+        Usuario empleador = sesionService.getUsuarioLogged(sesion);
+
+        // ver si admin tmb
+        if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        return ResponseEntity.ok().body(turnoService.verDetalleTurnoRealizado(
+                turnoId, sucursalId, empleador));
     }
 }

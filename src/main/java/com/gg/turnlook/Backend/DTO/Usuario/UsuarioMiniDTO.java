@@ -11,5 +11,4 @@ public class UsuarioMiniDTO {
 
     private String nombre;
     private String apellido;
-    // reseñas y eso dsp
 }

@@ -4,8 +4,7 @@ package com.gg.turnlook.Backend.DTO.Turno;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -14,5 +13,5 @@ public class TurnoMiniDTO {
 
     private Integer id;
     private String nombreServicio;
-    private LocalDate fechaTurno;
+    private LocalDateTime fechaTurno;
 }
