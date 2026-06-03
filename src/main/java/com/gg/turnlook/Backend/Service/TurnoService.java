@@ -154,6 +154,19 @@ public class TurnoService {
     }
 
 
+    public void finalizarTurno(Integer turnoId){
+
+        Turno turno = listarTurnoPorId(turnoId);
+
+        if(turno.getEstado() !=  EstadoTurno.PENDIENTE){
+            throw new ConflictException("El turno no está pendiente");
+        }
+
+        turno.setEstado(EstadoTurno.REALIZADO);
+        turnoRepo.save(turno);
+    }
+
+
     // uno para cancelar y reservar uno nuevo x cambio
 
 

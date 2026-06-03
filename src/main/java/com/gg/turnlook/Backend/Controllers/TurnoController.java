@@ -75,6 +75,22 @@ public class TurnoController {
     }
 
 
+    @PatchMapping("/finalizar/{turnoId}")
+    public ResponseEntity<?> finalizarTurno(@PathVariable("turnoId") Integer turnoId,
+                                            HttpSession sesion) {
+
+        sesionService.isLogged(sesion);
+
+        if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name()) &&
+                !sesionService.tieneRol(sesion, ERol.EMPLEADO.name())) {
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        turnoService.finalizarTurno(turnoId);
+        return ResponseEntity.ok().body("Se finalizó el turno correctamente");
+    }
+
+
     @GetMapping("/{estadoTurno}/sucursal/{sucursalId}")
     public ResponseEntity<?> listarTurnosPorSucursal(
             @PathVariable("estadoTurno") EstadoTurno estadoTurno,
