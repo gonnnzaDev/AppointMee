@@ -1,11 +1,9 @@
 package com.gg.turnlook.Backend.Service;
 
 
+import com.gg.turnlook.Backend.DTO.Servicio.ServicioResponseDTO;
 import com.gg.turnlook.Backend.DTO.Servicio.ServicioTurnoResponseDTO;
-import com.gg.turnlook.Backend.DTO.Turno.DisponibilidadDTO;
-import com.gg.turnlook.Backend.DTO.Turno.TurnoCrearDTO;
-import com.gg.turnlook.Backend.DTO.Turno.TurnoMiniDTO;
-import com.gg.turnlook.Backend.DTO.Turno.TurnoMostrarDTO;
+import com.gg.turnlook.Backend.DTO.Turno.*;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmpleadorResponseDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioMiniDTO;
 import com.gg.turnlook.Backend.Enum.ERol;
@@ -155,11 +153,11 @@ public class TurnoService {
     }
 
 
-    public void finalizarTurno(Integer turnoId){
+    public void finalizarTurno(Integer turnoId) {
 
         Turno turno = listarTurnoPorId(turnoId);
 
-        if(turno.getEstado() !=  EstadoTurno.PENDIENTE){
+        if (turno.getEstado() != EstadoTurno.PENDIENTE) {
             throw new ConflictException("El turno no está pendiente");
         }
 
@@ -199,7 +197,7 @@ public class TurnoService {
 
         Turno t = listarTurnoPorId(turnoId);
 
-        if(t.getEstado() != EstadoTurno.REALIZADO){
+        if (t.getEstado() != EstadoTurno.REALIZADO) {
             throw new BadRequestException("El turno solicitado no figura como realizado");
         }
 
@@ -215,6 +213,36 @@ public class TurnoService {
 
         return new TurnoMostrarDTO(
                 t.getId(), t.getFechaReserva(), t.getFechaHora(), cliente, empleado, servicio);
+    }
+
+
+    public List<TurnoMiniDTO> listarTurnosPorCliente(Usuario cliente, EstadoTurno estadoTurno) {
+
+        return turnoRepo.findByClienteAndEstado(cliente, estadoTurno).stream()
+                .map(t -> new TurnoMiniDTO(
+                        t.getId(), t.getServicio().getNombre(), t.getFechaHora()))
+                .toList();
+    }
+
+
+    public TurnoClienteResponseDTO verDetalleTurnoPropio(Usuario cliente, Integer turnoId) {
+
+        Turno t = listarTurnoPorId(turnoId);
+
+        if (!Objects.equals(t.getCliente().getId(), cliente.getId())) {
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        Usuario c = t.getCliente();
+        Usuario e = t.getEmpleado();
+        Servicio s = t.getServicio();
+
+        UsuarioMiniDTO cl = new UsuarioMiniDTO(c.getNombre(), c.getApellido());
+        UsuarioMiniDTO emp = new UsuarioMiniDTO(e.getNombre(), e.getApellido());
+        ServicioTurnoResponseDTO serv = new ServicioTurnoResponseDTO(
+                s.getId(), s.getNombre(), s.getPrecio(), s.getDuracion());
+
+        return new TurnoClienteResponseDTO(t.getFechaReserva(), t.getFechaHora(), emp, serv, cl);
     }
 
 

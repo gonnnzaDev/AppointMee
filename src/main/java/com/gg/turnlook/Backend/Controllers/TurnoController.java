@@ -123,4 +123,24 @@ public class TurnoController {
         return ResponseEntity.ok().body(turnoService.verDetalleTurnoRealizado(
                 turnoId, sucursalId, empleador));
     }
+
+    // admin no (dsp con spring security)
+    @GetMapping("/propios/{estadoTurno}")
+    public ResponseEntity<?> listarTurnosPropios(@PathVariable("estadoTurno") EstadoTurno estadoTurno,
+                                                 HttpSession sesion){
+
+        Usuario cliente = sesionService.getUsuarioLogged(sesion);
+
+        return  ResponseEntity.ok().body(turnoService.listarTurnosPorCliente(cliente, estadoTurno));
+    }
+
+    // admin no (dsp con spring sec)
+    @GetMapping("/propios/detalles/{turnoId}")
+    public ResponseEntity<?> verDetallesTurnosPropios(@PathVariable("turnoId") Integer turnoId,
+                                                     HttpSession sesion){
+
+        Usuario cliente = sesionService.getUsuarioLogged(sesion);
+
+        return ResponseEntity.ok().body(turnoService.verDetalleTurnoPropio(cliente, turnoId));
+    }
 }
