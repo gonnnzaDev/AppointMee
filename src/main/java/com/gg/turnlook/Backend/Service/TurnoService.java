@@ -145,8 +145,8 @@ public class TurnoService {
     public void cancelarTurno(Integer turnoId) {
         Turno turno = listarTurnoPorId(turnoId);
 
-        if (turno.getEstado() == EstadoTurno.REALIZADO) {
-            throw new ConflictException("El turno ya se realizó");
+        if (turno.getEstado() != EstadoTurno.PENDIENTE) {
+            throw new ConflictException("El turno no está pendiente");
         }
 
         turno.setEstado(EstadoTurno.CANCELADO);
