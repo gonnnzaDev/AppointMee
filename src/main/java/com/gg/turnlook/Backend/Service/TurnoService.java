@@ -185,7 +185,7 @@ public class TurnoService {
     }
 
 
-    public TurnoResponseDTO verDetalleTurnoRealizado(Integer turnoId, Integer sucursalId,
+    public TurnoResponseDTO verDetalleTurnoPorSucursal(Integer turnoId, Integer sucursalId,
                                                      Usuario empleador) {
 
         Sucursal sucursal = sucursalService.listarSucursalPorId(sucursalId);
@@ -195,10 +195,6 @@ public class TurnoService {
         }
 
         Turno t = listarTurnoPorId(turnoId);
-
-        if (t.getEstado() != EstadoTurno.REALIZADO) {
-            throw new BadRequestException("El turno solicitado no figura como realizado");
-        }
 
         Usuario c = t.getCliente();
         Usuario e = t.getEmpleado();

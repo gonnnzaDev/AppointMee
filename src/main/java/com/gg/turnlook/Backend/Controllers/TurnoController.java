@@ -109,35 +109,36 @@ public class TurnoController {
 
 
     @GetMapping("/{turnoId}/sucursal/{sucursalId}")
-    public ResponseEntity<?> verDetallesTurnos(
+    public ResponseEntity<?> verDetallesTurnosPorSucursal(
             @PathVariable("turnoId") Integer turnoId,
             @PathVariable("sucursalId") Integer sucursalId, HttpSession sesion) {
 
         Usuario empleador = sesionService.getUsuarioLogged(sesion);
 
         // ver si admin tmb
-        if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
+        if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name()) &&
+                !sesionService.tieneRol(sesion, ERol.EMPLEADO.name())) {
             throw new ForbiddenException("No tenes permisos");
         }
 
-        return ResponseEntity.ok().body(turnoService.verDetalleTurnoRealizado(
+        return ResponseEntity.ok().body(turnoService.verDetalleTurnoPorSucursal(
                 turnoId, sucursalId, empleador));
     }
 
     // admin no (dsp con spring security)
     @GetMapping("/propios/{estadoTurno}")
     public ResponseEntity<?> listarTurnosPropios(@PathVariable("estadoTurno") EstadoTurno estadoTurno,
-                                                 HttpSession sesion){
+                                                 HttpSession sesion) {
 
         Usuario cliente = sesionService.getUsuarioLogged(sesion);
 
-        return  ResponseEntity.ok().body(turnoService.listarTurnosPorCliente(cliente, estadoTurno));
+        return ResponseEntity.ok().body(turnoService.listarTurnosPorCliente(cliente, estadoTurno));
     }
 
     // admin no (dsp con spring sec)
     @GetMapping("/propios/detalles/{turnoId}")
     public ResponseEntity<?> verDetallesTurnosPropios(@PathVariable("turnoId") Integer turnoId,
-                                                     HttpSession sesion){
+                                                      HttpSession sesion) {
 
         Usuario cliente = sesionService.getUsuarioLogged(sesion);
 
