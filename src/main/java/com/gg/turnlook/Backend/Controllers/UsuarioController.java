@@ -83,6 +83,20 @@ public class UsuarioController {
     }
 
 
+    @DeleteMapping("/borrar-cuenta/{usuarioId}")
+    public ResponseEntity<?> borrarUsuario(@PathVariable("usuarioId") Integer usuarioId,
+                                           HttpSession sesion) {
+        sesionService.isLogged(sesion);
+
+        if(!Objects.equals(sesionService.getUsuarioId(sesion), usuarioId)){
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        usuarioService.borrarUsuario(usuarioId);
+        return ResponseEntity.ok().body("Se eliminó la cuenta permanentemente");
+    }
+
+
     @GetMapping("/listar")
     public ResponseEntity<?> listarUsuarios(HttpSession sesion) {
 

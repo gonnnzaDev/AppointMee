@@ -141,6 +141,7 @@ public class TurnoService {
         return true;
     }
 
+
     // ver si faltan mas validaciones
     public void cancelarTurno(Integer turnoId) {
         Turno turno = listarTurnoPorId(turnoId);
@@ -170,7 +171,6 @@ public class TurnoService {
     // uno para cancelar y reservar uno nuevo x cambio
 
 
-    // ver uno para pendientes
     public List<TurnoMiniDTO> listarTurnosPorSucursalYEstado(
             Integer sucursalId, Usuario empleador, EstadoTurno estadoTurno) {
 

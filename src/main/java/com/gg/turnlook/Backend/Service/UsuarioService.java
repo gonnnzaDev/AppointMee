@@ -162,5 +162,11 @@ public class UsuarioService {
 
         return uPerfil;
     }
+
+
+    public void borrarUsuario(Integer usuarioId){
+        Usuario u = listarUsuarioPorId(usuarioId);
+        usRepo.delete(u);
+    }
 }
 
