@@ -498,6 +498,99 @@ button:hover {
     transition: transform var(--transition);
 }
 
+/* Formularios Simples */
+.form-simple {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 32px;
+    max-width: 600px;
+    margin: calc(var(--navbar-h) + 40px) auto 40px;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-md);
+}
+
+.form-simple h1 {
+    font-size: 1.8rem;
+    margin-bottom: 24px;
+    color: var(--bee-color);
+}
+
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    color: var(--color);
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    background: var(--bg-input);
+    color: var(--color);
+    font-size: 0.95rem;
+    transition: border-color var(--transition);
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: var(--bee-color);
+    outline: none;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+.btn-submit {
+    flex: 1;
+    padding: 14px 20px;
+    background: var(--bee-color);
+    color: #000;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--transition);
+}
+
+.btn-submit:hover {
+    background: #daa302;
+}
+
+.btn-cancel {
+    flex: 1;
+    padding: 14px 20px;
+    background: transparent;
+    color: var(--color);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background var(--transition), border-color var(--transition);
+}
+
+.btn-cancel:hover {
+    background: var(--bg-input);
+    border-color: var(--bee-color);
+}
+
 .interior-imagenes-sucursal img:hover {
     transform: scale(1.02);
 }
@@ -1087,3 +1180,174 @@ button:hover {
         gap: 8px;
     }
 }
+
+
+/*esto es nuevo*/
+
+
+
+/* Tablas de Gestión */
+.table-container {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    max-width: 95%;
+    margin: calc(var(--navbar-h) + 40px) auto 40px;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-md);
+    overflow-x: auto;
+}
+
+.table-container h1 {
+    font-size: 1.8rem;
+    margin-bottom: 24px;
+    color: var(--bee-color);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.table thead {
+    background: var(--bg-input);
+    border-bottom: 2px solid var(--color-border);
+}
+
+.table th {
+    padding: 14px;
+    text-align: left;
+    color: white;
+    font-weight: 600;
+    background-color: var(--bg-input);
+    
+}
+
+.table td {
+    padding: 14px;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color);
+}
+
+.table tbody tr {
+    transition: background var(--transition);
+}
+
+.table tbody tr:hover {
+    background: var(--bg-input);
+}
+
+.table-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-edit,
+.btn-delete,
+.btn-view {
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background var(--transition), opacity var(--transition);
+}
+
+.btn-edit {
+    background: var(--bee-color);
+    color: #000;
+    font-weight: 600;
+}
+
+.btn-edit:hover {
+    background: #daa302;
+}
+
+.btn-delete {
+    background: #dc2626;
+    color: var(--color);
+}
+
+.btn-delete:hover {
+    background: #b91c1c;
+}
+
+.btn-view {
+    background: #0ea5e9;
+    color: var(--color);
+}
+
+.btn-view:hover {
+    background: #0284c7;
+}
+
+.btn-add {
+    padding: 12px 20px;
+    background: var(--bee-color);
+    color: #000;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background var(--transition);
+}
+
+.btn-add:hover {
+    background: #daa302;
+}
+
+.table-empty {
+    text-align: center;
+    padding: 40px;
+    color: var(--color-muted);
+    font-size: 1.1rem;
+}
+
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background: var(--bg-card);
+    margin: 5% auto;
+    padding: 24px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.close {
+    color: var(--color);
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color var(--transition);
+}
+
+.close:hover {
+    color: var(--bee-color);
+}
+
+
+/*hasta aca*/
