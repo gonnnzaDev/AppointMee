@@ -1,7 +1,6 @@
 package com.gg.turnlook.Backend.Service;
 
 
-import com.gg.turnlook.Backend.DTO.Servicio.ServicioResponseDTO;
 import com.gg.turnlook.Backend.DTO.Servicio.ServicioTurnoResponseDTO;
 import com.gg.turnlook.Backend.DTO.Turno.*;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmpleadorResponseDTO;
@@ -186,8 +185,8 @@ public class TurnoService {
     }
 
 
-    public TurnoMostrarDTO verDetalleTurnoRealizado(Integer turnoId, Integer sucursalId,
-                                                    Usuario empleador) {
+    public TurnoResponseDTO verDetalleTurnoRealizado(Integer turnoId, Integer sucursalId,
+                                                     Usuario empleador) {
 
         Sucursal sucursal = sucursalService.listarSucursalPorId(sucursalId);
 
@@ -211,7 +210,7 @@ public class TurnoService {
         ServicioTurnoResponseDTO servicio = new ServicioTurnoResponseDTO(
                 s.getId(), s.getNombre(), s.getPrecio(), s.getDuracion());
 
-        return new TurnoMostrarDTO(
+        return new TurnoResponseDTO(
                 t.getId(), t.getFechaReserva(), t.getFechaHora(), cliente, empleado, servicio);
     }
 
