@@ -17,7 +17,22 @@
     --sidebar-w: 220px;
     --transition: 0.25s ease;
     --font-mono: 'Courier New', Courier, monospace;
+
+    --am-bg: #0d0d14;
+    --am-surface: rgba(255, 255, 255, 0.05);
+    --am-border: rgba(255, 255, 255, 0.10);
+    --am-border-hover: rgba(255, 255, 255, 0.20);
+    --am-text: #ffffff;
+    --am-text-muted: rgba(255, 255, 255, 0.50);
+    --am-accent: #7f77dd;
+    --am-accent-hover: #9f99e8;
+    --am-radius: 12px;
+    --am-radius-sm: 8px;
+    --am-nav-height: 64px;
+    --am-transition: 0.2s ease;
 }
+
+
 
 *,
 *::before,
@@ -1097,30 +1112,26 @@ button:hover {
     background: #daa302;
 }
 
-/* =============================================
-   AppointMee — Navbar
-   Sin dependencias. Solo CSS puro.
-   ============================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700&family=DM+Sans:wght@400;500&display=swap');
 
-:root {
-    --am-bg: #0d0d14;
-    --am-surface: rgba(255, 255, 255, 0.05);
-    --am-border: rgba(255, 255, 255, 0.10);
-    --am-border-hover: rgba(255, 255, 255, 0.20);
-    --am-text: #ffffff;
-    --am-text-muted: rgba(255, 255, 255, 0.50);
-    --am-accent: #7f77dd;
-    --am-accent-hover: #9f99e8;
-    --am-radius: 12px;
-    --am-radius-sm: 8px;
-    --am-nav-height: 64px;
-    --am-transition: 0.2s ease;
+
+.about-info img {
+    height: 350px;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 20px;
+
 }
 
+.documentacion-links {
+    width: 100%;
+    height: 60px;
+    background: rgba(41, 41, 41, 0.188);
+    border-radius: 20px;
 
 
+}
 
 .am-nav {
     position: fixed;
@@ -1305,6 +1316,53 @@ button:hover {
     transform: translateY(-6.5px) rotate(-45deg);
 }
 
+
+.turnos-persona {
+    width: 100%;
+    height: 100vh;
+    align-items: center;
+    align-content: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+}
+.turnos-persona h1{
+
+    margin: 5px;
+    font-size: 70px;
+}
+
+.turnos-persona-info {
+
+    width: 100%;
+    height: 60vh;
+    display: flex;
+}
+
+.persona-info h2{
+    padding: 10px;
+
+}
+
+.persona-info {
+    background-color: #46464620;
+    width: 100%;
+    border: 0.5px solid var(--am-border);
+    margin: 2px;
+    border-radius: 10px;
+    padding: 5px;
+
+}
+
+.turno-misTurnos {
+    width: 100%;
+    height: 70px;
+    background-color: rgba(184, 184, 184, 0.1);
+    border-radius: 20px;
+    border: 0.5px solid var(--am-border);
+    align-content: center;
+    object-fit: cover;
+    padding: 10px;
+}
 
 @media (max-width: 768px) {
 

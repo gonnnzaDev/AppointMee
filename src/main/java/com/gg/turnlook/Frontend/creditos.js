@@ -44,9 +44,10 @@ function renderCreditos() {
                 <img src="https://mdp.utn.edu.ar/UTNMDQdata/thumbnail.jpg" alt="">
                 <hr>
                 <h2>Documentacion</h2>
-                <p>
-                    aca van todos los links del proyecto, como el github, el trello, el figma, etc.
-                </p>
+                <div class="documentacion-links">
+
+            
+                </div>
                 <div class="documentacion-links-container">
                     <a href="https://github.com/gonnnzaDev/AppointMee" target="_blank">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"

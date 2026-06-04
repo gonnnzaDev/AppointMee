@@ -72,6 +72,18 @@ if (botonLogin) {
 
             if (existe) {
 
+                //Post y abro el index
+                await fetch("http://localhost:3000/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        email: mail,
+                        password: pass
+                    })
+                });
+
                 window.location.href = "Index.html";
 
             } else {
@@ -139,8 +151,6 @@ function signInWithGoogle() {
             const name = profile.getName();
             const email = profile.getEmail();
 
-            console.log("Name:", name);
-            console.log("Email:", email);
 
             // fetch
         })
