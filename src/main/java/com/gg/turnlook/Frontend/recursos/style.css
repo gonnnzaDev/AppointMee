@@ -43,15 +43,19 @@ body {
     color: var(--color);
 }
 
+body:has(#register-form),
+body:has(#login) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 
 
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
 
 #login {
-    background:
-        radial-gradient(ellipse at 60% 0%, rgba(240, 189, 3, 0.08) 0%, transparent 55%),
-        radial-gradient(ellipse at 0% 100%, rgba(240, 189, 3, 0.05) 0%, transparent 40%),
-        #0a0a0c;
+    
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -61,11 +65,24 @@ body {
 
 #form-container {
     width: 100%;
-    max-width: 380px;
+    max-width: 420px;
     padding: 1.5rem 1rem;
 }
 
-/* ── Card shell ───────────────────────────────────────── */
+#register-form {
+    width: 100%;
+    max-width: 420px;
+    padding: 1.5rem 1rem;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        radial-gradient(ellipse at 60% 0%, rgba(240, 189, 3, 0.08) 0%, transparent 55%),
+        radial-gradient(ellipse at 0% 100%, rgba(240, 189, 3, 0.05) 0%, transparent 40%),
+        #0a0a0c;
+}
+
 .form {
     display: flex;
     flex-direction: column;
@@ -81,9 +98,9 @@ body {
         0 24px 64px rgba(0, 0, 0, 0.6);
 }
 
-.form > img {
-    display: none;
-}
+
+
+
 
 .credentials-form::before {
     display: block;
@@ -105,30 +122,23 @@ body {
     margin-bottom: 1.75rem;
 }
 
-.credentials-form {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
 .input-group {
     width: 100%;
     position: relative;
-}
-
-.mb-1 {
-    margin-bottom: 10px;
-}
-
-.mb-3 {
-    margin-bottom: 0;
 }
 
 .form-control {
     width: 100%;
     height: 44px;
     padding: 0 14px;
-    background: rgba(255, 255, 255, 0.05);
+box-shadow: 0.18s;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(240, 189, 3, 0.5);
+    box-shadow: 0 0 12px rgba(240, 189, 3, 0.2);
     border: 0.5px solid rgba(255, 255, 255, 0.12);
     border-radius: 10px;
     color: #f0ede6;
@@ -145,54 +155,24 @@ body {
     font-weight: 300;
 }
 
-.form-control:focus {
-    background: rgba(240, 189, 3, 0.06);
-    border-color: rgba(240, 189, 3, 0.55);
+.input-group {
+    width: 100%;
+    min-width: 500;
+    position: relative;
+    margin-bottom: 12px;
 }
 
-.vstack {
+.credentials-form {
+    width: 100%;
     display: flex;
     flex-direction: column;
 }
 
-.gap-1 {
-    gap: 8px;
-}
-
-.vstack hr {
-    border: none;
-    border-top: 0.5px solid rgba(255, 255, 255, 0.1);
-    margin: 4px 0;
-}
-
-#login-button {
-    width: 100%;
-    height: 44px;
-    margin-top: 6px;
-    background: #f0bd03;
-    color: #1a1200;
-    border: none;
-    border-radius: 10px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: -0.01em;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.1s;
-}
-
-#login-button:hover {
-    background: #daa500;
-    opacity: 1;
-}
-
-#login-button:active {
-    transform: scale(0.98);
-    opacity: 1;
-}
-
 #google-button,
-#register-button {
+#register-button,
+#login-button,
+#cancel-button,
+#register-person {
     width: 100%;
     height: 42px;
     background: transparent;
@@ -207,20 +187,22 @@ body {
     justify-content: center;
     gap: 8px;
     cursor: pointer;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.15s, box-shadow 0.15s;
 }
 
 #google-button:hover,
-#register-button:hover {
+#register-button:hover,
+#login-button:hover,
+#cancel-button:hover,
+#register-person:hover {
     background: rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 255, 255, 0.25);
     color: #f0ede6;
     opacity: 1;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(139, 139, 139, 0.15);
 }
 
-ubutton:hover {
-    opacity: 1;
-}
 
 .navbar {
     position: fixed !important;
@@ -355,60 +337,10 @@ nav form {
     transition: margin var(--transition);
 }
 
-.turn-article {
-    background: #1e293b;
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
-    cursor: pointer;
-}
 
-.turn-article:hover {
-    background: #0e131b;
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-md);
-}
-
-.turn-article img {
-    width: 100%;
-    height: 140px;
-    object-fit: cover;
-    display: block;
-}
-
-.turn-content {
-    padding: 12px;
-}
-
-.turn-content h2 {
-    font-size: 0.95rem;
-    margin-bottom: 6px;
-    color: var(--color);
-    line-height: 1.3;
-}
-
-.turn-content p {
-    font-size: 0.8rem;
-    color: var(--color-muted);
-    line-height: 1.5;
-}
-
-.turn-container a {
-    text-decoration: none;
-    color: inherit;
-}
-
-
-.form img {
-    width: 50%;
-    object-fit: cover;
-    display: block;
-    flex-shrink: 0;
-}
 
 .credentials-form {
-    width: 50%;
+    width: 100%;
     padding: 40px;
     display: flex;
     flex-direction: column;
@@ -436,10 +368,6 @@ nav form {
 
 .input-group input:focus {
     border-color: var(--bee-color);
-}
-
-#info-register input {
-    width: 100%;
 }
 
 button {
@@ -488,40 +416,7 @@ button:hover {
 }
 
 .documentacion-links-container {
-    display: flex;
-
-    width: 100%;
-    background: var(--bg-card);
-    border-radius: var(--radius-lg);
-    padding: 16px;
-    justify-content: center;
-    align-items: center;
-
-}
-
-.documentacion-links-container svg {
-    width: 50px;
-    height: 50px;
-    color: white;
-}
-
-.about-info img {
-    max-width: 80%;
-    max-height: 60%;
-    border-radius: var(--radius-md);
-}
-
-.about-info h1 {
-    font-size: clamp(2.5rem, 7vw, 4.5rem);
-}
-
-.about-info h2 {
-    font-size: clamp(1.8rem, 4vw, 3rem);
-    margin: 10px 0;
-}
-
-.about-info h3 {
-    font-size: clamp(1.4rem, 3vw, 2.5rem);
+    display: none;
 }
 
 .account-container {
@@ -557,11 +452,6 @@ button:hover {
     object-fit: cover;
     flex-shrink: 0;
     border: 3px solid var(--color-border);
-}
-
-.profile-info h1 {
-    font-size: clamp(2rem, 6vw, 4rem);
-    margin: 12px 0;
 }
 
 .error-container {
@@ -656,7 +546,6 @@ button:hover {
     transition: transform var(--transition);
 }
 
-/* Formularios Simples */
 .form-simple {
     background: var(--bg-card);
     border-radius: var(--radius-md);
@@ -749,62 +638,6 @@ button:hover {
     border-color: var(--bee-color);
 }
 
-.interior-imagenes-sucursal img:hover {
-    transform: scale(1.02);
-}
-
-.botones-sucursal {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-
-.acciones-sucursal {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-    margin: 20px 0;
-    flex-wrap: wrap;
-}
-
-.empleados-container {
-    height: 75vh;
-    width: 40%;
-    min-width: 260px;
-    margin: 0 16px;
-    padding: 12px;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--color-border);
-    box-sizing: border-box;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
-}
-
-.empleados-container::-webkit-scrollbar {
-    width: 5px;
-}
-
-.empleados-container::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.empleados-container::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-}
-
-.empleados-container::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.35);
-}
-
-.agendarTurno-container {
-
-    width: 100%;
-    box-sizing: border-box;
-}
-
 .agendarTurno-info {
     display: flex;
     height: 100vh;
@@ -824,67 +657,6 @@ button:hover {
 .titulo-turno h1 {
     margin: 0 auto;
     font-size: clamp(1.2rem, 3vw, 2rem);
-}
-
-.empleado-article {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    gap: 16px;
-    margin: 16px auto;
-    padding: 12px 16px;
-    transition: background var(--transition);
-    max-width: 420px;
-}
-
-.empleado-article:hover {
-    background: rgba(255, 255, 255, 0.04);
-}
-
-.empleado-article img {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    margin: 4px;
-    object-fit: cover;
-    flex-shrink: 0;
-}
-
-
-.info-seleccionada {
-    background: var(--bg-card);
-    border-radius: var(--radius-lg);
-    padding: 24px;
-    border: 1px solid var(--color-border);
-    box-shadow: var(--shadow-md);
-    display: flex;
-    flex-direction: column;
-}
-
-.info-seleccionada img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    border-radius: var(--radius-md);
-    margin-bottom: 16px;
-}
-
-
-.btn-proceso {
-    align-self: end;
-}
-
-.turnos-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 16px;
-    padding: 12px;
-    background: var(--bg-card);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--color-border);
-
 }
 
 
@@ -1173,11 +945,6 @@ button:hover {
         margin-left: var(--sidebar-w);
     }
 
-    .empleados-container {
-        width: 55%;
-        height: 65vh;
-    }
-
     .profile-card {
         padding: 28px;
         gap: 24px;
@@ -1190,15 +957,19 @@ button:hover {
 }
 
 @media (max-width: 900px) {
-    .form img {
-        display: none;
-    }
-
+   
     .credentials-form {
         width: 100%;
         padding: 36px 28px;
     }
 
+    #form-container {
+        max-width: 360px;
+    }
+
+    #register-form {
+        max-width: 360px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -1224,14 +995,6 @@ button:hover {
         padding: 16px;
     }
 
-    .empleados-container {
-        width: 100%;
-        height: 50vh;
-        min-height: 280px;
-        margin: 0 0 16px;
-        padding: 10px;
-    }
-
     .agendarTurno-info {
         flex-direction: column;
         align-items: flex-start;
@@ -1250,12 +1013,6 @@ button:hover {
         height: 120px;
     }
 
-    .acciones-sucursal {
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-    }
-
     #btn-reservar {
         width: 80%;
     }
@@ -1266,51 +1023,37 @@ button:hover {
 }
 
 @media (max-width: 480px) {
-    .turn-container {
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-        gap: 10px;
-        padding: 12px;
+    #form-container,
+    #register-form {
+        max-width: 100%;
+        padding: 1rem 0.5rem;
     }
 
-    .credentials-form {
-        padding: 20px 16px;
+    .form {
+        padding: 1.5rem 1rem;
+        border-radius: 16px;
     }
 
-    button {
-        font-size: 0.875rem;
+    .form-control {
+        height: 40px;
+        font-size: 13px;
     }
 
-    .profile-card img {
-        width: 100px;
-        height: 100px;
+    #google-button,
+    #register-button,
+    #login-button,
+    #cancel-button,
+    #register-person {
+        height: 40px;
+        font-size: 12px;
     }
 
-    .info-left-container a {
-        font-size: 0.85rem;
+    .credentials-form::before {
+        font-size: 1.5rem;
     }
 
-    .empleados-container {
-        height: 42vh;
-        min-height: 240px;
-        border-radius: var(--radius-sm);
-    }
-
-    .interior-imagenes-sucursal {
-        columns: 1;
-    }
-
-    #btn-reservar {
-        width: 95%;
-    }
-
-    .info-sucursal {
-        margin: 16px 2%;
-        padding: 16px;
-    }
-
-    .principal-imagen-sucursal {
-        width: 96%;
-        height: 28vh;
+    .credentials-form::after {
+        font-size: 12px;
     }
 }
 
@@ -1334,21 +1077,7 @@ button:hover {
 }
 
 
-/*esto es nuevo*/
 
-
-
-/* Tablas de Gestión */
-.table-container {
-    background: var(--bg-card);
-    border-radius: var(--radius-md);
-    padding: 24px;
-    max-width: 95%;
-    margin: calc(var(--navbar-h) + 40px) auto 40px;
-    border: 1px solid var(--color-border);
-    box-shadow: var(--shadow-md);
-    overflow-x: auto;
-}
 
 .table-container h1 {
     font-size: 1.8rem;
@@ -1395,45 +1124,6 @@ button:hover {
     gap: 8px;
 }
 
-.btn-edit,
-.btn-delete,
-.btn-view {
-    padding: 8px 16px;
-    border-radius: var(--radius-sm);
-    border: none;
-    cursor: pointer;
-    font-size: 0.85rem;
-    transition: background var(--transition), opacity var(--transition);
-}
-
-.btn-edit {
-    background: var(--bee-color);
-    color: #000;
-    font-weight: 600;
-}
-
-.btn-edit:hover {
-    background: #daa302;
-}
-
-.btn-delete {
-    background: #dc2626;
-    color: var(--color);
-}
-
-.btn-delete:hover {
-    background: #b91c1c;
-}
-
-.btn-view {
-    background: #0ea5e9;
-    color: var(--color);
-}
-
-.btn-view:hover {
-    background: #0284c7;
-}
-
 .btn-add {
     padding: 12px 20px;
     background: var(--bee-color);
@@ -1450,56 +1140,3 @@ button:hover {
     background: #daa302;
 }
 
-.table-empty {
-    text-align: center;
-    padding: 40px;
-    color: var(--color-muted);
-    font-size: 1.1rem;
-}
-
-
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 10000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(4px);
-}
-
-.modal-content {
-    background: var(--bg-card);
-    margin: 5% auto;
-    padding: 24px;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    width: 90%;
-    max-width: 600px;
-    max-height: 80vh;
-    overflow-y: auto;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.close {
-    color: var(--color);
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: color var(--transition);
-}
-
-.close:hover {
-    color: var(--bee-color);
-}
-
-
-/*hasta aca*/
