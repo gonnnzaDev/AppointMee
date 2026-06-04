@@ -1325,7 +1325,8 @@ button:hover {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
 }
-.turnos-persona h1{
+
+.turnos-persona h1 {
 
     margin: 5px;
     font-size: 70px;
@@ -1338,20 +1339,54 @@ button:hover {
     display: flex;
 }
 
-.persona-info h2{
+.persona-info h2 {
     padding: 10px;
 
+}
+.filtrar{
+    margin: 20px 0 20px 20px;
+
+}
+.filtrar select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: rgba(255, 255, 255, 0.05);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    border: 0.5px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    padding: 7px 32px 7px 12px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    min-width: 160px;
+}
+
+.filtrar select:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+
+.filtrar label {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.5);
 }
 
 .persona-info {
     background-color: #46464620;
     width: 100%;
     border: 0.5px solid var(--am-border);
-    margin: 2px;
+    margin: 20px 30px;
     border-radius: 10px;
-    padding: 5px;
+    padding: 10px;
 
 }
+
 
 .turno-misTurnos {
     width: 100%;
