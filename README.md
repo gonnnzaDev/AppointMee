@@ -23,7 +23,6 @@ El proyecto incluye autenticación de usuarios, manejo de roles y sistema de pag
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" height="40" alt="postgresql logo"  />
 </div>
 
-
 ## Backend
 
 * Java 21
@@ -49,6 +48,35 @@ El proyecto incluye autenticación de usuarios, manejo de roles y sistema de pag
 
 ## Base de datos
 * PostgreSQL (SupaBase)
+
+### Instrucciones
+
+1. Clonar el repositorio y acceder al directorio:
+   ```bash
+   git clone https://github.com/gonnnzaDev/AppointMee.git
+   cd AppointMee
+   ```
+
+2. Configurar la base de datos en `src/main/resources/application.properties`:
+   ```properties
+   spring.datasource.driver-class-name=org.postgresql.Driver
+   spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+   spring.jpa.hibernate.ddl-auto=validate
+   spring.jpa.show-sql=true
+   spring.datasource.username= (Usuario)
+   spring.datasource.password= (Contraseña)
+   
+   ```
+
+3. Compilar y ejecutar:
+   ```bash
+   ./mvnw spring-boot:run
+   ```
+
+4. Acceder a la aplicación en `http://localhost:8080/login`
+
+---
+
 
 # Equipo
 * Backend : **Giovanni Morro Bai**.
