@@ -160,12 +160,11 @@ public class UsuarioController {
 
         sesionService.isLogged(sesion);
 
-        if (sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
-            return ResponseEntity.ok().body(usuarioService.listarUsuariosPorEmailAdmin(userEmail));
-        } else if (sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
-            return ResponseEntity.ok().body(usuarioService.listarUsuariosPorEmailEmpleador(userEmail));
-        } else {
+        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
+            !sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
             throw new ForbiddenException("No tenes permisos");
         }
+
+        return ResponseEntity.ok().body(usuarioService.listarUsuariosPorEmail(userEmail));
     }
 }

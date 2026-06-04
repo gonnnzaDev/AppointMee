@@ -92,16 +92,19 @@ public class UsuarioService {
     }
 
 
-    public List<UsuarioAdminResponseDTO> listarUsuarios() {
+    public List<UsuarioMiniAdminDTO> listarUsuarios() {
         return usRepo.findByActivoTrue().stream()
-                .map(u -> new UsuarioAdminResponseDTO(
+                .map(u -> new UsuarioMiniAdminDTO(
                         u.getId(), u.getNombre(), u.getApellido(), u.isActivo()))
                 .toList();
     }
 
     // ver si despues lo saco
-    public List<Usuario> listarUsuariosEliminados() {
-        return usRepo.findByActivoFalse();
+    public List<UsuarioMiniAdminDTO> listarUsuariosEliminados() {
+        return usRepo.findByActivoFalse().stream()
+                .map(u -> new UsuarioMiniAdminDTO(
+                        u.getId(), u.getNombre(), u.getApellido(), u.isActivo()))
+                .toList();
     }
 
     // ver si despues lo saco
@@ -114,23 +117,15 @@ public class UsuarioService {
     }
 
 
-    public UsuarioAdminResponseDTO listarUsuariosPorEmailAdmin(UsuarioEmailDTO email) {
+    public UsuarioResponseDTO listarUsuariosPorEmail(UsuarioEmailDTO email) {
         Usuario u = listarUsuarioPorEmail(email.getEmail());
 
-        return new UsuarioAdminResponseDTO(u.getId(), u.getNombre(),
-                u.getApellido(), u.isActivo());
-    }
-
-
-    public UsuarioEmpleadorResponseDTO listarUsuariosPorEmailEmpleador(UsuarioEmailDTO email) {
-        Usuario u = listarUsuarioPorEmail(email.getEmail());
-
-        return new UsuarioEmpleadorResponseDTO(u.getId() ,u.getNombre(), u.getApellido()
+        return new UsuarioResponseDTO(u.getId(), u.getNombre(), u.getApellido()
                 , u.getEmail(), u.getFotoPerfil().getFotoValida());
     }
 
 
-    public Usuario listarUsuarioPorEmail(String email){
+    public Usuario listarUsuarioPorEmail(String email) {
         return usRepo.findByEmailAndActivoTrue(email).
                 orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
     }
@@ -147,7 +142,7 @@ public class UsuarioService {
     }
 
 
-    private UsuarioPerfilResponseDTO mapearUsuario(Integer id){
+    private UsuarioPerfilResponseDTO mapearUsuario(Integer id) {
         Usuario u = listarUsuarioPorId(id);
         UsuarioPerfilResponseDTO uPerfil = new UsuarioPerfilResponseDTO();
 
@@ -166,7 +161,7 @@ public class UsuarioService {
     }
 
 
-    public void borrarUsuario(Integer usuarioId){
+    public void borrarUsuario(Integer usuarioId) {
         Usuario u = listarUsuarioPorId(usuarioId);
         usRepo.delete(u);
     }

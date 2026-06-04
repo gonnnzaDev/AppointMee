@@ -4,9 +4,9 @@ import com.gg.turnlook.Backend.DTO.Sucursal.SucursalCrearDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalMiniDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalModificarDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalResponseDTO;
-import com.gg.turnlook.Backend.DTO.Usuario.UsuarioAdminResponseDTO;
+import com.gg.turnlook.Backend.DTO.Usuario.UsuarioMiniAdminDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmailDTO;
-import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmpleadorResponseDTO;
+import com.gg.turnlook.Backend.DTO.Usuario.UsuarioResponseDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioMiniDTO;
 import com.gg.turnlook.Backend.Excepciones.BadRequestException;
 import com.gg.turnlook.Backend.Excepciones.ConflictException;
@@ -175,19 +175,19 @@ public class SucursalService {
     }
 
 
-    public Set<UsuarioAdminResponseDTO> verEmpleadosAdmin(Integer sucursalId) {
+    public Set<UsuarioMiniAdminDTO> verEmpleadosAdmin(Integer sucursalId) {
         Sucursal suc = listarSucursalPorId(sucursalId);
         return suc.getEmpleados().stream().
-                map(u -> new UsuarioAdminResponseDTO(u.getId(),
+                map(u -> new UsuarioMiniAdminDTO(u.getId(),
                         u.getNombre(), u.getApellido(), u.isActivo()))
                 .collect(Collectors.toSet());
     }
 
     // est
-    public Set<UsuarioEmpleadorResponseDTO> verEmpleadosEmpleador(Integer sucursalId) {
+    public Set<UsuarioResponseDTO> verEmpleadosEmpleador(Integer sucursalId) {
         Sucursal suc = listarSucursalPorId(sucursalId);
         return suc.getEmpleados().stream().
-                map(u -> new UsuarioEmpleadorResponseDTO(u.getId() ,u.getNombre(),
+                map(u -> new UsuarioResponseDTO(u.getId() ,u.getNombre(),
                         u.getApellido(), u.getEmail(), u .getFotoPerfil().getFotoValida()))
                 .collect(Collectors.toSet());
     }

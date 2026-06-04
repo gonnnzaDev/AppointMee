@@ -3,7 +3,7 @@ package com.gg.turnlook.Backend.Service;
 
 import com.gg.turnlook.Backend.DTO.Servicio.ServicioTurnoResponseDTO;
 import com.gg.turnlook.Backend.DTO.Turno.*;
-import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmpleadorResponseDTO;
+import com.gg.turnlook.Backend.DTO.Usuario.UsuarioResponseDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioMiniDTO;
 import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Enum.EstadoTurno;
@@ -202,7 +202,7 @@ public class TurnoService {
         Servicio s = t.getServicio();
 
         UsuarioMiniDTO cliente = new UsuarioMiniDTO(c.getNombre(), c.getApellido());
-        UsuarioEmpleadorResponseDTO empleado = new UsuarioEmpleadorResponseDTO(
+        UsuarioResponseDTO empleado = new UsuarioResponseDTO(
                 e.getId(), e.getNombre(), e.getApellido(), e.getEmail(), e.getFotoPerfil().getFotoValida());
         ServicioTurnoResponseDTO servicio = new ServicioTurnoResponseDTO(
                 s.getId(), s.getNombre(), s.getPrecio(), s.getDuracion());

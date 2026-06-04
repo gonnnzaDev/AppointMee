@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UsuarioAdminResponseDTO {
+public class UsuarioMiniAdminDTO {
 
     private Integer id;
     private String nombre;
