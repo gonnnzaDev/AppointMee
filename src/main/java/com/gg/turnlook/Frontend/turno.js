@@ -1,3 +1,45 @@
+//Primera Parte de la seccion turno
+
+
+function buscarEmpleados() {
+
+    fetch('/api/empleados')
+        .then(res => res.json())
+        .then(empleados => {
+            renderEmpleados(empleados);
+        })
+        .catch(error => console.error('Error al cargar empleados:', error));
+
+
+}
+
+
+function renderEmpleados() {
+
+    const empleadosContainer = document.getElementById("empleados-container");
+
+    if (empleadosContainer) {
+
+        empleadosContainer.innerHTML = `    
+
+          <a href="">
+                    <article class="empleado-article">
+                        <p>Nombre</p>
+                        <p>Valoracion</p>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Baby.tux.sit-black-800x800.png"
+                            alt="">
+                    </article>
+
+                </a>
+        `;
+
+
+    }
+}
+
+
+
+//Segunda Parte de la seccion turno
 const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 const TURNOS_BASE = ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'];
 
