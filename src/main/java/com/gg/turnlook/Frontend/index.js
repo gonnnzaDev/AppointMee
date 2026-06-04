@@ -1,83 +1,63 @@
+const baseApi = "http://localhost:8080/";
 
-
-traerSucursales();
 
 async function traerSucursales() {
     try {
-        const res = await fetch('http://localhost:8080/sucursales/listar');
-
-        if (!res.ok) {
-            throw new Error(`HTTP error! Status: ${res.status}`);
-        }
-
+        const res = await fetch(baseApi + 'sucursales/listar');
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
         return await res.json();
-
     } catch (error) {
-        alert('Ocurrio un error! :', error);
+       // window.location.href = `/error.html?msg=${encodeURIComponent(error.message)}`;
         return [];
     }
 }
 
-
 async function mostrarSucursales() {
-
     const sucursales = await traerSucursales();
-
-    let sucursalesHTML = '';
-
-    sucursales.forEach((sucursal) => {
-
-        sucursalesHTML += renderSucursal(
-            // sucursal.link,
-            // sucursal.img,
-            // sucursal.imgPredefinida,
-            sucursal.nombre,
-            sucursal.descripcion,
-            sucursal.categoria
-        );
-
-
-
-    });
-
-
     const sucursalesContainer = document.getElementById('turn-container');
-
     if (sucursalesContainer) {
-
-        sucursalesContainer.innerHTML = sucursalesHTML;
-
+        sucursalesContainer.innerHTML = sucursales.map(sucursal =>
+            renderSucursal(sucursal.nombre, sucursal.descripcion, sucursal.categoria)
+        ).join('');
     }
-
 }
 
-// function renderSucursal(link, img, imgPredefinida, nombre, descripcion, categoria) {
 function renderSucursal(nombre, descripcion, categoria) {
-
-
-    /*   <a href="${link}">
-                    <article class="turn-article">
-                        <img src="${img}" alt="${imgPredefinida}">
-                        <div class="turn-content">
-                            <span class="turn-tag">${categoria}</span>
-                            <h2>${nombre}</h2>
-                            <p>${descripcion}</p>
-                        </div>
-                    </article>
-                </a> */
-
-    return `   
-            <a href="">
-                <article class="turn-article">
-                    <div class="turn-content">
-                        <span class="turn-tag">${categoria}</span>
-                        <h2>${nombre}</h2>
-                        <p>${descripcion}</p>
-                    </div>
-                </article>
-            </a>
-`;
-
-
+    return `
+        <a href="">
+            <article class="turn-article">
+                <div class="turn-content">
+                    <span class="turn-tag">${categoria}</span>
+                    <h2>${nombre}</h2>
+                    <p>${descripcion}</p>
+                </div>
+            </article>
+        </a>
+    `;
 }
 
+function categoriasDisponibles() {
+    fetch(baseApi + 'categorias')
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+            return res.json();
+        })
+        .then(categorias => renderCategoriasParaFiltrar(categorias))
+        .catch(error => {
+          //  window.location.href = `/error.html?msg=${encodeURIComponent(error.message)}`;
+        });
+}
+
+function renderCategoriasParaFiltrar(categorias) {
+    const containerLeft = document.getElementById("category-container");
+    if (containerLeft) {
+        containerLeft.innerHTML = categorias.map(c => `
+            <div class="categoria-item">
+                <p>${c.categoria}</p>
+            </div>
+        `).join('');
+    }
+}
+
+categoriasDisponibles();
+mostrarSucursales();
