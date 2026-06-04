@@ -1,7 +1,7 @@
 package com.gg.turnlook.Backend.DTO.Turno;
 
 
-import com.gg.turnlook.Backend.DTO.Servicio.ServicioResponseDTO;
+
 import com.gg.turnlook.Backend.DTO.Servicio.ServicioTurnoResponseDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioMiniDTO;
 import lombok.AllArgsConstructor;

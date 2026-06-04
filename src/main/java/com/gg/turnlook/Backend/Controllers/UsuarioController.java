@@ -1,14 +1,11 @@
 package com.gg.turnlook.Backend.Controllers;
 
-import com.gg.turnlook.Backend.DTO.Usuario.LoginDTO;
-import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmailDTO;
-import com.gg.turnlook.Backend.DTO.Usuario.UsuarioModificarDTO;
+import com.gg.turnlook.Backend.DTO.Usuario.*;
 import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
 import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Service.SesionService;
 import com.gg.turnlook.Backend.Service.UsuarioService;
-import com.gg.turnlook.Backend.DTO.Usuario.UsuarioCrearDTO;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +29,7 @@ public class UsuarioController {
     /// ENDPOINTS
 
 
-    @PostMapping("/inicio_sesion")
+    @PostMapping("/inicio-sesion")
     public ResponseEntity<?> iniciarSesion(@Valid @RequestBody LoginDTO login,
                                            HttpSession sesion) {
         Usuario u = usuarioService.inicioSesion(login);
@@ -41,6 +38,16 @@ public class UsuarioController {
         sesion.setAttribute("userRoles", usuarioService.setRolesComoString(u));
 
         return ResponseEntity.ok().body("Has iniciado sesion");
+    }
+
+
+    @GetMapping("/me")
+    public ResponseEntity<UsuarioMeDTO> getMe(HttpSession sesion){
+
+        Usuario u = sesionService.getUsuarioLogged(sesion);
+
+        return ResponseEntity.ok().body(new UsuarioMeDTO(
+                u.getId(), usuarioService.setRolesComoString(u)));
     }
 
 
@@ -123,6 +130,7 @@ public class UsuarioController {
     }
 
 
+    // borrar x otro distinto si pinta un filtrado
     @GetMapping("/listar/filtrar")
     public ResponseEntity<?> filtrarListaUsuarios(
             @RequestParam(required = false) String nombre,
