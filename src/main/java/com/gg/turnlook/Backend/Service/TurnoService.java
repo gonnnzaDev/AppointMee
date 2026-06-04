@@ -203,7 +203,7 @@ public class TurnoService {
 
         UsuarioMiniDTO cliente = new UsuarioMiniDTO(c.getNombre(), c.getApellido());
         UsuarioEmpleadorResponseDTO empleado = new UsuarioEmpleadorResponseDTO(
-                e.getId(), e.getNombre(), e.getApellido(), e.getEmail());
+                e.getId(), e.getNombre(), e.getApellido(), e.getEmail(), e.getFotoPerfil().getFotoValida());
         ServicioTurnoResponseDTO servicio = new ServicioTurnoResponseDTO(
                 s.getId(), s.getNombre(), s.getPrecio(), s.getDuracion());
 

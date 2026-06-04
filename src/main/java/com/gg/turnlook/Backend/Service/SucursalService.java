@@ -183,12 +183,12 @@ public class SucursalService {
                 .collect(Collectors.toSet());
     }
 
-
+    // est
     public Set<UsuarioEmpleadorResponseDTO> verEmpleadosEmpleador(Integer sucursalId) {
         Sucursal suc = listarSucursalPorId(sucursalId);
         return suc.getEmpleados().stream().
                 map(u -> new UsuarioEmpleadorResponseDTO(u.getId() ,u.getNombre(),
-                        u.getApellido(), u.getEmail()))
+                        u.getApellido(), u.getEmail(), u .getFotoPerfil().getFotoValida()))
                 .collect(Collectors.toSet());
     }
 

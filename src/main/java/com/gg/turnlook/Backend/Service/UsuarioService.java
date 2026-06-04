@@ -125,7 +125,8 @@ public class UsuarioService {
     public UsuarioEmpleadorResponseDTO listarUsuariosPorEmailEmpleador(UsuarioEmailDTO email) {
         Usuario u = listarUsuarioPorEmail(email.getEmail());
 
-        return new UsuarioEmpleadorResponseDTO(u.getId() ,u.getNombre(), u.getApellido(), u.getEmail());
+        return new UsuarioEmpleadorResponseDTO(u.getId() ,u.getNombre(), u.getApellido()
+                , u.getEmail(), u.getFotoPerfil().getFotoValida());
     }
 
 
@@ -156,6 +157,7 @@ public class UsuarioService {
         uPerfil.setEmail(u.getEmail());
         uPerfil.setFechaCreacion(u.getFechaCreacion());
         uPerfil.setRoles(setRolesComoString(u));
+        uPerfil.setFotoPerfil(u.getFotoPerfil().getFotoValida());
         uPerfil.setSucursalesEmpleado(u.getSucursalesEmpleado().stream()
                 .map(suc -> new SucursalMiniDTO(suc.getId(), suc.getNombre(),
                         suc.getCategoria().getCategoria())).collect(Collectors.toSet()));

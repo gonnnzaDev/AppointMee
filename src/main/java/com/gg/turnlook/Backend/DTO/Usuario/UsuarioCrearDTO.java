@@ -2,6 +2,7 @@ package com.gg.turnlook.Backend.DTO.Usuario;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import org.hibernate.validator.constraints.URL;
 
 @Data
 public class UsuarioCrearDTO {
@@ -29,5 +30,6 @@ public class UsuarioCrearDTO {
     @Size(min = 8, max = 150, message = "El email debe estar entre 8 y 150 caracteres")
     private String email;
 
-
+    @URL(message = "La foto de perfil debe ser una URL valida")
+    private String fotoUrl;
 }

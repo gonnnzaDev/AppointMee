@@ -18,6 +18,7 @@ public class UsuarioPerfilResponseDTO {
     private String apellido;
     private String email;
     private LocalDate fechaCreacion;
+    private String fotoPerfil;
     private Set<String> roles;
     private Set<SucursalMiniDTO> sucursalesEmpleado;
 }

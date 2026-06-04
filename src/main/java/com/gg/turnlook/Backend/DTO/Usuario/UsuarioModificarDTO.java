@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import org.hibernate.validator.constraints.URL;
 
 @Data
 public class UsuarioModificarDTO {
@@ -27,5 +28,6 @@ public class UsuarioModificarDTO {
     @Size(min = 8, max = 150, message = "El email debe estar entre 8 y 150 caracteres")
     private String email;
 
-
+    @URL(message = "La foto de perfil debe ser una URL valida")
+    private String fotoUrl;
 }
