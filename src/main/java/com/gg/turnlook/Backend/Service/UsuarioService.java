@@ -22,12 +22,12 @@ import java.util.stream.Collectors;
 public class UsuarioService {
 
     private final UsuarioRepository usRepo;
-    private final RolRepository rolRepo;
+    private final RolService rolService;
     private final PasswordEncoder passEncoder;
 
-    public UsuarioService(UsuarioRepository usRepo, RolRepository rolRepo, PasswordEncoder passEncoder) {
+    public UsuarioService(UsuarioRepository usRepo, RolService rolService, PasswordEncoder passEncoder) {
         this.usRepo = usRepo;
-        this.rolRepo = rolRepo;
+        this.rolService = rolService;
         this.passEncoder = passEncoder;
     }
 
@@ -56,8 +56,8 @@ public class UsuarioService {
 
 
     public Usuario crearUsuario(UsuarioCrearDTO u) {
-        Rol rol = rolRepo.findByRol(ERol.CLIENTE)
-                .orElseThrow(() -> new NotFoundException("Rol no encontrado"));
+
+        Rol rol = rolService.listarPorRol(ERol.CLIENTE);
 
         Usuario user = new Usuario(u.getNombre(), u.getApellido(), u.getEmail(),
                 passEncoder.encode(u.getPassword()));
@@ -164,6 +164,19 @@ public class UsuarioService {
     public void borrarUsuario(Integer usuarioId) {
         Usuario u = listarUsuarioPorId(usuarioId);
         usRepo.delete(u);
+    }
+
+
+    public void solicitudRolEmpleador(Integer userId){
+
+        Usuario usuario = listarUsuarioPorId(userId);
+
+        // ver q le llegue una noti a un admin para aprobar o no aprobar la solicitud
+        // quizas un formulario o algo asi nosE
+        
+        Rol empleador = rolService.listarPorRol(ERol.EMPLEADOR);
+        usuario.getRoles().add(empleador);
+        usRepo.save(usuario);
     }
 }
 

@@ -167,4 +167,20 @@ public class UsuarioController {
 
         return ResponseEntity.ok().body(usuarioService.listarUsuariosPorEmail(userEmail));
     }
+
+
+    // ver si es con formulario o notif a admin (DESPUES VER CON G)
+    @PatchMapping("/{userId}/solicitar-ser-empleador")
+    public ResponseEntity<?> solicitarRolEmpleador(@PathVariable("userId") Integer userId,
+                                                   HttpSession sesion){
+        sesionService.isLogged(sesion);
+
+        if(sesionService.tieneRol(sesion, ERol.EMPLEADOR.name()) ||
+                sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())){
+            throw new ForbiddenException("No podes solicitar ser empleador siendo ya uno");
+        }
+
+        usuarioService.solicitudRolEmpleador(userId);
+        return ResponseEntity.ok().body("Se te otorgó el rol Empleador");
+    }
 }
