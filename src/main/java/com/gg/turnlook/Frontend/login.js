@@ -1,3 +1,6 @@
+const baseApi = "http://localhost:8080/";
+
+
 renderLogin();
 
 
@@ -110,9 +113,6 @@ if (registerButton) {
 
 
 
-
-
-
 const botonGoogle = document.getElementById("google-button");
 
 if (botonGoogle) {
@@ -164,13 +164,12 @@ window.renderGoogleButton = function () {
 };
 
 
-
 async function userExists(mail, pass) {
 
     try {
 
         const response = await fetch(
-            "http://localhost:8080/usuarios/inicio_sesion",
+            baseApi + "usuarios/inicio_sesion",
             {
                 method: "POST",
                 headers: {

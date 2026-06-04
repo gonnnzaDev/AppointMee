@@ -1,17 +1,12 @@
-<!DOCTYPE html>
-<html lang="es">
+render();
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agregar Servicio</title>
-   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link rel="stylesheet" href="recursos/style.css">
-</head>
+function render() {
 
-<body>
-    <div id="navbar"></div>
+    const container = document.getElementById("formulario-agregarServicio");
+
+    if (container) {
+
+        container.innerHTML = `
 
     <div class="form-simple">
         <h1>Agregar Nuevo Servicio</h1>
@@ -39,8 +34,9 @@
             </div>
         </form>
     </div>
+`
 
-    <script src="recursos/script.js"></script>
-</body>
 
-</html>
+
+    }
+}

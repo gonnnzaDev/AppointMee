@@ -64,19 +64,3 @@ if (navbar) {
 
 
 
-
-function buscarCategorias() {
-    fetch('/api/categorias')
-        .then(response => response.json())
-        .then(categorias => {
-            const select = document.getElementById('categoria');
-
-            categorias.forEach(categoria => {
-                const option = document.createElement('option');
-                option.value = categoria.id;
-                option.textContent = categoria.nombre;
-                select.appendChild(option);
-            });
-        })
-        .catch(error => console.error('Error al cargar categorías:', error));
-}
