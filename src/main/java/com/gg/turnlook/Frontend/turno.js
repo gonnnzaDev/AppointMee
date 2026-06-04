@@ -1,45 +1,170 @@
-//Primera Parte de la seccion turno
+const apiBaseURL = "http://localhost:8080/turnos";
+const imagenURLAlternativa = "https://xentra.glomastore.mx/img/sin_imagen.png";
+
+renderTurnos();
+
+//en empleados container debe ingresar los html de la otra funcion
+
+function renderTurnos() {
 
 
-function buscarEmpleados() {
+    const agendarTurnosContainer = document.getElementById("agendarTurno-container");
 
-    fetch('/api/empleados')
-        .then(res => res.json())
-        .then(empleados => {
-            renderEmpleados(empleados);
-        })
-        .catch(error => console.error('Error al cargar empleados:', error));
+    if (agendarTurnosContainer) {
+
+
+        agendarTurnosContainer.innerHTML = `
+          <div class="agendarTurno-info">
+
+
+            <div class="empleados-container">
+
+              
+            </div>
+
+
+            <div class="info-seleccionada" id="info-seleccionada">
+              
+            </div>
+
+            <button class="btn-proceso" id="btn-siguiente-turno-1">Siguiente</button>
+
+
+        </div>
+        `
+
+
+        buscarEmpleados();
+
+
+        const btnSiguiente = document.getElementById("btn-siguiente-turno-1");
+
+        btnSiguiente.addEventListener("click",
+            () => {
+                  agendarTurnosContainer.innerHTML =
+                `
+
+               <div class="agendarTurno-info">
+        <div class="turno-container">
+
+            <div class="turno-header">
+                <h1>¿Cuándo querés venir?</h1>
+            </div>
+
+            <div class="cal-nav">
+                <button class="cal-nav-btn" id="btn-prev">&#8249;</button>
+                <span class="cal-mes-nombre" id="cal-mes-nombre"></span>
+                <button class="cal-nav-btn" id="btn-next">&#8250;</button>
+            </div>
+
+            <div class="cal-semana">
+                <div class="cal-semana-label">DO</div>
+                <div class="cal-semana-label">LU</div>
+                <div class="cal-semana-label">MA</div>
+                <div class="cal-semana-label">MI</div>
+                <div class="cal-semana-label">JU</div>
+                <div class="cal-semana-label">VI</div>
+                <div class="cal-semana-label">SA</div>
+            </div>
+
+            <div class="cal-grid" id="cal-grid"></div>
+
+            <p class="turno-horarios-titulo" id="horarios-titulo">Horarios disponibles</p>
+            <div class="turno-horarios-grid" id="horarios-grid">
+                <span class="turno-sin-dia">Seleccioná un día para ver los horarios.</span>
+            </div>
+
+            <div class="turno-resumen" id="turno-resumen">
+                <span class="turno-resumen-texto" id="turno-resumen-texto"></span>
+            </div>
+
+            <div class="turno-footer">
+                <button class="turno-btn-siguiente" id="btn-siguiente-turno-2" disabled>
+                    Confirmar turno <span>→</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+        `
+
+            }
+        )
+          
+
+
+
+    }
 
 
 }
 
 
-function renderEmpleados() {
+//Primera Parte de la seccion turno
 
+
+
+function buscarEmpleados() {
+
+    fetch('')
+        .then(res => res.json())
+        .then(empleados => {
+            cargarEmpleados(empleados);
+        })
+        .catch(error => alert(error.message));
+
+
+}
+
+
+
+function visualizarProfesionalSeleccionado(id) {
+
+    const info = document.getElementById("info-seleccionada");
+
+    if(info){
+        info.innerHTML = `
+                <img src="" alt="${imagenURLAlternativa}">
+                <h2>Nombre:</h2>
+                <p>Puntuacion:</p>
+`;
+    }
+
+
+}
+
+
+function cargarEmpleados(e) {
+
+    const baseDeLink = "";
+
+    let link = baseDeLink + e.id;
     const empleadosContainer = document.getElementById("empleados-container");
-
     if (empleadosContainer) {
-
-        empleadosContainer.innerHTML = `    
-
-          <a href="">
+        empleadosContainer.innerHTML = empleados.map(e => `
+            <a href="${link}">
                     <article class="empleado-article">
-                        <p>Nombre</p>
-                        <p>Valoracion</p>
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Baby.tux.sit-black-800x800.png"
-                            alt="">
+                        <p>${e.nombre}</p>
+                        <p>${e.valoracion}</p>
+                        <img src="${e.imagen}"
+                            alt="${imagenURLAlternativa}">
                     </article>
 
                 </a>
-        `;
 
-
+        `).join('');
     }
 }
 
 
 
-//Segunda Parte de la seccion turno
+
+//Segundo paso render
+
+
+
+//Segunda Parte de la seccion turno (segundo paso logica)
 const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 const TURNOS_BASE = ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'];
 
@@ -142,3 +267,7 @@ document.getElementById('btn-next').addEventListener('click', () => {
 });
 
 renderCalendario();
+
+
+
+
