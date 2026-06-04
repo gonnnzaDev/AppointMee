@@ -3,7 +3,6 @@ const apiBaseURL = "http://localhost:8080/servicios";
 const params = new URLSearchParams(window.location.search);
 const sucursalId = params.get("sucursalId");
 
-console.log(sucursalId);
 render();
 
 function render() {
@@ -67,7 +66,7 @@ function render() {
 
 
 
-function postServicio(nombre, descripcion, duracion, precio, sucursalId) {
+function postSucursal(nombre, descripcion, duracion, precio, sucursalId) {
 
     const datos = {
         nombre: nombre,

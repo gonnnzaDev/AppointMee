@@ -1,11 +1,13 @@
+const apiBaseURL = "http://localhost:8080/sucursales";
+
 render();
 
-function render(){
+function render() {
 
     const container = document.getElementById("formulario-agregarSucursal");
-    
-    if(container){
-        
+
+    if (container) {
+
         container.innerHTML = `
         
         <div class="form-simple">
@@ -53,7 +55,85 @@ function render(){
         </form>
         </div>
         `;
-        
-        
+
+        const btn = document.getElementById("btn-guardar-servicio");
+
+        btn.addEventListener("click", (e) => {
+            e.preventDefault();
+
+
+            /*
+    private String nombre;
+
+    private String direccion;
+
+    private String telefono;
+
+    private String descripcion;
+
+    private Integer categoriaId;
+
+    private LocalTime horaApertura;
+
+    private LocalTime horaCierre; 
+    */
+
+
+
+
+        }
+        )
     }
 }
+
+
+
+
+
+
+
+
+function postSucursal(nombre, descripcion, duracion, precio, sucursalId) {
+
+    const datos = {
+        nombre: nombre,
+        descripcion: descripcion,
+        duracion: duracion,
+        precio: precio,
+        sucursalId: sucursalId
+    };
+
+    fetch(apiBaseURL + '/crear',
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(datos)
+        })
+        .then(response => response.text())
+        .then(data => {
+            alert(data);
+        })
+        .catch(error => alert(`Error al guardar: ${error.message}`));
+
+
+
+
+}
+
+/*  @PostMapping("/crear")
+    public ResponseEntity<?> crearSucursal(
+            @Valid @RequestBody SucursalCrearDTO sucursal,
+            HttpSession sesion) {
+
+        sesionService.isLogged(sesion);
+
+        if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        sucursalService.crearSucursal(sucursal, sesionService.getUsuarioId(sesion));
+        return ResponseEntity.ok().body("Se creó la sucursal");
+    }
+ */
