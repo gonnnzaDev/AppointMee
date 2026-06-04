@@ -173,7 +173,7 @@ public class UsuarioService {
 
         // ver q le llegue una noti a un admin para aprobar o no aprobar la solicitud
         // quizas un formulario o algo asi nosE
-        
+
         Rol empleador = rolService.listarPorRol(ERol.EMPLEADOR);
         usuario.getRoles().add(empleador);
         usRepo.save(usuario);

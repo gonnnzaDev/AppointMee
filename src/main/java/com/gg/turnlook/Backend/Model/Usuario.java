@@ -44,7 +44,7 @@ public class Usuario {
     private boolean activo = true;
 
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "imagen_id")
     private Imagen fotoPerfil;
 

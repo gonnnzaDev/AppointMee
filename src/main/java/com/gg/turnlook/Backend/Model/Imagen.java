@@ -20,7 +20,7 @@ public class Imagen {
     @Column(nullable = true)
     private String url;
 
-    @Column(nullable = false)
+    @Column(name = "url_alt" ,nullable = false)
     private String urlAlt = "https://i.pinimg.com/originals/bb/b7/13/bbb713760b2b209894bce2b42fe8f4bd.jpg";
                                 // ver si funca dsp
 
