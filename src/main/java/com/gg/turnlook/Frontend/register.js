@@ -1,3 +1,7 @@
+renderRegister();
+
+
+
 
 //render de register para que funcione en la misma pagina q el login
 const registerPerson = document.getElementById("register-person");
@@ -108,4 +112,61 @@ function postUser(name, surname, mail, pass) {
         .catch(error => {
             alert(error);
         });
+}
+
+
+function renderRegister(){
+
+    const container = document.getElementById("register-form")
+
+    if(container){
+
+        container.innerHTML =`
+        
+             <div class="form" id="info-register">
+
+                <div class="credentials-form" id="realizar-registro-button">
+
+                    <div class="input-group mb-1">
+                        <input type="text" class="form-control" placeholder="Name" aria-label="Username"
+                            aria-describedby="basic-addon1" id="register-name-input"
+                            
+                            id="register-name-input"
+                            >
+                    </div>
+                    <div class="input-group mb-1">
+                        <input type="text" class="form-control" placeholder="Surname" aria-label="Username"
+                            aria-describedby="basic-addon1" id="register-surname-input"
+                            id="register-surname-input"
+                            >
+                    </div>
+                    <div class="input-group mb-1">
+                        <input type="text" class="form-control" placeholder="Mail" aria-label="Username"
+                            aria-describedby="basic-addon1" id="register-mail-input"
+                            
+                            id="register-mail-input">
+                    </div>
+                    <div class="input-group mb-1">
+                        <input type="password" class="form-control" placeholder="Password" aria-label="Password"
+                            aria-describedby="basic-addon1" id="register-password1-input"
+                            id="register-password1-input">
+                    </div>
+
+                    <div class="input-group mb-1">
+                        <input type="password" class="form-control" placeholder="Confirm Password" aria-label="Password"
+                            aria-describedby="basic-addon1" id="register-password2-input"
+                            id="register-password2-input">
+                    </div>
+
+
+                    <div class="vstack gap-1 mb-3">
+                        <button type="button" id="register-button">Register</button>
+                    </div>
+                    <div class="vstack gap-1 mb-3">
+                        <button type="button" id="cancel-button">Cancel</button>
+                    </div>
+                </div>
+        `
+    }
+
 }
