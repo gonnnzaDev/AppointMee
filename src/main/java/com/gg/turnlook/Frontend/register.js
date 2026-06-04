@@ -95,7 +95,6 @@ function renderRegister(){
                 </div>
                 <div class="vstack gap-1 mb-3">
                     <button type="button" id="register-person">Crear Cuenta</button>
-                    <hr>
                     <button type="button" id="cancel-button">Volver a Login</button>
                 </div>
             </div>

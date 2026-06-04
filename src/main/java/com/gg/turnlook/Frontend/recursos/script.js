@@ -1,66 +1,84 @@
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // regla q todos los email deben cumplir
 
-const navbar = document.getElementById("navbar");
-//Esto es para modularizar el navbar
+function initNavbar() {
+  const navbar = document.getElementById("navbar");
+  if (!navbar) return;
 
-if (navbar) {
+  navbar.innerHTML = `
+    <nav class="am-nav">
+      <div class="am-nav__container">
 
-    navbar.innerHTML = `
+        <a class="am-nav__brand" href="Index.html">
+          <img
+            src="https://cdn.discordapp.com/attachments/1492334072901533747/1502155047633424504/content.png?ex=69feae68&is=69fd5ce8&hm=373d791a61c3ae304c7d324ffe6da30d02ae77d062898b8284aacd23271ea4fb"
+            alt="AppointMee logo"
+            class="am-nav__logo"
+          />
+          <span class="am-nav__title">AppointMee</span>
+        </a>
 
-<nav class="navbar navbar-expand-sm border-bottom border-body" data-bs-theme="dark">
-    <div class="container">
-        <a class="navbar-brand" href="#">
-        <img src="https://cdn.discordapp.com/attachments/1492334072901533747/1502155047633424504/content.png?ex=69feae68&is=69fd5ce8&hm=373d791a61c3ae304c7d324ffe6da30d02ae77d062898b8284aacd23271ea4fb"></a>
-        
-        <h2>AppointMee</h2>
+        <div class="am-nav__search">
+          <svg class="am-nav__search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="6.5" cy="6.5" r="5.5"/>
+            <line x1="11.5" y1="11.5" x2="15" y2="15"/>
+          </svg>
+          <input
+            class="am-nav__search-input"
+            type="search"
+            placeholder="Buscá tu próximo turno..."
+            autocomplete="off"
+          />
+        </div>
 
-        <button class="navbar-toggler" type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarScroll">
+        <ul class="am-nav__links" id="amNavLinks">
+          <li><a class="am-nav__link" href="Index.html" data-page="home">Home</a></li>
+          <li><a class="am-nav__link" href="Perfil.html" data-page="perfil">Perfil</a></li>
+          <li><a class="am-nav__link" href="#" data-page="turnos">Mis Turnos</a></li>
+        </ul>
 
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-left" viewBox="0 0 16 16">
-  <path fill-rule="evenodd" d="M2 13.5a.5.5 0 0 0 .5.5h6a.5.5 0 0 0 0-1H3.707L13.854 2.854a.5.5 0 0 0-.708-.708L3 12.293V7.5a.5.5 0 0 0-1 0z"/>
-</svg>
-
+        <button class="am-nav__toggle" id="amNavToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="amNavLinks">
+          <span class="am-nav__toggle-bar"></span>
+          <span class="am-nav__toggle-bar"></span>
+          <span class="am-nav__toggle-bar"></span>
         </button>
 
-        <form class="d-flex">
-                <input class="form-control me-2" type="search" placeholder="Busca tu proximo turno...">
+      </div>
+    </nav>
+  `;
 
-                <button class="btn btn-outline-success" type="submit">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-</svg>
-                </button>
-            </form>
-
-        <div class="collapse navbar-collapse" id="navbarScroll">
-
-            <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll">
-
-                <li class="nav-item">
-                    <a class="nav-link active" href="Index.html">Home</a>
-                </li>
-
-                  <li class="nav-item">
-                    <a class="nav-link " href="Perfil.html">Perfil</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
-                </li>
-
-            </ul>
-
-            
-
-        </div>
-    </div>
-</nav>
-`;
+  _bindToggle();
+  _markActiveLink();
 }
 
+function _bindToggle() {
+  const toggle = document.getElementById("amNavToggle");
+  const links  = document.getElementById("amNavLinks");
+  if (!toggle || !links) return;
 
+  toggle.addEventListener("click", () => {
+    const isOpen = links.classList.toggle("am-nav__links--open");
+    toggle.classList.toggle("am-nav__toggle--open", isOpen);
+    toggle.setAttribute("aria-expanded", String(isOpen));
+  });
 
+  document.addEventListener("click", (e) => {
+    if (!toggle.contains(e.target) && !links.contains(e.target)) {
+      links.classList.remove("am-nav__links--open");
+      toggle.classList.remove("am-nav__toggle--open");
+      toggle.setAttribute("aria-expanded", "false");
+    }
+  });
+}
 
+function _markActiveLink() {
+  const currentPage = window.location.pathname.split("/").pop() || "Index.html";
+  const links = document.querySelectorAll(".am-nav__link");
+  links.forEach((link) => {
+    const href = link.getAttribute("href").split("/").pop();
+    if (href === currentPage) {
+      link.classList.add("am-nav__link--active");
+    }
+  });
+}
 
+document.addEventListener("DOMContentLoaded", initNavbar);
