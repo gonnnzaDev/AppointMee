@@ -49,7 +49,7 @@ Red social de turnos para Trabajo Practico Final de la Materia Programacion III 
    spring.jpa.show-sql=true
    spring.datasource.username= (Usuario)
    spring.datasource.password= (Contraseña)
-   
+   spring.datasource.url= (Bdd)
    ```
 
 3. Compilar y ejecutar:
