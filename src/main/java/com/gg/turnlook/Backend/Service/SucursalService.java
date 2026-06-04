@@ -49,8 +49,9 @@ public class SucursalService {
             return false;
         }
 
-        return sucursal.getEmpleados().contains(usuario) ||
-                sucursal.getEmpleador().equals(usuario);
+        return sucursal.getEmpleador().getId().equals(usuario.getId()) ||
+                sucursal.getEmpleados().stream()
+                        .anyMatch(u -> u.getId().equals(usuario.getId()));
     }
 
 

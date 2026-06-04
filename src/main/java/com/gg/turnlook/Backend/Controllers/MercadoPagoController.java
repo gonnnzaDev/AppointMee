@@ -1,19 +1,22 @@
 package com.gg.turnlook.Backend.Controllers;
 
-import com.gg.turnlook.Backend.DTO.PagoDTO;
+
 import com.gg.turnlook.Backend.Service.MercadoPagoService;
+import com.mercadopago.exceptions.MPApiException;
+import com.mercadopago.exceptions.MPException;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
 @RequestMapping("/pagos")
 public class MercadoPagoController {
 
+
+
     private final MercadoPagoService mpService;
+
 
     public MercadoPagoController(MercadoPagoService mpService) {
         this.mpService = mpService;
@@ -22,10 +25,18 @@ public class MercadoPagoController {
 
     /// ENDPOINTS
 
-   /* @PostMapping("/preferencia")
-    public ResponseEntity<?> realizarPago(@RequestBody PagoDTO pagoDTO){
-                               
+
+    @PostMapping("/preferencia/{turnoId}")
+    public ResponseEntity<?> realizarPago(@PathVariable("turnoId") Integer turnoId,
+                                          HttpSession sesion) throws MPException, MPApiException {
+      try {
+          return ResponseEntity.ok().body(mpService.pagar(turnoId));
+      }catch (MPException e1){
+          return ResponseEntity.status(500).body("Error mp1");  // test
+      }catch (MPApiException e2){
+          return ResponseEntity.status(500).body("Error mp2");  // test
+      }
     }
-            lo termino cuando tengo la clase hecha
-    */
+
+
 }
