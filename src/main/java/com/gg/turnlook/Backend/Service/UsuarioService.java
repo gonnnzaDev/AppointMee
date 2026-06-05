@@ -7,6 +7,7 @@ import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Excepciones.ConflictException;
 import com.gg.turnlook.Backend.Excepciones.NotFoundException;
 import com.gg.turnlook.Backend.Excepciones.UnauthorizedException;
+import com.gg.turnlook.Backend.Model.Imagen;
 import com.gg.turnlook.Backend.Model.Rol;
 import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Repository.RolRepository;
@@ -23,11 +24,13 @@ public class UsuarioService {
 
     private final UsuarioRepository usRepo;
     private final RolService rolService;
+    private final ImagenService imagenService;
     private final PasswordEncoder passEncoder;
 
-    public UsuarioService(UsuarioRepository usRepo, RolService rolService, PasswordEncoder passEncoder) {
+    public UsuarioService(UsuarioRepository usRepo, RolService rolService, ImagenService imagenService, PasswordEncoder passEncoder) {
         this.usRepo = usRepo;
         this.rolService = rolService;
+        this.imagenService = imagenService;
         this.passEncoder = passEncoder;
     }
 
@@ -61,7 +64,10 @@ public class UsuarioService {
 
         Usuario user = new Usuario(u.getNombre(), u.getApellido(), u.getEmail(),
                 passEncoder.encode(u.getPassword()));
+
         user.getRoles().add(rol);
+        user.setFotoPerfil(imagenService.crearFotoPerfil(u.getFotoUrl()));
+
         return usRepo.save(user);
     }
 
@@ -78,15 +84,22 @@ public class UsuarioService {
 
         Usuario user = listarUsuarioPorId(userId);
 
-        if (usuario.getNombre() != null) user.setNombre(usuario.getNombre());
-        if (usuario.getApellido() != null) user.setApellido(usuario.getApellido());
+        if (usuario.getNombre() != null && !usuario.getNombre().isBlank()) user.setNombre(usuario.getNombre());
+
+        if (usuario.getApellido() != null && !usuario.getApellido().isBlank()) user.setApellido(usuario.getApellido());
+
         if (usuario.getEmail() != null && !usuario.getEmail().equals(user.getEmail())) {
             if (usRepo.existsByEmail(usuario.getEmail())) {
                 throw new ConflictException("El email ingresado ya esta en uso");
             }
             user.setEmail(usuario.getEmail());
         }
+
         if (usuario.getPassword() != null) user.setPassword(passEncoder.encode(usuario.getPassword()));
+
+        if (usuario.getFotoUrl() != null && !usuario.getFotoUrl().isBlank()) {
+            imagenService.cambiarFotoPerfil(user, usuario.getFotoUrl());
+        }
 
         usRepo.save(user);
     }
@@ -167,7 +180,7 @@ public class UsuarioService {
     }
 
 
-    public void solicitudRolEmpleador(Integer userId){
+    public void solicitudRolEmpleador(Integer userId) {
 
         Usuario usuario = listarUsuarioPorId(userId);
 

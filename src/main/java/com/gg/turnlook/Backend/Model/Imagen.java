@@ -21,8 +21,8 @@ public class Imagen {
     private String url;
 
     @Column(name = "url_alt" ,nullable = false)
-    private String urlAlt = "https://i.pinimg.com/originals/bb/b7/13/bbb713760b2b209894bce2b42fe8f4bd.jpg";
-                                // ver si funca dsp
+    private String urlAlt = "https://pimedelaar.org/wp-content/uploads/2023/05/no-image.png";
+                                // borrar esto dsp cuando g pase la suya O dejar esta
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "servicio_id")

@@ -1,6 +1,6 @@
 package com.gg.turnlook.Backend.Excepciones;
 
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
             errores.put(error.getField(), error.getDefaultMessage());
         });
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errores);
+        return ResponseEntity.status(400).body(errores);
     }
 
     @ExceptionHandler(NotFoundException.class)
