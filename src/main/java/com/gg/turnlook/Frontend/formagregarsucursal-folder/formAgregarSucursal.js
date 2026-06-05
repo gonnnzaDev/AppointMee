@@ -62,21 +62,6 @@ function render() {
             e.preventDefault();
 
 
-            /*
-    private String nombre;
-
-    private String direccion;
-
-    private String telefono;
-
-    private String descripcion;
-
-    private Integer categoriaId;
-
-    private LocalTime horaApertura;
-
-    private LocalTime horaCierre; 
-    */
 
 
 

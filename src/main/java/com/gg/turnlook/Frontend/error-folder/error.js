@@ -65,7 +65,7 @@ function buscarEmpleados() {
             cargarEmpleados(empleados);
         })
         .catch(error => {
-            window.location.href = `/error.html?msg=${encodeURIComponent(error.message)}`;
+            window.location.href = `../error.html?msg=${encodeURIComponent(error.message)}`;
         });
 }
 

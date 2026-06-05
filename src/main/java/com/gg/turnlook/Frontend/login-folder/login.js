@@ -102,7 +102,7 @@ if (botonLogin) {
             if (!existe) {
                 alert("Usuario o contraseña incorrectos");
             } else {
-                window.location.href = "/index-folder/Index.html";
+                window.location.href = "../index-folder/Index.html";
             }
 
         }
@@ -118,7 +118,7 @@ const cancelButton = document.getElementById("cancel-button");
 if (cancelButton) {
 
     cancelButton.addEventListener("click", () => {
-        window.location.href = "/login-folder/Login.html";
+        window.location.href = "../login-folder/Login.html";
     }
 
     );
@@ -129,7 +129,7 @@ const registerButton = document.getElementById("register-button");
 if (registerButton) {
 
     registerButton.addEventListener("click", () => {
-        window.location.href = "/register-folder/Register.html";
+        window.location.href = "../register-folder/Register.html";
     });
 }
 
