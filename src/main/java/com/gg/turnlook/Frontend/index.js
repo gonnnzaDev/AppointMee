@@ -16,8 +16,13 @@ async function mostrarSucursales() {
     const sucursales = await traerSucursales();
     const sucursalesContainer = document.getElementById('turn-container');
     if (sucursalesContainer) {
-        sucursalesContainer.innerHTML = sucursales.map(sucursal =>
-            renderSucursal(sucursal.nombre, sucursal.descripcion, sucursal.categoria)
+        sucursalesContainer.innerHTML = sucursales.map
+        (sucursal =>
+            renderSucursal(
+                sucursal.nombre,
+                sucursal.descripcion,
+                sucursal.categoria
+            )
         ).join('');
     }
 }
@@ -36,6 +41,10 @@ function renderSucursal(nombre, descripcion, categoria) {
     `;
 }
 
+mostrarSucursales();
+
+
+/*
 function categoriasDisponibles() {
     fetch(baseApi + 'categorias')
         .then(res => {
@@ -58,6 +67,6 @@ function renderCategoriasParaFiltrar(categorias) {
         `).join('');
     }
 }
-
 categoriasDisponibles();
-mostrarSucursales();
+*/
+

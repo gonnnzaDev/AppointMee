@@ -73,7 +73,7 @@ if (botonLogin) {
             if (existe) {
 
                 //Post y abro el index
-                await fetch("usuario/inicio_sesion", {
+                await fetch("usuarios/inicio_sesion", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
