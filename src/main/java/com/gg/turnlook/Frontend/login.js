@@ -1,5 +1,4 @@
-const baseApi = "http://localhost:8080/";
-
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 renderLogin();
 
@@ -47,6 +46,35 @@ function renderLogin() {
 
 
 
+async function userExists(mail, pass) {
+
+    try {
+
+        const response = await fetch(`http://localhost:8080/usuarios/inicio_sesion`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+               
+                body: JSON.stringify({
+                    email: mail.value,
+                    pass: pass.value
+                })
+            }
+        );
+
+        if (!response.ok) {
+            return false;
+        }
+
+        return true;
+
+    } catch (error) {
+        return false;
+    }
+}
+
 
 
 
@@ -70,27 +98,14 @@ if (botonLogin) {
 
             const existe = await userExists(mail, pass);
 
-            if (existe) {
+            console.log(existe);    
 
-                //Post y abro el index
-                await fetch("usuario/inicio_sesion", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        email: mail,
-                        password: pass
-                    })
-                });
-
-                window.location.href = "Index.html";
-
-            } else {
-
+            if (!existe) {
                 alert("Usuario o contraseña incorrectos");
-
+            } else {
+                window.location.href = "Index.html";
             }
+
         }
     });
 
@@ -118,7 +133,6 @@ if (registerButton) {
         window.location.href = "Register.html";
     });
 }
-
 
 
 const botonGoogle = document.getElementById("google-button");
@@ -168,35 +182,4 @@ window.renderGoogleButton = function () {
         });
     });
 };
-
-
-async function userExists(mail, pass) {
-
-    try {
-
-        const response = await fetch(
-            baseApi + "usuarios/inicio_sesion",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    email: mail.value,
-                    pass: pass.value
-                })
-            }
-        );
-
-        if (!response.ok) {
-            return false;
-        }
-
-        return true;
-
-    } catch (error) {
-        alert(error.message);
-        return false;
-    }
-}
 
