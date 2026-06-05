@@ -1,7 +1,6 @@
 const apiBaseURL = "http://localhost:8080/turnos";
-const imagenURLAlternativa = "https://xentra.glomastore.mx/img/sin_imagen.png";
+const imagenURLAlternativa = "https://xent ra.glomastore.mx/img/sin_imagen.png";
 
-renderTurnos();
 
 //en empleados container debe ingresar los html de la otra funcion
 
@@ -16,7 +15,7 @@ function renderTurnos() {
         agendarTurnosContainer.innerHTML = `
           <div class="agendarTurno-info">
 
-
+ 
             <div class="empleados-container">
 
               

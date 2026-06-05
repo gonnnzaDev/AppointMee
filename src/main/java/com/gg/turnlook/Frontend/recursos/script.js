@@ -31,9 +31,11 @@ function initNavbar() {
         </div>
 
         <ul class="am-nav__links" id="amNavLinks">
+        
           <li><a class="am-nav__link" href="Index.html" data-page="home">Home</a></li>
           <li><a class="am-nav__link" href="Perfil.html" data-page="perfil">Perfil</a></li>
-          <li><a class="am-nav__link" href="#" data-page="turnos">Mis Turnos</a></li>
+          <li><a class="am-nav__link" href="MisTurnos.html" data-page="turnos">Mis Turnos</a></li>
+          
         </ul>
 
         <button class="am-nav__toggle" id="amNavToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="amNavLinks">

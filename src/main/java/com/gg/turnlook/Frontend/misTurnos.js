@@ -8,13 +8,13 @@ function renderTurnos() {
         container.innerHTML = `
         <div class="filtrar">
 
-                 <label for="estados">Estado:</label>
-
-                 <select name="estados" id="estados">
-                   <option value="pendientes">Pendientes</option>
-                   <option value="confirmados">Confirmados</option>
-                   <option value="finalizados">Finalizados</option>
-                 </select>
+                         <label for="estados">Estado:</label>
+            
+             <select name="estados" id="estados">
+               <option value="pendientes">Pendientes</option>
+               <option value="confirmados">Confirmados</option>
+               <option value="finalizados">Finalizados</option>
+             </select>
 
         </div>
          <div class="persona-info">
