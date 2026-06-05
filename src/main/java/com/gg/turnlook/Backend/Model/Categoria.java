@@ -23,9 +23,7 @@ public class Categoria {
     @Column(unique = true, nullable = false)
     private String categoria;
 
-    @OneToMany(mappedBy = "categoria")
-    @JsonIgnore
-    private List<Sucursal> sucursales;
+    
 
     /// CONSTRUCTORES
     public Categoria(String nombre) {
