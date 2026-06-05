@@ -96,21 +96,15 @@ public class SucursalController {
         return ResponseEntity.ok().body(sucursalService.listarSucursales());
     }
 
-    // mejorar este dsp q ahora es bastante inutil
+
     @GetMapping("/listar/filtrar")
-    public ResponseEntity<?> filtrarListaSucursales(@RequestParam(required = false) String nombre,
-                                                    @RequestParam(required = false) Boolean activo,
-                                                    @RequestParam(required = false) Integer catId,
-                                                    @RequestParam(required = false) Integer userId,
+    public ResponseEntity<?> filtrarListaSucursales(@RequestParam(required = false) Integer catId,
+                                                    @RequestParam(required = false) String nombre,
                                                     HttpSession sesion) {
 
         sesionService.isLogged(sesion);
 
-        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
-            throw new ForbiddenException("No tenes permisos");
-        }
-
-        return ResponseEntity.ok().body(sucursalService.filtrarListaSucursales(nombre, activo, catId, userId));
+        return ResponseEntity.ok().body(sucursalService.filtrarListaSucursales(catId, nombre));
     }
 
 
@@ -122,13 +116,14 @@ public class SucursalController {
         return ResponseEntity.ok().body(sucursalService.verSucursalPorId(id));
     }
 
+
     @GetMapping("/{sucursalId}/empleados")
     public ResponseEntity<?> empleadosPorSucursal(@PathVariable("sucursalId") Integer sucursalId,
-                                                  HttpSession sesion){
+                                                  HttpSession sesion) {
         sesionService.isLogged(sesion);
         boolean esAdmin = sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name());
 
-        if(!esAdmin && !sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())){
+        if (!esAdmin && !sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
             throw new ForbiddenException("No tenes permisos");
         }
 
@@ -142,18 +137,19 @@ public class SucursalController {
                 : ResponseEntity.ok().body(sucursalService.verEmpleadosEmpleador(sucursalId));
     }
 
+
     @PostMapping("/{sucursalId}/empleados")
     public ResponseEntity<?> agregarEmpleado(@PathVariable("sucursalId") Integer sucursalId,
                                              @Valid @RequestBody UsuarioEmailDTO userEmail,
-                                             HttpSession sesion){
+                                             HttpSession sesion) {
         sesionService.isLogged(sesion);
 
-        if(!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())){
+        if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
             throw new ForbiddenException("No tenes permisos");
         }
 
         Sucursal suc = sucursalService.listarSucursalPorId(sucursalId);
-        if(!Objects.equals(sesionService.getUsuarioId(sesion), suc.getEmpleador().getId())){
+        if (!Objects.equals(sesionService.getUsuarioId(sesion), suc.getEmpleador().getId())) {
             throw new ForbiddenException("No tenes permisos");
         }
 
@@ -166,15 +162,15 @@ public class SucursalController {
     @DeleteMapping("/{sucursalId}/empleados/{empleadoId}")
     public ResponseEntity<?> eliminarEmpleado(@PathVariable("sucursalId") Integer sucursalId,
                                               @PathVariable("empleadoId") Integer empleadoId,
-                                              HttpSession sesion){
+                                              HttpSession sesion) {
         sesionService.isLogged(sesion);
 
-        if(!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())){
+        if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
             throw new ForbiddenException("No tenes permisos");
         }
 
         Sucursal suc = sucursalService.listarSucursalPorId(sucursalId);
-        if(!Objects.equals(sesionService.getUsuarioId(sesion), suc.getEmpleador().getId())){
+        if (!Objects.equals(sesionService.getUsuarioId(sesion), suc.getEmpleador().getId())) {
             throw new ForbiddenException("No tenes permisos");
         }
 

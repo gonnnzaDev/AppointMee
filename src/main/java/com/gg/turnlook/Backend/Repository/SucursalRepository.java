@@ -9,6 +9,15 @@ import java.util.Optional;
 public interface SucursalRepository extends JpaRepository<Sucursal, Integer> {
 
     Optional<Sucursal> findByNombre(String nombre);
+
     List<Sucursal> findByActivoTrue();
+
     boolean existsByDireccionIgnoreCase(String direccion);
+
+    List<Sucursal> findByNombreContainingIgnoreCaseAndCategoriaIdAndActivoTrue(
+            String nombre, Integer catId);
+
+    List<Sucursal> findByNombreContainingIgnoreCaseAndActivoTrue(String nombre);
+
+    List<Sucursal> findByCategoriaIdAndActivoTrue(Integer catId);
 }

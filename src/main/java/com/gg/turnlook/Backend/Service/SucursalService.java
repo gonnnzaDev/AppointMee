@@ -90,8 +90,8 @@ public class SucursalService {
         }
         if (sucursal.getTelefono() != null) suc.setTelefono(sucursal.getTelefono());
         if (sucursal.getDescripcion() != null) suc.setDescripcion(sucursal.getDescripcion());
-        if(sucursal.getHoraApertura() != null) suc.setHoraApertura(sucursal.getHoraApertura());
-        if(sucursal.getHoraCierre() != null) suc.setHoraCierre(sucursal.getHoraCierre());
+        if (sucursal.getHoraApertura() != null) suc.setHoraApertura(sucursal.getHoraApertura());
+        if (sucursal.getHoraCierre() != null) suc.setHoraCierre(sucursal.getHoraCierre());
 
         if (!suc.getHoraCierre().isAfter(suc.getHoraApertura())) {
             throw new BadRequestException("El horario de cierre tiene que ser posterior al de apertura");
@@ -156,16 +156,25 @@ public class SucursalService {
     }
 
 
-    // ver si dsp out
-    public List<Sucursal> filtrarListaSucursales(String nombre, Boolean activo,
-                                                 Integer catId, Integer userId) {
+    public List<SucursalMiniDTO> filtrarListaSucursales(Integer catId, String nombre) {
 
-        return sucRepo.findAll().stream().
-                filter(s -> nombre == null || s.getNombre().equalsIgnoreCase(nombre)).
-                filter(s -> activo == null || s.isActivo() == activo).
-                filter(s -> catId == null || s.getCategoria().getId() == catId).
-                filter(s -> userId == null || s.getEmpleador().getId() == userId).
-                toList();
+        List<Sucursal> sucursales;
+
+        boolean tieneNombre = nombre != null && !nombre.isBlank();
+
+        if (catId != null && tieneNombre) {
+            sucursales = sucRepo.findByNombreContainingIgnoreCaseAndCategoriaIdAndActivoTrue(nombre, catId);
+        } else if (catId == null && tieneNombre) {
+            sucursales = sucRepo.findByNombreContainingIgnoreCaseAndActivoTrue(nombre);
+        } else if (catId != null) {
+            sucursales = sucRepo.findByCategoriaIdAndActivoTrue(catId);
+        } else {
+            return listarSucursales();
+        }
+
+        return sucursales.stream().map(s -> new SucursalMiniDTO(
+                        s.getId(), s.getNombre(), s.getCategoria().getCategoria()))
+                .toList();
     }
 
 
@@ -187,8 +196,8 @@ public class SucursalService {
     public Set<UsuarioResponseDTO> verEmpleadosEmpleador(Integer sucursalId) {
         Sucursal suc = listarSucursalPorId(sucursalId);
         return suc.getEmpleados().stream().
-                map(u -> new UsuarioResponseDTO(u.getId() ,u.getNombre(),
-                        u.getApellido(), u.getEmail(), u .getFotoPerfil().getFotoValida()))
+                map(u -> new UsuarioResponseDTO(u.getId(), u.getNombre(),
+                        u.getApellido(), u.getEmail(), u.getFotoPerfil().getFotoValida()))
                 .collect(Collectors.toSet());
     }
 
@@ -201,7 +210,7 @@ public class SucursalService {
     }
 
 
-    public void eliminarEmpleado(Sucursal sucursal, Integer userId){
+    public void eliminarEmpleado(Sucursal sucursal, Integer userId) {
 
         Usuario usuario = usuarioService.listarUsuarioPorId(userId);
         sucursal.getEmpleados().remove(usuario);   // dsp ver lo de notificacion
