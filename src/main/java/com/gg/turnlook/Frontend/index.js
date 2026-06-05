@@ -1,47 +1,85 @@
-const baseApi = "http://localhost:8080/";
 
 
-async function traerSucursales() {
+renderSucursales();
+
+async function renderSucursales() {
+    const container = document.getElementById("turn-container");
+
+    if (container) {
+
+        const sucursales = await buscarSucursales();
+
+        sucursales.forEach(sucursal => {
+
+            container.innerHTML +=
+                //<img src=""> poner dsp
+                `
+            <a href="${baseApi}/sucursal/${sucursal.id}">
+            <article class="turn-article">
+            <div class="turn-content">
+            <span class="turn-tag">${sucursal.categoria}</span>
+            <h2>${sucursal.nombre}</h2>
+            <p>${sucursal.descripcion}</p>
+            </div>
+            </article>
+            </a>
+            `;
+        });
+    }
+}
+
+async function buscarSucursales() {
     try {
-        const res = await fetch(baseApi + 'sucursales/listar');
-        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-        return await res.json();
+        const response = await fetch(`http://localhost:8080/sucursales/listar`);
+
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}`);
+        }
+
+        return await response.json();
     } catch (error) {
-       // window.location.href = `/error.html?msg=${encodeURIComponent(error.message)}`;
+        alert(error.message);
         return [];
     }
 }
 
-async function mostrarSucursales() {
-    const sucursales = await traerSucursales();
-    const sucursalesContainer = document.getElementById('turn-container');
-    if (sucursalesContainer) {
-        sucursalesContainer.innerHTML = sucursales.map
-        (sucursal =>
-            renderSucursal(
-                sucursal.nombre,
-                sucursal.descripcion,
-                sucursal.categoria
-            )
-        ).join('');
+async function renderCategorias() {
+    const container = document.getElementById("category-container");
+
+    if (container) {
+
+        const categoiras = await buscarCategorias();
+
+        categorias.forEach(c => {
+
+            container.innerHTML +=
+                `
+            <div class="categoria-item">
+                <button class="btn-categoria-item" id="${c.id}">${c.categoria}</button>
+            </div>
+            `;
+        });
+
+
     }
+
 }
 
-function renderSucursal(nombre, descripcion, categoria) {
-    return `
-        <a href="">
-            <article class="turn-article">
-                <div class="turn-content">
-                    <span class="turn-tag">${categoria}</span>
-                    <h2>${nombre}</h2>
-                    <p>${descripcion}</p>
-                </div>
-            </article>
-        </a>
-    `;
-}
+async function buscarCategorias(){
+    try {
+        const response = await fetch(`http://localhost:8080/categorias`);
 
-mostrarSucursales();
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        alert(error.message);
+        return [];
+    }
+
+}
 
 
 /*
@@ -58,12 +96,9 @@ function categoriasDisponibles() {
 }
 
 function renderCategoriasParaFiltrar(categorias) {
-    const containerLeft = document.getElementById("category-container");
     if (containerLeft) {
         containerLeft.innerHTML = categorias.map(c => `
-            <div class="categoria-item">
-                <p>${c.categoria}</p>
-            </div>
+          
         `).join('');
     }
 }

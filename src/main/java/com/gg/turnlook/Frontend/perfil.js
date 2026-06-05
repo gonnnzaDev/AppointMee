@@ -1,8 +1,18 @@
-function renderMyProfile(usuario) {
+import { sesionActiva } from "./recursos/modulos.js";
+
+// const user = sesionActiva();
+//console.log(user);
+//renderPerfil(user.id);
+renderPerfil(12);
+
+
+async function renderPerfil(id) {
 
     const infoAccountDiv = document.getElementById("info-account");
 
     if (infoAccountDiv) {
+
+        const usuario = await cargarUsuario(id);
 
         infoAccountDiv.innerHTML = `    
     <div class="profile-card">
@@ -20,19 +30,20 @@ function renderMyProfile(usuario) {
     }
 }
 
+async function cargarUsuario(id) {
+    try {
+        const response = await fetch(`http://localhost:8080/usuarios/${id}`);
 
-function getUser(id) {
-    fetch(`http://localhost:8080/usuarios/${id}`)
-        .then(async res => {
-            if (!res.ok) {
-                throw new Error("Error del servidor");
-            }
-            return res.json();
-        })
-        .then(usuario => {
-            renderMyProfile(usuario);
-        })
-        .catch(error => {
-            alert(error);
-        });
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        alert(error.message);
+        return null;
+    }
 }
+
+
+

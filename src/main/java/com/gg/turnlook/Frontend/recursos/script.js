@@ -1,4 +1,7 @@
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // regla q todos los email deben cumplir
+const baseApi = "http://localhost:8080/";
+
+
+
 
 function initNavbar() {
   const navbar = document.getElementById("navbar");
@@ -10,7 +13,7 @@ function initNavbar() {
 
         <a class="am-nav__brand" href="Index.html">
           <img
-            src="https://cdn.discordapp.com/attachments/1492334072901533747/1502155047633424504/content.png?ex=69feae68&is=69fd5ce8&hm=373d791a61c3ae304c7d324ffe6da30d02ae77d062898b8284aacd23271ea4fb"
+            src="recursos/content.png"
             alt="AppointMee logo"
             class="am-nav__logo"
           />
@@ -54,7 +57,7 @@ function initNavbar() {
 
 function _bindToggle() {
   const toggle = document.getElementById("amNavToggle");
-  const links  = document.getElementById("amNavLinks");
+  const links = document.getElementById("amNavLinks");
   if (!toggle || !links) return;
 
   toggle.addEventListener("click", () => {
