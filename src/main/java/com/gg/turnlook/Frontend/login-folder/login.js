@@ -50,13 +50,12 @@ async function userExists(mail, pass) {
 
     try {
 
-        const response = await fetch(`http://localhost:8080/usuarios/inicio_sesion`,
+        const response = await fetch(`http://localhost:8080/usuarios/inicio-sesion`,
             {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-               
                 body: JSON.stringify({
                     email: mail.value,
                     pass: pass.value
@@ -98,12 +97,12 @@ if (botonLogin) {
 
             const existe = await userExists(mail, pass);
 
-            console.log(existe);    
+            console.log(existe);
 
             if (!existe) {
                 alert("Usuario o contraseña incorrectos");
             } else {
-                window.location.href = "Index.html";
+                window.location.href = "index-folder/Index.html";
             }
 
         }
@@ -119,7 +118,7 @@ const cancelButton = document.getElementById("cancel-button");
 if (cancelButton) {
 
     cancelButton.addEventListener("click", () => {
-        window.location.href = "Login.html";
+        window.location.href = "login-folder/Login.html";
     }
 
     );
@@ -130,7 +129,7 @@ const registerButton = document.getElementById("register-button");
 if (registerButton) {
 
     registerButton.addEventListener("click", () => {
-        window.location.href = "Register.html";
+        window.location.href = "register-folder/Register.html";
     });
 }
 

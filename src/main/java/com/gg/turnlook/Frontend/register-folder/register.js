@@ -36,7 +36,7 @@ const cancelButton = document.getElementById("cancel-button");
 
 if (cancelButton) {
     cancelButton.addEventListener("click", () => {
-        window.location.href = "Login.html";
+        window.location.href = "login-folder/Login.html";
     });
 }
 function postUser(name, surname, mail, pass) {

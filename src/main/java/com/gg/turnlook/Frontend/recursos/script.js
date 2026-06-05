@@ -11,7 +11,7 @@ function initNavbar() {
     <nav class="am-nav">
       <div class="am-nav__container">
 
-        <a class="am-nav__brand" href="Index.html">
+        <a class="am-nav__brand" href="index-folder/Index.html">
           <img
             src="recursos/content.png"
             alt="AppointMee logo"
@@ -30,14 +30,15 @@ function initNavbar() {
             type="search"
             placeholder="Buscá tu próximo turno..."
             autocomplete="off"
+            id="search-input"
           />
         </div>
 
         <ul class="am-nav__links" id="amNavLinks">
         
-          <li><a class="am-nav__link" href="Index.html" data-page="home">Home</a></li>
-          <li><a class="am-nav__link" href="Perfil.html" data-page="perfil">Perfil</a></li>
-          <li><a class="am-nav__link" href="MisTurnos.html" data-page="turnos">Mis Turnos</a></li>
+          <li><a class="am-nav__link" href="index-folder/Index.html" data-page="home">Home</a></li>
+          <li><a class="am-nav__link" href="perfil-folder/Perfil.html" data-page="perfil">Perfil</a></li>
+          <li><a class="am-nav__link" href="misturnos-folder/MisTurnos.html" data-page="turnos">Mis Turnos</a></li>
           
         </ul>
 
@@ -88,6 +89,54 @@ function _markActiveLink() {
 
 document.addEventListener("DOMContentLoaded", initNavbar);
 
+obtenerSucursalesFiltradas(null, "Test");
 
+async function obtenerSucursalesFiltradas(catId, texto) {
+
+  const parametrosEnviar = new URLSearchParams();
+
+  if (catId) parametrosEnviar.append('catId', catId);
+  if (texto) parametrosEnviar.append('nombre', texto);
+
+  const urlFinal = parametrosEnviar
+    .toString() ? `http://localhost:8080/listar/filtrar?${parametrosEnviar.toString()}` : urlBase;
+
+  try {
+    const respuesta = await fetch(urlFinal, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include'
+    });
+
+    if (!respuesta.ok) {
+      throw new Error(`Error en el servidor: ${respuesta.status}`);
+    }
+
+
+    return await respuesta.json();
+
+  } catch (error) {
+    alert('Error al realizar la petición:', error);
+  }
+}
+
+
+
+async function usoBuscador(termino) {
+  try {
+    const response = await fetch(`http://localhost:8080/sucursales/listar/filtrar/${termino}`);
+
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    alert(error.message);
+    return null;
+  }
+}
 
 

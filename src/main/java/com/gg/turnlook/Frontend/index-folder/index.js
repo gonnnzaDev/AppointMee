@@ -1,5 +1,6 @@
 
 
+
 renderSucursales();
 
 async function renderSucursales() {
@@ -12,11 +13,11 @@ async function renderSucursales() {
         sucursales.forEach(sucursal => {
 
             container.innerHTML +=
-                //<img src=""> poner dsp
                 `
-            <a href="${baseApi}/sucursal/${sucursal.id}">
-            <article class="turn-article">
-            <div class="turn-content">
+                <a href="${window.location.origin}/sucursal-folder/Sucursal.html?id=${sucursal.id}">
+                <article class="turn-article">
+                <div class="turn-content">
+            <img src="${sucursal.imagen}">
             <span class="turn-tag">${sucursal.categoria}</span>
             <h2>${sucursal.nombre}</h2>
             <p>${sucursal.descripcion}</p>
@@ -65,7 +66,7 @@ async function renderCategorias() {
 
 }
 
-async function buscarCategorias(){
+async function buscarCategorias() {
     try {
         const response = await fetch(`http://localhost:8080/categorias`);
 
