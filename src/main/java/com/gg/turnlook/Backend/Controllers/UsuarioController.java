@@ -4,11 +4,16 @@ import com.gg.turnlook.Backend.DTO.Usuario.*;
 import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
 import com.gg.turnlook.Backend.Model.Usuario;
+import com.gg.turnlook.Backend.Service.JwtService;
 import com.gg.turnlook.Backend.Service.SesionService;
 import com.gg.turnlook.Backend.Service.UsuarioService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
@@ -20,31 +25,44 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
     private final SesionService sesionService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
-    public UsuarioController(UsuarioService usuarioService, SesionService sesionService) {
+    public UsuarioController(UsuarioService usuarioService, SesionService sesionService, AuthenticationManager authenticationManager, JwtService jwtService) {
         this.usuarioService = usuarioService;
         this.sesionService = sesionService;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
+
 
     /// ENDPOINTS
 
 
+
     @PostMapping("/inicio-sesion")
-    public ResponseEntity<?> iniciarSesion(@Valid @RequestBody LoginDTO login,
-                                           HttpSession sesion) {
-        Usuario u = usuarioService.inicioSesion(login);
+    public ResponseEntity<?> iniciarSesion(@Valid @RequestBody LoginDTO login) {
 
-        sesion.setAttribute("userId", u.getId());
-        sesion.setAttribute("userRoles", usuarioService.setRolesComoString(u));
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(login.getEmail(), login.getPass()));
 
-        return ResponseEntity.ok().body("Has iniciado sesion");
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        Usuario usuario = usuarioService.listarUsuarioPorEmail(userDetails.getUsername());
+
+        return ResponseEntity.ok().body(
+                new LoginResponseDTO(jwtService.generarToken(usuario)));
     }
 
 
     @GetMapping("/me")
-    public ResponseEntity<UsuarioMeDTO> getMe(HttpSession sesion){
+    public ResponseEntity<UsuarioMeDTO> getMe(Authentication authentication){
 
-        Usuario u = sesionService.getUsuarioLogged(sesion);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        String email = userDetails.getUsername();
+
+        Usuario u = usuarioService.listarUsuarioPorEmail(email);
 
         return ResponseEntity.ok().body(new UsuarioMeDTO(
                 u.getId(), usuarioService.setRolesComoString(u)));
@@ -154,7 +172,7 @@ public class UsuarioController {
         sesionService.isLogged(sesion);
 
         if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
-            !Objects.equals(id, sesionService.getUsuarioId(sesion))) {
+                !Objects.equals(id, sesionService.getUsuarioId(sesion))) {
             throw new ForbiddenException("No tenes permisos");
         }
 
@@ -169,7 +187,7 @@ public class UsuarioController {
         sesionService.isLogged(sesion);
 
         if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
-            !sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
+                !sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
             throw new ForbiddenException("No tenes permisos");
         }
 
