@@ -1,5 +1,8 @@
+import { authHeaders, sesionActiva } from "../recursos/modulos.js";
 
+const u = sesionActiva();
 
+console.log(u);
 
 renderSucursales();
 
@@ -17,7 +20,7 @@ async function renderSucursales() {
                 <a href="${window.location.origin}/sucursal-folder/Sucursal.html?id=${sucursal.id}">
                 <article class="turn-article">
                 <div class="turn-content">
-            <img src="${sucursal.imagen}">
+            <img src="${sucursal.imagen || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQPQenKJTzexez3E1uN7qtSwZ8tgPQsVJ9DQ&s"}">
             <span class="turn-tag">${sucursal.categoria}</span>
             <h2>${sucursal.nombre}</h2>
             <p>${sucursal.descripcion}</p>
@@ -31,8 +34,12 @@ async function renderSucursales() {
 
 async function buscarSucursales() {
     try {
-        const response = await fetch(`http://localhost:8080/sucursales/listar`);
-
+        const response = await fetch(`http://localhost:8080/sucursales/listar`,
+            {
+                headers: authHeaders()
+            }
+        );
+        console.log(authHeaders());
         if (!response.ok) {
             throw new Error(`Error ${response.status}`);
         }

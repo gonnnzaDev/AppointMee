@@ -1,12 +1,13 @@
-import { sesionActiva } from "../recursos/modulos.js";
+import { sesionActiva, authHeaders } from "../recursos/modulos.js";
+
 
 const user = await sesionActiva();
 
-console.log(user.id);
-
-if (user) {
-    renderPerfil(user.id);
+if (!user) {
+    window.location.href = "../login.html";
 }
+
+renderPerfil(user.id);
 
 //CAMBIAR EL RENDER DE ABAJO TAMBIEN!!!
 
@@ -18,9 +19,11 @@ async function renderPerfil(id) {
 
         const usuario = await cargarUsuario(id);
 
+        console.log(usuario);
+
         infoAccountDiv.innerHTML = `
         <div class="profile-card">
-    <img src="${usuario.fotoPerfil}" alt="">
+    <img src="${usuario.fotoPerfil || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQPQenKJTzexez3E1uN7qtSwZ8tgPQsVJ9DQ&s"}" alt="">
     <h3>Nombre: ${usuario.nombre}</h3>
     <h3>Apellido: ${usuario.apellido}</h3>
     <h3>Email: ${usuario.email}</h3>
@@ -34,7 +37,7 @@ async function renderPerfil(id) {
 
         opciones.addEventListener("click", () => {
 
-            renderOpciones();
+            renderOpciones(id);
 
 
         });
@@ -42,7 +45,7 @@ async function renderPerfil(id) {
     }
 }
 
-function renderOpciones() {
+function renderOpciones(id) {
 
     const infoAccountDiv = document.getElementById("info-account");
 
@@ -64,27 +67,28 @@ function renderOpciones() {
         const editar = document.getElementById("btn-editar-perfil");
         const volver = document.getElementById("btn-volver-perfil");
 
-        if (eliminar && editar && volver) {
 
-            volver.addEventListener('click', () => {
-                renderPerfil(sesionActiva());
+        volver.addEventListener('click', () => {
+            renderPerfil(id);
 
-            });
-
-
-            editar.addEventListener('click', () => {
+        });
 
 
-            });
-            eliminar.addEventListener('click', async () => {
-                const rta = await eliminarCuenta(sesionActiva());
+        editar.addEventListener('click', () => {
 
-                if (rta) { alert("Eliminacion Realizada con exito") }
-                else { alert("No se pudo eliminar") }
 
-            });
+        });
+        eliminar.addEventListener('click', async () => {
 
-        }
+
+            const rta = await eliminarCuenta(id);
+
+
+            if (rta) { alert("Eliminacion Realizada con exito") }
+            else { alert("No se pudo eliminar") }
+
+        });
+
 
 
     }
@@ -94,8 +98,9 @@ async function eliminarCuenta(id) {
 
     try {
 
-        const response = await fetch(`http://localhost:8080/usuarios/borrar_cuenta/${id}`,
+        const response = await fetch(`http://localhost:8080/usuarios/borrar-cuenta/${id}`,
             {
+                headers: authHeaders(),
                 method: "DELETE"
             }
         );
@@ -117,7 +122,13 @@ async function eliminarCuenta(id) {
 
 async function cargarUsuario(id) {
     try {
-        const response = await fetch(`http://localhost:8080/usuarios/${id}`);
+
+
+        const response = await fetch(`http://localhost:8080/usuarios/${id}`,
+            {
+                headers: authHeaders()
+            }
+        );
 
         if (!response.ok) {
             throw new Error(`Error ${response.status}`);

@@ -1,5 +1,5 @@
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
+import { authHeaders } from "../recursos/modulos.js";
 renderLogin();
 
 
@@ -64,10 +64,15 @@ async function userExists(mail, pass) {
         );
 
         if (!response.ok) {
-            return false;
+            alert("Credenciales Invalidas");
+              return null;
         }
 
-        return true;
+        const data = await response.json();
+
+        localStorage.setItem("token", data.token);
+
+        return data;
 
     } catch (error) {
         return false;

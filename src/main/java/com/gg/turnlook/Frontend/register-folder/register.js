@@ -1,3 +1,6 @@
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
 renderRegister();
 
 // Event listener para el botón de registrarse
@@ -36,13 +39,12 @@ const cancelButton = document.getElementById("cancel-button");
 
 if (cancelButton) {
     cancelButton.addEventListener("click", () => {
-        window.location.href = "/login-folder/Login.html";
+        window.location.href = "../login-folder/Login.html";
     });
 }
 function postUser(name, surname, mail, pass) {
 
 
-    // testea 
     fetch("http://localhost:8080/usuarios/crear", {
         method: "POST",
         headers: {
@@ -56,6 +58,8 @@ function postUser(name, surname, mail, pass) {
         })
     }).then(data => {
         alert("Registrado con exito!");
+        window.location.href = "../login-folder/Login.html";
+
     })
         .catch(error => {
             alert(error);
@@ -63,13 +67,13 @@ function postUser(name, surname, mail, pass) {
 }
 
 
-function renderRegister(){
+function renderRegister() {
 
     const container = document.getElementById("register-form")
 
-    if(container){
+    if (container) {
 
-        container.innerHTML =`
+        container.innerHTML = `
         
         <div class="form" id="info-register">
             <div class="credentials-form" id="realizar-registro-button">
