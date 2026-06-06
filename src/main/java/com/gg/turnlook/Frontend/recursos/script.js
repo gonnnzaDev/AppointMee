@@ -36,9 +36,9 @@ function initNavbar() {
 
         <ul class="am-nav__links" id="amNavLinks">
         
-          <li><a class="am-nav__link" href="index-folder/Index.html" data-page="home">Home</a></li>
-          <li><a class="am-nav__link" href="perfil-folder/Perfil.html" data-page="perfil">Perfil</a></li>
-          <li><a class="am-nav__link" href="misturnos-folder/MisTurnos.html" data-page="turnos">Mis Turnos</a></li>
+          <li><a class="am-nav__link" href="../index-folder/Index.html" data-page="home">Home</a></li>
+          <li><a class="am-nav__link" href="../perfil-folder/Perfil.html" data-page="perfil">Perfil</a></li>
+          <li><a class="am-nav__link" href="../misturnos-folder/MisTurnos.html" data-page="turnos">Mis Turnos</a></li>
           
         </ul>
 
@@ -88,7 +88,7 @@ function _markActiveLink() {
 }
 
 document.addEventListener("DOMContentLoaded", initNavbar);
-
+/*
 obtenerSucursalesFiltradas(null, "Test");
 
 async function obtenerSucursalesFiltradas(catId, texto) {
@@ -139,4 +139,4 @@ async function usoBuscador(termino) {
   }
 }
 
-
+*/

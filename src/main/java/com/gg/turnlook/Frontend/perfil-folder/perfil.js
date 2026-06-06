@@ -1,6 +1,8 @@
-import { sesionActiva } from "./recursos/modulos.js";
+import { sesionActiva } from "../recursos/modulos.js";
 
 const user = await sesionActiva();
+
+console.log(user.id);
 
 if (user) {
     renderPerfil(user.id);

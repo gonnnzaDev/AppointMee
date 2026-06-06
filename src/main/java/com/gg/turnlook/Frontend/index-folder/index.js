@@ -43,7 +43,7 @@ async function buscarSucursales() {
         return [];
     }
 }
-
+/*
 async function renderCategorias() {
     const container = document.getElementById("category-container");
 
@@ -81,7 +81,7 @@ async function buscarCategorias() {
     }
 
 }
-
+*/
 
 /*
 function categoriasDisponibles() {
