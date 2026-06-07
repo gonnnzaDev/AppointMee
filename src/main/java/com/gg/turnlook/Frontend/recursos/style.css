@@ -2359,9 +2359,10 @@ button:hover {
     margin: 10vh auto;
     box-sizing: border-box;
 }
-.configuracion-info h1{
+
+.configuracion-info h1 {
     font-size: 40px;
-    
+
 }
 
 .configuracion-botones {
@@ -2373,23 +2374,41 @@ button:hover {
 
 
 }
-.configuracion-titulo{
+
+.configuracion-titulo {
     margin: 10px;
     display: flex;
-        align-items: center;
+    align-items: center;
     font-family: var(--font-mono);
 
     justify-content: center;
 
 }
-.seccion-configuracion{
+
+.seccion-configuracion {
 
     background-color: var(--bg-glass);
     margin: 20px 0;
     padding: 20px;
     border-radius: 20px;
     border: 1px solid var(--dk-border);
-    
 
+
+
+}
+
+.documentacion-links-container {
+    
+    display: flex;
+    justify-content: center;
+    background-color: var(--bg-glass);
+    margin: 20px 0;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid var(--dk-border);
+
+}
+.documentacion-links-container svg{
+    color: white;
 
 }
