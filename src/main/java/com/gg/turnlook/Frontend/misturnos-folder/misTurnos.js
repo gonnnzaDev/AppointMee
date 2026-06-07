@@ -1,54 +1,66 @@
-renderTurnos();
+import { authHeaders } from "../recursos/modulos";
 
-function renderTurnos() {
+const user = await sesionActiva();
 
-    const container = document.getElementById("turnos-persona-info");
+if (!user) {
+    window.location.href = "../login.html";
+}
+
+renderTurnos(user.id);
+
+function renderTurnos(id) {
+
+    const container = document.getElementById("info");
+
     if (container) {
 
-        container.innerHTML = `
-        <div class="filtrar">
+        const turnosLista = buscarMisTurnos("Pendientes");
 
-                         <label for="estados">Estado:</label>
-            
-             <select name="estados" id="estados">
-               <option value="pendientes">Pendientes</option>
-               <option value="confirmados">Confirmados</option>
-               <option value="finalizados">Finalizados</option>
-             </select>
 
-        </div>
-         <div class="persona-info">
+        turnosLista.forEach(turnos => {
+
+            container.innerHTML +=
+                `
 
              <div class="turno-misTurnos">
-                        <p>Nombre del servicio</p>
-                        <p>Fecha</p>
-                        
-                    </div>
-
+                        <p>${turnos.nombreS}</p>
+                        <p>${turnos.fechaT}</p>
             </div>
 
-`;
+                `
+
+        });
+
+
 
     }
+
+
 
 
 }
 
 function cargarTurnos() {
 
-    const cancelados = document.getElementById("turnos-cancelados");
-    const pendientes = document.getElementById("turnos-pendientes");
-    const finalizados = document.getElementById("turnos-finalizados");
-
-
-
-
-
 
 }
 
-/*  <div class="turno-misTurnos">
-                        <p>Nombre del servicio</p>
-                        <p>Fecha</p>
-                        
-                    </div> */
+
+function buscarMisTurnos(estadoTurno) {
+    try {
+        const response = await fetch(`http://localhost:8080/turnos/propios/${estadoTurno}`,
+            {
+                headers: authHeaders()
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        alert(error.message);
+        return [];
+    }
+}

@@ -23,7 +23,7 @@ async function renderPerfil(id) {
 
         infoAccountDiv.innerHTML = `
         <div class="profile-card">
-    <img src="${usuario.fotoPerfil || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQPQenKJTzexez3E1uN7qtSwZ8tgPQsVJ9DQ&s"}" alt="">
+    <img src="${usuario.fotoPerfil}" alt="">
     <h3>Nombre: ${usuario.nombre}</h3>
     <h3>Apellido: ${usuario.apellido}</h3>
     <h3>Email: ${usuario.email}</h3>

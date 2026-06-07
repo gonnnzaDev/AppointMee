@@ -17,9 +17,9 @@ async function renderSucursales() {
 
             container.innerHTML +=
                 `
-                <a href="${window.location.origin}/sucursal-folder/Sucursal.html?id=${sucursal.id}">
-                <article class="turn-article">
-                <div class="turn-content">
+            <a href="${window.location.origin}/sucursal-folder/Sucursal.html?id=${sucursal.id}">
+            <article class="turn-article">
+            <div class="turn-content">
             <img src="${sucursal.imagen || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQPQenKJTzexez3E1uN7qtSwZ8tgPQsVJ9DQ&s"}">
             <span class="turn-tag">${sucursal.categoria}</span>
             <h2>${sucursal.nombre}</h2>

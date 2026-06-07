@@ -26,7 +26,9 @@ async function render() {
     }
 
     const imgNoDispo = "https://static.vecteezy.com/system/resources/previews/022/059/000/non_2x/no-image-available-icon-vector.jpg";
-    container.innerHTML = `
+    
+    container.innerHTML =
+     `
       <button id="btn-volver">Volver</button>
       <div class="principal-imagen-sucursal">
           <img src="${sucursal.imagen || imgNoDispo}">
