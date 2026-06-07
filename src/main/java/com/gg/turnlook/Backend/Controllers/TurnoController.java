@@ -96,15 +96,16 @@ public class TurnoController {
             @PathVariable("estadoTurno") EstadoTurno estadoTurno,
             @PathVariable("sucursalId") Integer sucursalId, HttpSession sesion) {
 
-        Usuario empleador = sesionService.getUsuarioLogged(sesion);
+        Usuario usuario = sesionService.getUsuarioLogged(sesion);
 
         // ver si admin tmb
-        if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
+        if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name()) &&
+                !sesionService.tieneRol(sesion, ERol.EMPLEADO.name())) {
             throw new ForbiddenException("No tenes permisos");
         }
 
         return ResponseEntity.ok().body(turnoService.listarTurnosPorSucursalYEstado(
-                sucursalId, empleador, estadoTurno));
+                sucursalId, usuario, estadoTurno));
     }
 
 
@@ -113,7 +114,7 @@ public class TurnoController {
             @PathVariable("turnoId") Integer turnoId,
             @PathVariable("sucursalId") Integer sucursalId, HttpSession sesion) {
 
-        Usuario empleador = sesionService.getUsuarioLogged(sesion);
+        Usuario usuario = sesionService.getUsuarioLogged(sesion);
 
         // ver si admin tmb
         if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name()) &&
@@ -122,7 +123,7 @@ public class TurnoController {
         }
 
         return ResponseEntity.ok().body(turnoService.verDetalleTurnoPorSucursal(
-                turnoId, sucursalId, empleador));
+                turnoId, sucursalId, usuario));
     }
 
     // admin no (dsp con spring security)

@@ -170,11 +170,11 @@ public class TurnoService {
 
 
     public List<TurnoMiniDTO> listarTurnosPorSucursalYEstado(
-            Integer sucursalId, Usuario empleador, EstadoTurno estadoTurno) {
+            Integer sucursalId, Usuario usuario, EstadoTurno estadoTurno) {
 
         Sucursal sucursal = sucursalService.listarSucursalPorId(sucursalId);
 
-        if (!sucursalService.enSucursal(empleador.getId(), sucursal.getId())) {
+        if (!sucursalService.enSucursal(usuario.getId(), sucursal.getId())) {
             throw new ForbiddenException("No perteneces a esta sucursal");
         }
 
@@ -187,11 +187,11 @@ public class TurnoService {
 
 
     public TurnoResponseDTO verDetalleTurnoPorSucursal(Integer turnoId, Integer sucursalId,
-                                                     Usuario empleador) {
+                                                     Usuario usuario) {
 
         Sucursal sucursal = sucursalService.listarSucursalPorId(sucursalId);
 
-        if (!sucursalService.enSucursal(empleador.getId(), sucursal.getId())) {
+        if (!sucursalService.enSucursal(usuario.getId(), sucursal.getId())) {
             throw new ForbiddenException("No perteneces a esta sucursal");
         }
 
