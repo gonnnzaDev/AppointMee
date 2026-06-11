@@ -1,6 +1,7 @@
 package com.gg.turnlook.Backend.Service;
 
 
+
 import com.gg.turnlook.Backend.Model.Servicio;
 import com.gg.turnlook.Backend.Model.Turno;
 import com.mercadopago.MercadoPagoConfig;
@@ -16,8 +17,11 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
 @Service
 public class MercadoPagoService {
+
 
 
     private final TurnoService turnoService;
@@ -27,11 +31,14 @@ public class MercadoPagoService {
     private String tokenMp;
 
 
+
     public MercadoPagoService(TurnoService turnoService) {
         this.turnoService = turnoService;
     }
 
 
+
+    /// METODOS
 
 
     public String pagar(Integer turnoId) throws MPException, MPApiException {

@@ -7,15 +7,22 @@ import com.gg.turnlook.Backend.Model.Rol;
 import com.gg.turnlook.Backend.Repository.RolRepository;
 import org.springframework.stereotype.Service;
 
+
+
 @Service
 public class RolService {
 
+
     private final RolRepository rolRepo;
+
 
     public RolService(RolRepository rolRepo) {
         this.rolRepo = rolRepo;
     }
 
+
+
+    /// METODOS
 
 
     public Rol listarPorRol(ERol rol){

@@ -6,66 +6,75 @@ import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmailDTO;
 import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
 import com.gg.turnlook.Backend.Model.Sucursal;
+import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Service.SesionService;
 import com.gg.turnlook.Backend.Service.SucursalService;
 import com.gg.turnlook.Backend.Service.UsuarioService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
+
+
 
 @RestController
 @RequestMapping("/sucursales")
 @CrossOrigin(origins = "*")
 public class SucursalController {
 
+
+
     private final SucursalService sucursalService;
     private final SesionService sesionService;
+    private final UsuarioService usuarioService;
 
-    public SucursalController(SucursalService sucursalService, UsuarioService usuarioService, SesionService sesionService) {
+
+
+    public SucursalController(SucursalService sucursalService, UsuarioService usuarioService, SesionService sesionService, UsuarioService usuarioService1) {
         this.sucursalService = sucursalService;
         this.sesionService = sesionService;
+        this.usuarioService = usuarioService1;
     }
+
 
 
     /// ENDPOINTS
 
-    // endpoint para empezar a crear tu sucursal (dsp lo hag)
 
-    // dsp cambiar a spring security para validar sin http sesion manual
+
+    @PreAuthorize("hasRole('EMPLEADOR')")
     @PostMapping("/crear")
     public ResponseEntity<?> crearSucursal(
-            @Valid @RequestBody SucursalCrearDTO sucursal,
-            HttpSession sesion) {
+            @Valid @RequestBody SucursalCrearDTO sucursal, Authentication auth) {
 
-        sesionService.isLogged(sesion);
+        String email = (String) auth.getPrincipal();
 
-        if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
-            throw new ForbiddenException("No tenes permisos");
-        }
+        Usuario user = usuarioService.listarUsuarioPorEmail(email);
 
-        sucursalService.crearSucursal(sucursal, sesionService.getUsuarioId(sesion));
+        sucursalService.crearSucursal(sucursal, user.getId());
         return ResponseEntity.ok().body("Se creó la sucursal");
     }
 
 
+    // ver si saco ADMIN , seguro si
+    @PreAuthorize("hasAnyRole('EMPLEADOR','ADMINISTRADOR')")
     @PatchMapping("/modificar/{id}")
     public ResponseEntity<?> modificarSucursal(@PathVariable("id") Integer id,
                                                @Valid @RequestBody SucursalModificarDTO sucursal,
-                                               HttpSession sesion) {
+                                               Authentication auth) {
 
-        sesionService.isLogged(sesion);
-        boolean esAdmin = sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name());
+        String email = (String) auth.getPrincipal();
 
-        if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name()) && !esAdmin) {
-            throw new ForbiddenException("No tenes permisos");
-        }
+        Usuario user = usuarioService.listarUsuarioPorEmail(email);
 
         Sucursal suc = sucursalService.listarSucursalPorId(id);
 
-        if (!esAdmin && !Objects.equals(sesionService.getUsuarioId(sesion), suc.getEmpleador().getId())) {
+        if (!sesionService.tieneRol(user, ERol.ADMINISTRADOR.name()) &&
+                !Objects.equals(user.getId(), suc.getEmpleador().getId())) {
             throw new ForbiddenException("No tenes permisos");
         }
 
@@ -74,12 +83,16 @@ public class SucursalController {
     }
 
 
+    @PreAuthorize("hasAnyRole('EMPLEADOR','ADMINISTRADOR')")
     @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<?> eliminarSucursal(@PathVariable("id") Integer id, HttpSession sesion) {
+    public ResponseEntity<?> eliminarSucursal(@PathVariable("id") Integer id,
+                                              Authentication auth) {
 
-        sesionService.isLogged(sesion);
+        String email = (String) auth.getPrincipal();
 
-        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
+        Usuario user = usuarioService.listarUsuarioPorEmail(email);
+
+        if(!sucursalService.enSucursal(user.getId(), id)){
             throw new ForbiddenException("No tenes permisos");
         }
 
@@ -89,9 +102,7 @@ public class SucursalController {
 
 
     @GetMapping("/listar")
-    public ResponseEntity<?> listarSucursales(HttpSession sesion) {
-
-        sesionService.isLogged(sesion);
+    public ResponseEntity<?> listarSucursales(Authentication auth) {
 
         return ResponseEntity.ok().body(sucursalService.listarSucursales());
     }
@@ -100,36 +111,34 @@ public class SucursalController {
     @GetMapping("/listar/filtrar")
     public ResponseEntity<?> filtrarListaSucursales(@RequestParam(required = false) Integer catId,
                                                     @RequestParam(required = false) String nombre,
-                                                    HttpSession sesion) {
-
-        sesionService.isLogged(sesion);
+                                                    Authentication auth) {
 
         return ResponseEntity.ok().body(sucursalService.filtrarListaSucursales(catId, nombre));
     }
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> sucursalPorId(@PathVariable("id") Integer id, HttpSession sesion) {
-
-        sesionService.isLogged(sesion);
+    public ResponseEntity<?> sucursalPorId(@PathVariable("id") Integer id,
+                                           Authentication auth) {
 
         return ResponseEntity.ok().body(sucursalService.verSucursalPorId(id));
     }
 
 
+    @PreAuthorize("hasAnyRole('EMPLEADOR','ADMINISTRADOR')")
     @GetMapping("/{sucursalId}/empleados")
     public ResponseEntity<?> empleadosPorSucursal(@PathVariable("sucursalId") Integer sucursalId,
-                                                  HttpSession sesion) {
-        sesionService.isLogged(sesion);
-        boolean esAdmin = sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name());
+                                                  Authentication auth) {
 
-        if (!esAdmin && !sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
-            throw new ForbiddenException("No tenes permisos");
-        }
+        String email = (String) auth.getPrincipal();
+
+        Usuario user = usuarioService.listarUsuarioPorEmail(email);
+
+        boolean esAdmin = sesionService.tieneRol(user, ERol.ADMINISTRADOR.name());
 
         Sucursal suc = sucursalService.listarSucursalPorId(sucursalId);
 
-        if (!esAdmin && !Objects.equals(sesionService.getUsuarioId(sesion), suc.getEmpleador().getId())) {
+        if (!esAdmin && !Objects.equals(user.getId(), suc.getEmpleador().getId())) {
             throw new ForbiddenException("No tenes permisos");
         }
 
@@ -138,18 +147,19 @@ public class SucursalController {
     }
 
 
+    @PreAuthorize("hasRole('EMPLEADOR')")
     @PostMapping("/{sucursalId}/empleados")
     public ResponseEntity<?> agregarEmpleado(@PathVariable("sucursalId") Integer sucursalId,
                                              @Valid @RequestBody UsuarioEmailDTO userEmail,
-                                             HttpSession sesion) {
-        sesionService.isLogged(sesion);
+                                             Authentication auth) {
 
-        if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
-            throw new ForbiddenException("No tenes permisos");
-        }
+        String email = (String) auth.getPrincipal();
+
+        Usuario user = usuarioService.listarUsuarioPorEmail(email);
 
         Sucursal suc = sucursalService.listarSucursalPorId(sucursalId);
-        if (!Objects.equals(sesionService.getUsuarioId(sesion), suc.getEmpleador().getId())) {
+
+        if (!Objects.equals(user.getId(), suc.getEmpleador().getId())) {
             throw new ForbiddenException("No tenes permisos");
         }
 
@@ -159,18 +169,19 @@ public class SucursalController {
     }
 
 
+    @PreAuthorize("hasRole('EMPLEADOR')")
     @DeleteMapping("/{sucursalId}/empleados/{empleadoId}")
     public ResponseEntity<?> eliminarEmpleado(@PathVariable("sucursalId") Integer sucursalId,
                                               @PathVariable("empleadoId") Integer empleadoId,
-                                              HttpSession sesion) {
-        sesionService.isLogged(sesion);
+                                              Authentication auth) {
 
-        if (!sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
-            throw new ForbiddenException("No tenes permisos");
-        }
+        String email = (String) auth.getPrincipal();
+
+        Usuario user = usuarioService.listarUsuarioPorEmail(email);
 
         Sucursal suc = sucursalService.listarSucursalPorId(sucursalId);
-        if (!Objects.equals(sesionService.getUsuarioId(sesion), suc.getEmpleador().getId())) {
+
+        if (!Objects.equals(user.getId(), suc.getEmpleador().getId())) {
             throw new ForbiddenException("No tenes permisos");
         }
 

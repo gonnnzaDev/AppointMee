@@ -1,5 +1,7 @@
 package com.gg.turnlook.Backend.Service;
 
+
+
 import com.gg.turnlook.Backend.DTO.Servicio.ServicioCrearDTO;
 import com.gg.turnlook.Backend.DTO.Servicio.ServicioMiniDTO;
 import com.gg.turnlook.Backend.DTO.Servicio.ServicioModificarDTO;
@@ -13,16 +15,26 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+
+
 @Service
 public class ServicioService {
 
+
+
     private final ServicioRepository servRepo;
     private final SucursalService sucService;
+
+
 
     public ServicioService(ServicioRepository servRepo, SucursalService sucService) {
         this.servRepo = servRepo;
         this.sucService = sucService;
     }
+
+
+
+    /// METODOS
 
 
     public void crearServicio(ServicioCrearDTO servicio) {
@@ -68,7 +80,9 @@ public class ServicioService {
 
 
     public List<ServicioMiniDTO> listarServiciosSucursal(Integer sucursalId){
+
         sucService.listarSucursalPorId(sucursalId);  //validacion
+
         return servRepo.findBySucursalId(sucursalId).stream()
                 .map(s -> new ServicioMiniDTO(s.getId(), s.getNombre(),
                         s.getDuracion()))

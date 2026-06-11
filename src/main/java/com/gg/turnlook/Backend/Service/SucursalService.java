@@ -22,12 +22,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+
+
 @Service
 public class SucursalService {
+
+
 
     private final SucursalRepository sucRepo;
     private final CategoriaRepository catRepo;
     private final UsuarioService usuarioService;
+
+
 
     public SucursalService(SucursalRepository sucRepo, CategoriaRepository catRepo, UsuarioService usuarioService) {
         this.sucRepo = sucRepo;
@@ -36,7 +42,10 @@ public class SucursalService {
     }
 
 
+
     /// METODOS
+
+
 
     public boolean enSucursal(Integer idUsuario, Integer idSucursal) {
 
@@ -191,6 +200,7 @@ public class SucursalService {
                         u.getNombre(), u.getApellido(), u.isActivo()))
                 .collect(Collectors.toSet());
     }
+
 
     // est
     public Set<UsuarioResponseDTO> verEmpleadosEmpleador(Integer sucursalId) {

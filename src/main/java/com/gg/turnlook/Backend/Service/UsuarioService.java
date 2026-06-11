@@ -19,13 +19,19 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+
+
 @Service
 public class UsuarioService {
+
+
 
     private final UsuarioRepository usRepo;
     private final RolService rolService;
     private final ImagenService imagenService;
     private final PasswordEncoder passEncoder;
+
+
 
     public UsuarioService(UsuarioRepository usRepo, RolService rolService, ImagenService imagenService, PasswordEncoder passEncoder) {
         this.usRepo = usRepo;
@@ -35,7 +41,9 @@ public class UsuarioService {
     }
 
 
+
     /// METODOS
+
 
 
     public Usuario inicioSesion(LoginDTO login) {
@@ -112,6 +120,7 @@ public class UsuarioService {
                 .toList();
     }
 
+
     // ver si despues lo saco
     public List<UsuarioMiniAdminDTO> listarUsuariosEliminados() {
         return usRepo.findByActivoFalse().stream()
@@ -119,6 +128,7 @@ public class UsuarioService {
                         u.getId(), u.getNombre(), u.getApellido(), u.isActivo()))
                 .toList();
     }
+
 
     // ver si despues lo saco
     public List<Usuario> filtrarListaUsuarios(String nombre, String apellido, Boolean activo) {
@@ -131,6 +141,7 @@ public class UsuarioService {
 
 
     public UsuarioResponseDTO listarUsuariosPorEmail(UsuarioEmailDTO email) {
+
         Usuario u = listarUsuarioPorEmail(email.getEmail());
 
         return new UsuarioResponseDTO(u.getId(), u.getNombre(), u.getApellido()

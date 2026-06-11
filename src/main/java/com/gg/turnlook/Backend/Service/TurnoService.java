@@ -24,13 +24,18 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
+
 @Service
 public class TurnoService {
+
 
     private final TurnoRepository turnoRepo;
     private final UsuarioService usuarioService;
     private final ServicioService servicioService;
     private final SucursalService sucursalService;
+
+
 
     public TurnoService(TurnoRepository turnoRepo, UsuarioService usuarioService, ServicioService servicioService, SucursalService sucursalService) {
         this.turnoRepo = turnoRepo;
@@ -38,6 +43,11 @@ public class TurnoService {
         this.servicioService = servicioService;
         this.sucursalService = sucursalService;
     }
+
+
+
+    /// METODOS
+
 
 
     public void registrarTurno(TurnoCrearDTO turno) {
@@ -141,8 +151,7 @@ public class TurnoService {
 
 
     // ver si faltan mas validaciones
-    public void cancelarTurno(Integer turnoId) {
-        Turno turno = listarTurnoPorId(turnoId);
+    public void cancelarTurno(Turno turno) {
 
         if (turno.getEstado() != EstadoTurno.PENDIENTE) {
             throw new ConflictException("El turno no está pendiente");
@@ -153,10 +162,9 @@ public class TurnoService {
     }
 
 
-    public void finalizarTurno(Integer turnoId) {
+    public void finalizarTurno(Turno turno) {
 
-        Turno turno = listarTurnoPorId(turnoId);
-
+        // ver si dejo el estado confirmado y si si agregarlo ak tmb
         if (turno.getEstado() != EstadoTurno.PENDIENTE) {
             throw new ConflictException("El turno no está pendiente");
         }
@@ -170,13 +178,7 @@ public class TurnoService {
 
 
     public List<TurnoMiniDTO> listarTurnosPorSucursalYEstado(
-            Integer sucursalId, Usuario usuario, EstadoTurno estadoTurno) {
-
-        Sucursal sucursal = sucursalService.listarSucursalPorId(sucursalId);
-
-        if (!sucursalService.enSucursal(usuario.getId(), sucursal.getId())) {
-            throw new ForbiddenException("No perteneces a esta sucursal");
-        }
+            Sucursal sucursal, Usuario usuario, EstadoTurno estadoTurno) {
 
         return turnoRepo.findByServicioSucursalIdAndEstado(sucursal.getId(),
                         estadoTurno).stream()
@@ -186,16 +188,7 @@ public class TurnoService {
     }
 
 
-    public TurnoResponseDTO verDetalleTurnoPorSucursal(Integer turnoId, Integer sucursalId,
-                                                     Usuario usuario) {
-
-        Sucursal sucursal = sucursalService.listarSucursalPorId(sucursalId);
-
-        if (!sucursalService.enSucursal(usuario.getId(), sucursal.getId())) {
-            throw new ForbiddenException("No perteneces a esta sucursal");
-        }
-
-        Turno t = listarTurnoPorId(turnoId);
+    public TurnoResponseDTO verDetalleTurnoPorSucursal(Turno t) {
 
         Usuario c = t.getCliente();
         Usuario e = t.getEmpleado();

@@ -3,6 +3,7 @@ package com.gg.turnlook.Backend.Excepciones;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,6 +45,12 @@ public class GlobalExceptionHandler {
     }
 
 
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<?> handleAuthorizationDenied(AuthorizationDeniedException e){
+        return ResponseEntity.status(403).body("No tenes permisos");
+    }
+
+
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<?> handleConflict(ConflictException e){
         return ResponseEntity.status(409).body(e.getMessage());
@@ -67,4 +74,6 @@ public class GlobalExceptionHandler {
         e.printStackTrace(); // dsp sacar
         return ResponseEntity.status(500).body("Error interno del servidor");
     }
+
+
 }

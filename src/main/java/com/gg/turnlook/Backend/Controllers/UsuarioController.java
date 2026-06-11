@@ -10,6 +10,7 @@ import com.gg.turnlook.Backend.Service.UsuarioService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,10 +24,14 @@ import java.util.Objects;
 @CrossOrigin(origins = "*")
 public class UsuarioController {
 
+
+
     private final UsuarioService usuarioService;
     private final SesionService sesionService;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+
+
 
     public UsuarioController(UsuarioService usuarioService, SesionService sesionService, AuthenticationManager authenticationManager, JwtService jwtService) {
         this.usuarioService = usuarioService;
@@ -34,6 +39,7 @@ public class UsuarioController {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
     }
+
 
 
     /// ENDPOINTS
@@ -56,9 +62,9 @@ public class UsuarioController {
 
 
     @GetMapping("/me")
-    public ResponseEntity<UsuarioMeDTO> getMe(Authentication authentication){
+    public ResponseEntity<UsuarioMeDTO> getMe(Authentication auth){
 
-        String email = (String) authentication.getPrincipal();
+        String email = (String) auth.getPrincipal();
 
         Usuario u = usuarioService.listarUsuarioPorEmail(email);
 
@@ -77,11 +83,13 @@ public class UsuarioController {
     @PatchMapping("/modificar/{id}")
     public ResponseEntity<?> modificarUsuario(@PathVariable("id") Integer id,
                                               @Valid @RequestBody UsuarioModificarDTO usuario,
-                                              HttpSession sesion) {
+                                              Authentication auth) {
 
-        Usuario user = sesionService.getUsuarioLogged(sesion);
+        String email = (String) auth.getPrincipal();
 
-        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())
+        Usuario user = usuarioService.listarUsuarioPorEmail(email);
+
+        if (!sesionService.tieneRol(user, ERol.ADMINISTRADOR.name())
                 && !Objects.equals(id, user.getId())) {
             throw new ForbiddenException("No tenes permisos");
         }
@@ -91,27 +99,28 @@ public class UsuarioController {
     }
 
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<?> eliminarUsuario(@PathVariable("id") Integer id,
-                                             HttpSession sesion) {
+                                             Authentication auth) {
 
-        sesionService.isLogged(sesion);
-
-        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
-            throw new ForbiddenException("No tenes permisos");
-        }
+        // ver si valido algo aca pero no creo
 
         usuarioService.eliminarUsuario(id);
         return ResponseEntity.ok().body("Se elimino al usuario");
     }
 
 
+    @PreAuthorize("hasRole('CLIENTE')")
     @DeleteMapping("/borrar-cuenta/{usuarioId}")
     public ResponseEntity<?> borrarUsuario(@PathVariable("usuarioId") Integer usuarioId,
-                                           HttpSession sesion) {
-        sesionService.isLogged(sesion);
+                                           Authentication auth) {
 
-        if(!Objects.equals(sesionService.getUsuarioId(sesion), usuarioId)){
+        String email = (String) auth.getPrincipal();
+
+        Usuario usuario = usuarioService.listarUsuarioPorEmail(email);
+
+        if(!Objects.equals(usuario.getId(), usuarioId)){
             throw new ForbiddenException("No tenes permisos");
         }
 
@@ -120,58 +129,45 @@ public class UsuarioController {
     }
 
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/listar")
-    public ResponseEntity<?> listarUsuarios(HttpSession sesion) {
-
-        sesionService.isLogged(sesion);
-
-        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
-            throw new ForbiddenException("No tenes permisos");
-        }
+    public ResponseEntity<?> listarUsuarios(Authentication auth) {
 
         return ResponseEntity.ok().body(usuarioService.listarUsuarios());
     }
 
 
     // ver si out
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/listar/eliminados")
-    public ResponseEntity<?> listarUsuariosEliminados(HttpSession sesion) {
-
-        sesionService.isLogged(sesion);
-
-        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
-            throw new ForbiddenException("No tenes permisos");
-        }
+    public ResponseEntity<?> listarUsuariosEliminados(Authentication auth) {
 
         return ResponseEntity.ok().body(usuarioService.listarUsuariosEliminados());
     }
 
 
     // borrar x otro distinto si pinta un filtrado
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/listar/filtrar")
     public ResponseEntity<?> filtrarListaUsuarios(
             @RequestParam(required = false) String nombre,
             @RequestParam(required = false) String apellido,
             @RequestParam(required = false) Boolean activo,
-            HttpSession sesion) {
-
-        sesionService.isLogged(sesion);
-
-        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())) {
-            throw new ForbiddenException("No tenes permisos");
-        }
+            Authentication auth) {
 
         return ResponseEntity.ok().body(usuarioService.filtrarListaUsuarios(nombre, apellido, activo));
     }
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> filtrarUsuariosId(@PathVariable Integer id, HttpSession sesion) {
+    public ResponseEntity<?> filtrarUsuariosId(@PathVariable Integer id, Authentication auth) {
 
-        sesionService.isLogged(sesion);
+        String email = (String) auth.getPrincipal();
 
-        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
-                !Objects.equals(id, sesionService.getUsuarioId(sesion))) {
+        Usuario user = usuarioService.listarUsuarioPorEmail(email);
+
+        if (!sesionService.tieneRol(user, ERol.ADMINISTRADOR.name()) &&
+                !Objects.equals(id, user.getId())) {
             throw new ForbiddenException("No tenes permisos");
         }
 
@@ -179,31 +175,20 @@ public class UsuarioController {
     }
 
 
+    @PreAuthorize("hasAnyRole('EMPLEADOR','ADMINISTRADOR')")
     @GetMapping("/email")
     public ResponseEntity<?> filtrarUsuariosEmail(@Valid @RequestBody UsuarioEmailDTO userEmail,
-                                                  HttpSession sesion) {
-
-        sesionService.isLogged(sesion);
-
-        if (!sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name()) &&
-                !sesionService.tieneRol(sesion, ERol.EMPLEADOR.name())) {
-            throw new ForbiddenException("No tenes permisos");
-        }
+                                                  Authentication auth) {
 
         return ResponseEntity.ok().body(usuarioService.listarUsuariosPorEmail(userEmail));
     }
 
 
     // ver si es con formulario o notif a admin (DESPUES VER CON G)
+    @PreAuthorize("!hasRole('ADMIN') && !hasRole('EMPLEADOR')")
     @PatchMapping("/{userId}/solicitar-ser-empleador")
     public ResponseEntity<?> solicitarRolEmpleador(@PathVariable("userId") Integer userId,
-                                                   HttpSession sesion){
-        sesionService.isLogged(sesion);
-
-        if(sesionService.tieneRol(sesion, ERol.EMPLEADOR.name()) ||
-                sesionService.tieneRol(sesion, ERol.ADMINISTRADOR.name())){
-            throw new ForbiddenException("No podes solicitar ser empleador siendo ya uno");
-        }
+                                                   Authentication auth){
 
         usuarioService.solicitudRolEmpleador(userId);
         return ResponseEntity.ok().body("Se te otorgó el rol Empleador");
