@@ -58,10 +58,8 @@ public class UsuarioController {
     @GetMapping("/me")
     public ResponseEntity<UsuarioMeDTO> getMe(Authentication authentication){
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-        String email = userDetails.getUsername();
-
+        String email = (String) authentication.getPrincipal();
+        
         Usuario u = usuarioService.listarUsuarioPorEmail(email);
 
         return ResponseEntity.ok().body(new UsuarioMeDTO(
@@ -135,6 +133,7 @@ public class UsuarioController {
     }
 
 
+    // ver si out
     @GetMapping("/listar/eliminados")
     public ResponseEntity<?> listarUsuariosEliminados(HttpSession sesion) {
 

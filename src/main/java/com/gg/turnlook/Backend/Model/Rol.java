@@ -39,6 +39,13 @@ public class Rol {
         return id != null && id.equals(rol.id);
     }
 
+
+
+    public String getNombre(){
+        return rol.name();
+    }
+
+
     @Override
     public int hashCode() {
         return getClass().hashCode();

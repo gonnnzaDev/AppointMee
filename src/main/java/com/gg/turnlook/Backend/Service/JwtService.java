@@ -23,14 +23,6 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secret;
 
-    private final UsuarioService usuarioService;
-
-
-    public JwtService(UsuarioService usuarioService) {
-        this.usuarioService = usuarioService;
-    }
-
-
 
 
     /// METODOS
@@ -47,7 +39,7 @@ public class JwtService {
         return Jwts.builder()
                 .subject(usuario.getEmail())
                 .claim("id",  usuario.getId())
-                .claim("roles", usuarioService.setRolesComoString(usuario))
+                .claim("roles", usuario.getRoles().stream().map(r -> r.getNombre()).toList())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 86400000))
                 .signWith(getSignKey())
@@ -83,11 +75,9 @@ public class JwtService {
     }
 
 
-    public boolean tokenValido(String token, UserDetails userDetails){
+    public boolean tokenValido(String token){
 
-        String email = extraerEmail(token);
-
-        return email.equals(userDetails.getUsername()) && !estaExpirado(token);
+        return !estaExpirado(token);
     }
 
 

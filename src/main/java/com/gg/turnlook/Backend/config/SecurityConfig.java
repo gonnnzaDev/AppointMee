@@ -2,6 +2,7 @@ package com.gg.turnlook.Backend.config;
 
 
 import com.gg.turnlook.Backend.Service.CustomUserDetailsService;
+import org.apache.catalina.User;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
 @Configuration
@@ -19,23 +21,26 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
 
+    private final JwtFilter jwtFilter;
+
+
+
+    public SecurityConfig(JwtFilter jwtFilter) {
+        this.jwtFilter = jwtFilter;
+    }
+
+
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) {
-       /*
-       return httpSecurity
-                .authorizeHttpRequests(r -> {
-                    r.requestMatchers(HttpMethod.GET,"/", "/hello").permitAll();
-                    r.anyRequest().authenticated();
-                })
-                .formLogin(Customizer.withDefaults())
-                .oauth2Login(Customizer.withDefaults())
-                .build();
-        */
+
         return httpSecurity
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
-                )
+                        .requestMatchers("/usuarios/inicio-sesion").permitAll()
+                        .anyRequest().authenticated())
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

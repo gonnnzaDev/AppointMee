@@ -8,12 +8,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 
 @Component
@@ -21,12 +23,10 @@ public class JwtFilter extends OncePerRequestFilter {
 
 
     private final JwtService jwtService;
-    private final CustomUserDetailsService userDetailsService;
 
 
-    public JwtFilter(JwtService jwtService, CustomUserDetailsService userDetailsService) {
+    public JwtFilter(JwtService jwtService) {
         this.jwtService = jwtService;
-        this.userDetailsService = userDetailsService;
     }
 
 
@@ -55,13 +55,16 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        UserDetails  userDetails = userDetailsService.loadUserByUsername(email);
+        List<String> roles = jwtService.extraerRoles(token);
+        List<SimpleGrantedAuthority> authorities = roles.stream()
+                .map(rol -> new SimpleGrantedAuthority("ROLE_" + rol))
+                .toList();
 
-        if(jwtService.tokenValido(token, userDetails)){
+        if(jwtService.tokenValido(token)){
 
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities());
+                            email, null, authorities);
 
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
