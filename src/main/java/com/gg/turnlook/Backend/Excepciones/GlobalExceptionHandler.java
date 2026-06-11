@@ -64,7 +64,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGeneral(Exception e){
-        e.printStackTrace();
+        e.printStackTrace(); // dsp sacar
         return ResponseEntity.status(500).body("Error interno del servidor");
     }
 }

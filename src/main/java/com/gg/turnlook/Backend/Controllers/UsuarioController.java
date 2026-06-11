@@ -59,7 +59,7 @@ public class UsuarioController {
     public ResponseEntity<UsuarioMeDTO> getMe(Authentication authentication){
 
         String email = (String) authentication.getPrincipal();
-        
+
         Usuario u = usuarioService.listarUsuarioPorEmail(email);
 
         return ResponseEntity.ok().body(new UsuarioMeDTO(
