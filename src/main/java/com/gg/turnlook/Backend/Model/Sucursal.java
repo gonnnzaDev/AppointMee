@@ -1,5 +1,6 @@
 package com.gg.turnlook.Backend.Model;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.Set;
+
+
 
 @Entity
 @Table(name = "sucursales")
@@ -51,15 +54,21 @@ public class Sucursal {
     @Column(nullable = true)
     private String mpToken;
 
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "imagen_id")
+    private Imagen fotoPerfil;
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "empleador_id")
     private Usuario empleador;
 
-    /// hacer el onetomany de servicios
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -70,10 +79,13 @@ public class Sucursal {
     @JsonIgnoreProperties("sucursalesEmpleado")
     private Set<Usuario> empleados = new HashSet<>();
 
+
+
     @PrePersist
     public void prePersist() {
         this.fechaCreacion = LocalDate.now();
     }
+
 
 
     /// CONSTRUCTORES

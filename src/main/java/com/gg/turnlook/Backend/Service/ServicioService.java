@@ -24,12 +24,14 @@ public class ServicioService {
 
     private final ServicioRepository servRepo;
     private final SucursalService sucService;
+    private final ImagenService imagenService;
 
 
 
-    public ServicioService(ServicioRepository servRepo, SucursalService sucService) {
+    public ServicioService(ServicioRepository servRepo, SucursalService sucService, ImagenService imagenService) {
         this.servRepo = servRepo;
         this.sucService = sucService;
+        this.imagenService = imagenService;
     }
 
 
@@ -48,6 +50,9 @@ public class ServicioService {
                 servicio.getNombre(), servicio.getDescripcion(), servicio.getDuracion(),
                 servicio.getPrecio(), sucursal
         );
+
+        serv.setFotoPerfil(imagenService.crearFotoPerfil(servicio.getFotoUrl()));
+
         servRepo.save(serv);
     }
 
@@ -55,12 +60,19 @@ public class ServicioService {
     public void modificarServicio(ServicioModificarDTO servicio, Servicio servOld) {
 
         if (servicio.getNombre() != null) servOld.setNombre(servicio.getNombre());
+
         if (servicio.getDescripcion() != null) servOld.setDescripcion(servicio.getDescripcion());
+
         if (servicio.getDuracion() != null) servOld.setDuracion(servicio.getDuracion());
+
         if (servicio.getPrecio() != null) servOld.setPrecio(servicio.getPrecio());
 
         if(servOld.getDuracion() % 30 != 0){
             throw new BadRequestException("La duracion tiene que ser en intervalos de 30 minutos");
+        }
+
+        if(servicio.getFotoUrl() != null && !servicio.getFotoUrl().isBlank()){
+            imagenService.cambiarFotoPerfilServicio(servOld,  servicio.getFotoUrl());
         }
 
         servRepo.save(servOld);

@@ -35,6 +35,12 @@ public class Servicio {
     @Column(nullable = false)
     private boolean activo = true;
 
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "imagen_id")
+    private Imagen fotoPerfil;
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sucursal_id")
     private Sucursal sucursal;

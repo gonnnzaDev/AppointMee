@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ImagenService {
 
+
     private final ImagenRepository imagenRepo;
 
 
@@ -48,6 +49,7 @@ public class ImagenService {
     public Imagen crearFotoPerfil(String url){
 
         Imagen imagen = new Imagen();
+
         if(url != null && !url.isBlank()){
             imagen.setUrl(url);
         }
@@ -56,7 +58,7 @@ public class ImagenService {
     }
 
 
-    public void cambiarFotoPerfil(Usuario usuario, String url){
+    public void cambiarFotoPerfilUsuario(Usuario usuario, String url){
 
         Imagen imagen = usuario.getFotoPerfil();
 
@@ -69,4 +71,36 @@ public class ImagenService {
         imagen.setUrl(url);
         imagenRepo.save(imagen);
     }
+
+
+    public void cambiarFotoPerfilSucursal(Sucursal sucursal, String url){
+
+        Imagen imagen = sucursal.getFotoPerfil();
+
+        if(imagen == null){
+            imagen = crearFotoPerfil(url);
+            sucursal.setFotoPerfil(imagen);
+            return;
+        }
+
+        imagen.setUrl(url);
+        imagenRepo.save(imagen);
+    }
+
+
+    public void cambiarFotoPerfilServicio(Servicio servicio, String url){
+
+        Imagen imagen = servicio.getFotoPerfil();
+
+        if(imagen == null){
+            imagen = crearFotoPerfil(url);
+            servicio.setFotoPerfil(imagen);
+            return;
+        }
+
+        imagen.setUrl(url);
+        imagenRepo.save(imagen);
+    }
+
+
 }

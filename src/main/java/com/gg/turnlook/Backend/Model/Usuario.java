@@ -43,10 +43,12 @@ public class Usuario {
     @Column(nullable = false)
     private boolean activo = true;
 
-    // ver esto
+
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "imagen_id")
     private Imagen fotoPerfil;
+
 
     @ManyToMany()
     @JoinTable(
@@ -57,9 +59,12 @@ public class Usuario {
     @JsonIgnoreProperties("usuarios")
     private Set<Rol> roles = new HashSet<>();
 
+
     @ManyToMany(mappedBy = "empleados")
     @JsonIgnore
     private Set<Sucursal> sucursalesEmpleado = new HashSet<>();
+
+
 
     @PrePersist
     public void prePersist() {

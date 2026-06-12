@@ -32,13 +32,15 @@ public class SucursalService {
     private final SucursalRepository sucRepo;
     private final CategoriaRepository catRepo;
     private final UsuarioService usuarioService;
+    private final ImagenService imagenService;
 
 
 
-    public SucursalService(SucursalRepository sucRepo, CategoriaRepository catRepo, UsuarioService usuarioService) {
+    public SucursalService(SucursalRepository sucRepo, CategoriaRepository catRepo, UsuarioService usuarioService, ImagenService imagenService) {
         this.sucRepo = sucRepo;
         this.catRepo = catRepo;
         this.usuarioService = usuarioService;
+        this.imagenService = imagenService;
     }
 
 
@@ -70,13 +72,21 @@ public class SucursalService {
             throw new BadRequestException("El horario de cierre tiene que ser posterior al de apertura");
         }
 
+        if(sucRepo.existsByDireccionIgnoreCase(sucursal.getDireccion())){
+            throw new ConflictException("La direccion ingresada ya existe");
+        }
+
         Categoria cat = catRepo.findById(sucursal.getCategoriaId()).
                 orElseThrow(() -> new NotFoundException("No se encontró la categoria"));
 
         Usuario empleador = usuarioService.listarUsuarioPorId(userId);
+
         Sucursal suc = new Sucursal(sucursal.getNombre(), sucursal.getDireccion(),
                 sucursal.getTelefono(), sucursal.getDescripcion(),
-                sucursal.getHoraApertura(), sucursal.getHoraCierre(), cat, empleador);
+                sucursal.getHoraApertura(), sucursal.getHoraCierre(),
+                cat, empleador);
+
+        suc.setFotoPerfil(imagenService.crearFotoPerfil(sucursal.getFotoUrl()));
 
         sucRepo.save(suc);
     }
@@ -89,7 +99,9 @@ public class SucursalService {
                     orElseThrow(() -> new NotFoundException("No se encontró la categoria"));
             suc.setCategoria(cat);
         }
+
         if (sucursal.getNombre() != null) suc.setNombre(sucursal.getNombre());
+
         if (sucursal.getDireccion() != null &&
                 !sucursal.getDireccion().equalsIgnoreCase(suc.getDireccion())) {
             if (sucRepo.existsByDireccionIgnoreCase(sucursal.getDireccion())) {
@@ -97,13 +109,22 @@ public class SucursalService {
             }
             suc.setDireccion(sucursal.getDireccion());
         }
+
         if (sucursal.getTelefono() != null) suc.setTelefono(sucursal.getTelefono());
+
         if (sucursal.getDescripcion() != null) suc.setDescripcion(sucursal.getDescripcion());
+
         if (sucursal.getHoraApertura() != null) suc.setHoraApertura(sucursal.getHoraApertura());
+
         if (sucursal.getHoraCierre() != null) suc.setHoraCierre(sucursal.getHoraCierre());
 
         if (!suc.getHoraCierre().isAfter(suc.getHoraApertura())) {
             throw new BadRequestException("El horario de cierre tiene que ser posterior al de apertura");
+        }
+
+        // ver si valida bien como ultimo dsp
+        if (sucursal.getFotoUrl() != null && !sucursal.getFotoUrl().isBlank()){
+            imagenService.cambiarFotoPerfilSucursal(suc, sucursal.getFotoUrl());
         }
 
         sucRepo.save(suc);

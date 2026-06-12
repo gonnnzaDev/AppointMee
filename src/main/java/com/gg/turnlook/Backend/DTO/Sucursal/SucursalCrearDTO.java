@@ -3,6 +3,7 @@ package com.gg.turnlook.Backend.DTO.Sucursal;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import org.hibernate.validator.constraints.URL;
 
 import java.time.LocalTime;
 
@@ -39,5 +40,9 @@ public class SucursalCrearDTO {
     @NotNull(message = "La hora de cierre es obligatoria")
     @JsonFormat(pattern = "HH:mm")
     private LocalTime horaCierre;
+
+    @NotBlank(message = "La foto de perfil es obligatoria")
+    @URL(message = "La foto de perfil debe ser una URL valida")
+    private String fotoUrl;
 
 }

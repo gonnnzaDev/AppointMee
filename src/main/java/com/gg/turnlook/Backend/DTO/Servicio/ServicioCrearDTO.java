@@ -2,6 +2,7 @@ package com.gg.turnlook.Backend.DTO.Servicio;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import org.hibernate.validator.constraints.URL;
 
 import java.math.BigDecimal;
 
@@ -34,5 +35,9 @@ public class ServicioCrearDTO {
     @Positive(message = "El ID de sucursal debe ser positivo")
     private Integer sucursalId;
 
+
+    @NotBlank(message = "La foto de perfil es obligatoria")
+    @URL(message = "La foto de perfil debe ser una URL valida")
+    private String fotoUrl;
 
 }

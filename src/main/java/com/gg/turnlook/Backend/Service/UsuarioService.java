@@ -7,10 +7,8 @@ import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Excepciones.ConflictException;
 import com.gg.turnlook.Backend.Excepciones.NotFoundException;
 import com.gg.turnlook.Backend.Excepciones.UnauthorizedException;
-import com.gg.turnlook.Backend.Model.Imagen;
 import com.gg.turnlook.Backend.Model.Rol;
 import com.gg.turnlook.Backend.Model.Usuario;
-import com.gg.turnlook.Backend.Repository.RolRepository;
 import com.gg.turnlook.Backend.Repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -107,7 +105,7 @@ public class UsuarioService {
         if (usuario.getPassword() != null) user.setPassword(passEncoder.encode(usuario.getPassword()));
 
         if (usuario.getFotoUrl() != null && !usuario.getFotoUrl().isBlank()) {
-            imagenService.cambiarFotoPerfil(user, usuario.getFotoUrl());
+            imagenService.cambiarFotoPerfilUsuario(user, usuario.getFotoUrl());
         }
 
         usRepo.save(user);

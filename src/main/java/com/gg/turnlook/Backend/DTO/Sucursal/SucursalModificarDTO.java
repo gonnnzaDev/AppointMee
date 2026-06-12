@@ -3,6 +3,7 @@ package com.gg.turnlook.Backend.DTO.Sucursal;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import org.hibernate.validator.constraints.URL;
 
 import java.time.LocalTime;
 
@@ -18,6 +19,7 @@ public class SucursalModificarDTO {
     @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\d\\s.,#-]+$",
             message = "La direccion solo debe contener letras, numeros y espacios")
     private String direccion;
+
 
     @Size(min = 8, max = 20, message = "El telefono debe estar entre los 8 y 20 digitos")
     @Pattern(regexp = "^\\d+$" , message = "El telefono solo puede contener numeros")
@@ -38,4 +40,9 @@ public class SucursalModificarDTO {
 
     @JsonFormat(pattern = "HH:mm")
     private LocalTime horaCierre;
+
+
+    @URL(message = "La foto de perfil debe ser una URL valida")
+    private String fotoUrl;
+
 }
