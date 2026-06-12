@@ -46,16 +46,17 @@ public class UsuarioService {
 
 
 
-    public Usuario inicioSesion(LoginDTO login) {
+    public void recuperarCuenta(LoginDTO login) {
 
-        Usuario u = usRepo.findByEmailAndActivoTrue(login.getEmail())
+        Usuario usuario = usRepo.findByEmailAndActivoFalse(login.getEmail())
                 .orElseThrow(() -> new UnauthorizedException("Credenciales incorrectas"));
 
-        if (!passEncoder.matches(login.getPass(), u.getPassword())) {
+        if (!passEncoder.matches(login.getPass(), usuario.getPassword())) {
             throw new UnauthorizedException("Credenciales incorrectas");
         }
 
-        return u;
+        usuario.setActivo(true);
+        usRepo.save(usuario);
     }
 
 
@@ -185,12 +186,6 @@ public class UsuarioService {
     }
 
 
-    public void borrarUsuario(Integer usuarioId) {
-        Usuario u = listarUsuarioPorId(usuarioId);
-        usRepo.delete(u);
-    }
-
-
     public void solicitudRolEmpleador(Integer userId) {
 
         Usuario usuario = listarUsuarioPorId(userId);
@@ -202,5 +197,6 @@ public class UsuarioService {
         usuario.getRoles().add(empleador);
         usRepo.save(usuario);
     }
+
 }
 

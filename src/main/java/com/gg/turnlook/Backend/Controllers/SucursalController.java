@@ -92,7 +92,8 @@ public class SucursalController {
 
         Usuario user = usuarioService.listarUsuarioPorEmail(email);
 
-        if(!sucursalService.enSucursal(user.getId(), id)){
+        if(!sesionService.tieneRol(user, ERol.ADMINISTRADOR.name()) &&
+                !sucursalService.enSucursal(user.getId(), id)){
             throw new ForbiddenException("No tenes permisos");
         }
 

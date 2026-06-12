@@ -7,7 +7,6 @@ import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Service.JwtService;
 import com.gg.turnlook.Backend.Service.SesionService;
 import com.gg.turnlook.Backend.Service.UsuarioService;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -61,6 +60,15 @@ public class UsuarioController {
     }
 
 
+    @PostMapping("/recuperar-cuenta")
+    public ResponseEntity<?> recuperarCuenta(@Valid @RequestBody LoginDTO login){
+
+        usuarioService.recuperarCuenta(login);
+        return ResponseEntity.ok().body("Su cuenta fue activada correctamente. " +
+                "Ya puede iniciar sesion");
+    }
+
+
     @GetMapping("/me")
     public ResponseEntity<UsuarioMeDTO> getMe(Authentication auth){
 
@@ -104,10 +112,16 @@ public class UsuarioController {
     public ResponseEntity<?> eliminarUsuario(@PathVariable("id") Integer id,
                                              Authentication auth) {
 
-        // ver si valido algo aca pero no creo
+        String email = (String) auth.getPrincipal();
+
+        Usuario usuario = usuarioService.listarUsuarioPorEmail(email);
+
+        if(!Objects.equals(usuario.getId(), id)){
+            throw new ForbiddenException("No podes eliminar tu cuenta siendo Administrador");
+        }
 
         usuarioService.eliminarUsuario(id);
-        return ResponseEntity.ok().body("Se elimino al usuario");
+        return ResponseEntity.ok().body("Se eliminó al usuario");
     }
 
 
@@ -124,8 +138,8 @@ public class UsuarioController {
             throw new ForbiddenException("No tenes permisos");
         }
 
-        usuarioService.borrarUsuario(usuarioId);
-        return ResponseEntity.ok().body("Se eliminó la cuenta permanentemente");
+        usuarioService.eliminarUsuario(usuarioId);
+        return ResponseEntity.ok().body("Se eliminó la cuenta");
     }
 
 

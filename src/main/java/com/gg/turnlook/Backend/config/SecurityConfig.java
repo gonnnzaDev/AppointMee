@@ -28,14 +28,11 @@ public class SecurityConfig {
     private final JwtAccessDeniedHandler accessDeniedHandler;
 
 
-
     public SecurityConfig(JwtFilter jwtFilter, JwtAuthenticationEntryPoint authenticationEntryPoint, JwtAccessDeniedHandler accessDeniedHandler) {
         this.jwtFilter = jwtFilter;
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.accessDeniedHandler = accessDeniedHandler;
     }
-
-
 
 
     @Bean
@@ -44,12 +41,16 @@ public class SecurityConfig {
         return httpSecurity
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/usuarios/inicio-sesion").permitAll()
+                        .requestMatchers(
+                                "/usuarios/inicio-sesion",
+                                "/usuarios/recuperar-cuenta",
+                                "/usuarios/crear")
+                        .permitAll()
                         .anyRequest().authenticated())
 
                 .exceptionHandling(e -> e
-                .authenticationEntryPoint(authenticationEntryPoint)
-                .accessDeniedHandler(accessDeniedHandler))
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler))
 
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

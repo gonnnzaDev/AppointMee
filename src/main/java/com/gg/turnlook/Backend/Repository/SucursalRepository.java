@@ -8,6 +8,7 @@ import java.util.Optional;
 
 public interface SucursalRepository extends JpaRepository<Sucursal, Integer> {
 
+    // borrar lo mas probable
     Optional<Sucursal> findByNombre(String nombre);
 
     List<Sucursal> findByActivoTrue();
