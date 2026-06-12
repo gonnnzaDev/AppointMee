@@ -44,7 +44,12 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/usuarios/inicio-sesion",
                                 "/usuarios/recuperar-cuenta",
-                                "/usuarios/crear")
+                                "/usuarios/crear",
+
+                                // para swagger
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html")
                         .permitAll()
                         .anyRequest().authenticated())
 
