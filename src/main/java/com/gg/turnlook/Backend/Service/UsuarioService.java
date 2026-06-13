@@ -178,7 +178,7 @@ public class UsuarioService {
         uPerfil.setFotoPerfil(u.getFotoPerfil().getFotoValida());
         uPerfil.setSucursalesEmpleado(u.getSucursalesEmpleado().stream()
                 .map(suc -> new SucursalMiniDTO(suc.getId(), suc.getNombre(),
-                        suc.getCategoria().getCategoria(),
+                        suc.getCategoria().getCategoria().name(),
                         suc.getFotoPerfil().getFotoValida()))
                 .toList());
 

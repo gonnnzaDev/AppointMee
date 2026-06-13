@@ -181,7 +181,7 @@ public class SucursalService {
     public List<SucursalMiniDTO> listarSucursales() {
         return sucRepo.findByActivoTrue().stream()
                 .map(suc -> new SucursalMiniDTO(suc.getId(), suc.getNombre(),
-                        suc.getCategoria().getCategoria(),
+                        suc.getCategoria().getCategoria().name(),
                         suc.getFotoPerfil().getFotoValida()))
                 .toList();
     }
@@ -203,7 +203,7 @@ public class SucursalService {
         dto.setTelefono(suc.getTelefono());
         dto.setDescripcion(suc.getDescripcion());
         dto.setFechaCreacion(suc.getFechaCreacion());
-        dto.setCategoria(suc.getCategoria().getCategoria());
+        dto.setCategoria(suc.getCategoria().getCategoria().name());
         dto.setHoraApertura(suc.getHoraApertura());
         dto.setHoraCierre(suc.getHoraCierre());
         dto.setFotoPerfil(suc.getFotoPerfil().getFotoValida());
@@ -244,7 +244,7 @@ public class SucursalService {
         }
 
         return sucursales.stream().map(s -> new SucursalMiniDTO(
-                        s.getId(), s.getNombre(), s.getCategoria().getCategoria(),
+                        s.getId(), s.getNombre(), s.getCategoria().getCategoria().name(),
                         s.getFotoPerfil().getFotoValida()))
                 .toList();
     }

@@ -1,12 +1,12 @@
 package com.gg.turnlook.Backend.Model;
 
+
+import com.gg.turnlook.Backend.Enum.ECategoria;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.minidev.json.annotate.JsonIgnore;
 
-import java.util.List;
 
 @Entity
 @Table(name = "categorias")
@@ -15,21 +15,22 @@ import java.util.List;
 @NoArgsConstructor
 public class Categoria {
 
+
     /// ATRIBUTOS
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(unique = true, nullable = false)
-    private String categoria;
+    @Enumerated(EnumType.STRING)
+    private ECategoria categoria;
 
-    
 
     /// CONSTRUCTORES
-    public Categoria(String nombre) {
-        this.categoria = nombre;
+
+    public Categoria(ECategoria categoria) {
+        this.categoria = categoria;
     }
 
 
-
 }
+

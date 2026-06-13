@@ -119,7 +119,7 @@ public class ServicioService {
 
         dto.setNombreSucursal(s.getSucursal().getNombre());
         dto.setDireccionSucursal(s.getSucursal().getDireccion());
-        dto.setCategoriaSucursal(s.getSucursal().getCategoria().getCategoria());
+        dto.setCategoriaSucursal(s.getSucursal().getCategoria().getCategoria().name());
 
         return dto;
     }
