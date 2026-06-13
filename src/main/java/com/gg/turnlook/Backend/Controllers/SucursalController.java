@@ -1,5 +1,6 @@
 package com.gg.turnlook.Backend.Controllers;
 
+import com.gg.turnlook.Backend.DTO.Imagen.ImagenDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalCrearDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalModificarDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmailDTO;
@@ -20,12 +21,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Objects;
 
 
-
 @RestController
 @RequestMapping("/sucursales")
 @CrossOrigin(origins = "*")
 public class SucursalController {
-
 
 
     private final SucursalService sucursalService;
@@ -41,9 +40,7 @@ public class SucursalController {
     }
 
 
-
     /// ENDPOINTS
-
 
 
     @PreAuthorize("hasRole('EMPLEADOR')")
@@ -83,6 +80,70 @@ public class SucursalController {
     }
 
 
+    // ver si admin tmb
+    @PreAuthorize("hasRole('EMPLEADOR')")
+    @GetMapping("/{sucursalId}/imagenes")
+    public ResponseEntity<?> verImagenesPorSucursal(
+            @PathVariable("sucursalId") Integer sucursalId,
+            Authentication auth) {
+
+        String email = (String) auth.getPrincipal();
+
+        Usuario user = usuarioService.listarUsuarioPorEmail(email);
+
+        Sucursal suc = sucursalService.listarSucursalPorId(sucursalId);
+
+        if (!sucursalService.enSucursal(user.getId(), sucursalId)) {
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        return ResponseEntity.ok().body(sucursalService.listarImagenesPorSucursal(suc));
+    }
+
+
+    @PreAuthorize("hasRole('EMPLEADOR')")
+    @PostMapping("/{sucursalId}/agregar/imagenes")
+    public ResponseEntity<?> agregarImagenes(@PathVariable("sucursalId") Integer sucursalId,
+                                             @Valid @RequestBody ImagenDTO imagenes,
+                                             Authentication auth) {
+
+        String email = (String) auth.getPrincipal();
+
+        Usuario user = usuarioService.listarUsuarioPorEmail(email);
+
+        if (!sucursalService.enSucursal(user.getId(), sucursalId)) {
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        Sucursal suc =  sucursalService.listarSucursalPorId(sucursalId);
+
+        sucursalService.agregarImagenes(imagenes, suc);
+        return ResponseEntity.ok().body("Se agregaron las imagenes a la sucursal");
+    }
+
+
+    // ver si admin tmb
+    @PreAuthorize("hasRole('EMPLEADOR')")
+    @DeleteMapping("/{sucursalId}/eliminar/imagen/{imagenId}")
+    public ResponseEntity<?> eliminarImagen(@PathVariable("sucursalId") Integer sucursalId,
+                                            @PathVariable("imagenId") Integer imagenId,
+                                            Authentication auth) {
+
+        String email = (String) auth.getPrincipal();
+
+        Usuario user = usuarioService.listarUsuarioPorEmail(email);
+
+        if (!sucursalService.enSucursal(user.getId(), sucursalId)) {
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        Sucursal suc =  sucursalService.listarSucursalPorId(sucursalId);
+
+        sucursalService.eliminarImagen(imagenId, suc);
+        return ResponseEntity.ok().body("Se eliminó la imagen de la sucursal");
+    }
+
+
     @PreAuthorize("hasAnyRole('EMPLEADOR','ADMINISTRADOR')")
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<?> eliminarSucursal(@PathVariable("id") Integer id,
@@ -92,8 +153,8 @@ public class SucursalController {
 
         Usuario user = usuarioService.listarUsuarioPorEmail(email);
 
-        if(!sesionService.tieneRol(user, ERol.ADMINISTRADOR.name()) &&
-                !sucursalService.enSucursal(user.getId(), id)){
+        if (!sesionService.tieneRol(user, ERol.ADMINISTRADOR.name()) &&
+                !sucursalService.enSucursal(user.getId(), id)) {
             throw new ForbiddenException("No tenes permisos");
         }
 

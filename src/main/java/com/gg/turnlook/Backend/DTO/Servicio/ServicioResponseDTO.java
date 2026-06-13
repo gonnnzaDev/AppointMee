@@ -17,6 +17,7 @@ public class ServicioResponseDTO {
      private String descripcion;
      private Integer duracion;
      private BigDecimal precio;
+     private String fotoPerfil;
      private String nombreSucursal;
      private String direccionSucursal;
      private String categoriaSucursal;

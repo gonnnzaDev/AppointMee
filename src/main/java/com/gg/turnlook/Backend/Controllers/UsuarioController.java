@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -206,5 +207,13 @@ public class UsuarioController {
 
         usuarioService.solicitudRolEmpleador(userId);
         return ResponseEntity.ok().body("Se te otorgó el rol Empleador");
+    }
+
+
+    @DeleteMapping("/eliminar/foto-perfil")
+    public ResponseEntity<?> eliminarFotoPerfil(@AuthenticationPrincipal String email){
+
+        usuarioService.eliminarFotoPerfil(email);
+        return ResponseEntity.ok().body("Se eliminó la foto de perfil");
     }
 }

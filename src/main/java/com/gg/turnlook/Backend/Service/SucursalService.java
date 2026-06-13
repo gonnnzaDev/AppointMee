@@ -1,5 +1,7 @@
 package com.gg.turnlook.Backend.Service;
 
+import com.gg.turnlook.Backend.DTO.Imagen.ImagenDTO;
+import com.gg.turnlook.Backend.DTO.Imagen.ImagenResponseDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalCrearDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalMiniDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalModificarDTO;
@@ -10,8 +12,10 @@ import com.gg.turnlook.Backend.DTO.Usuario.UsuarioResponseDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioMiniDTO;
 import com.gg.turnlook.Backend.Excepciones.BadRequestException;
 import com.gg.turnlook.Backend.Excepciones.ConflictException;
+import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
 import com.gg.turnlook.Backend.Excepciones.NotFoundException;
 import com.gg.turnlook.Backend.Model.Categoria;
+import com.gg.turnlook.Backend.Model.Imagen;
 import com.gg.turnlook.Backend.Model.Sucursal;
 import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Repository.CategoriaRepository;
@@ -19,6 +23,7 @@ import com.gg.turnlook.Backend.Repository.SucursalRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -131,6 +136,40 @@ public class SucursalService {
     }
 
 
+    public List<ImagenResponseDTO> listarImagenesPorSucursal(Sucursal suc){
+
+        return imagenService.listarImagenesPorSucursal(suc);
+    }
+
+
+    public void agregarImagenes(ImagenDTO imagenes, Sucursal sucursal){
+
+        long totalImagenes = imagenService.cuantasImagenesPorSucursal(sucursal);
+
+        if(imagenes.getUrls().size() + totalImagenes > 5){
+            throw new ConflictException("Una sucursal no puede tener mas de 5 imagenes");
+        }
+
+        for(String imagen : imagenes.getUrls()){
+
+            imagenService.crearImagenSucursal(sucursal, imagen);
+        }
+
+    }
+
+
+    public void eliminarImagen(Integer imagenId, Sucursal suc){
+
+        Imagen img = imagenService.listarImagenPorId(imagenId);
+
+        if(!Objects.equals(img.getSucursal().getId(), suc.getId())){
+            throw new ForbiddenException("La imagen no le corresponde a esta sucursal");
+        }
+        
+        imagenService.eliminarImagen(img);
+    }
+
+
     public void eliminarSucursal(Integer id) {
         Sucursal sucursal = listarSucursalPorId(id);
         //sucRepo.delete(sucursal.get());  ver si dejo este o el de activo -> false
@@ -142,7 +181,8 @@ public class SucursalService {
     public List<SucursalMiniDTO> listarSucursales() {
         return sucRepo.findByActivoTrue().stream()
                 .map(suc -> new SucursalMiniDTO(suc.getId(), suc.getNombre(),
-                        suc.getCategoria().getCategoria()))
+                        suc.getCategoria().getCategoria(),
+                        suc.getFotoPerfil().getFotoValida()))
                 .toList();
     }
 
@@ -166,6 +206,7 @@ public class SucursalService {
         dto.setCategoria(suc.getCategoria().getCategoria());
         dto.setHoraApertura(suc.getHoraApertura());
         dto.setHoraCierre(suc.getHoraCierre());
+        dto.setFotoPerfil(suc.getFotoPerfil().getFotoValida());
 
         UsuarioMiniDTO empleador = new UsuarioMiniDTO(
                 suc.getEmpleador().getNombre(),
@@ -203,7 +244,8 @@ public class SucursalService {
         }
 
         return sucursales.stream().map(s -> new SucursalMiniDTO(
-                        s.getId(), s.getNombre(), s.getCategoria().getCategoria()))
+                        s.getId(), s.getNombre(), s.getCategoria().getCategoria(),
+                        s.getFotoPerfil().getFotoValida()))
                 .toList();
     }
 

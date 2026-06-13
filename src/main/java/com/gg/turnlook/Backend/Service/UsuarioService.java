@@ -178,7 +178,9 @@ public class UsuarioService {
         uPerfil.setFotoPerfil(u.getFotoPerfil().getFotoValida());
         uPerfil.setSucursalesEmpleado(u.getSucursalesEmpleado().stream()
                 .map(suc -> new SucursalMiniDTO(suc.getId(), suc.getNombre(),
-                        suc.getCategoria().getCategoria())).collect(Collectors.toSet()));
+                        suc.getCategoria().getCategoria(),
+                        suc.getFotoPerfil().getFotoValida()))
+                .toList());
 
         return uPerfil;
     }
@@ -196,5 +198,12 @@ public class UsuarioService {
         usRepo.save(usuario);
     }
 
+
+    public void eliminarFotoPerfil(String userEmail){
+
+        Usuario usuario = listarUsuarioPorEmail(userEmail);
+
+        imagenService.eliminarFotoPerfilUsuario(usuario);
+    }
 }
 

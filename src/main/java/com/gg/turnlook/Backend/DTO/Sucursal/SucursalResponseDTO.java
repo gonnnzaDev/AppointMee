@@ -25,4 +25,5 @@ public class SucursalResponseDTO {
      private LocalTime horaCierre;
      private UsuarioMiniDTO empleador;
      private Set<UsuarioMiniDTO> empleados;
+     private String fotoPerfil;
 }

@@ -97,7 +97,7 @@ public class ServicioService {
 
         return servRepo.findBySucursalId(sucursalId).stream()
                 .map(s -> new ServicioMiniDTO(s.getId(), s.getNombre(),
-                        s.getDuracion()))
+                        s.getDuracion(), s.getFotoPerfil().getFotoValida()))
                 .toList();
     }
 
@@ -115,6 +115,7 @@ public class ServicioService {
         dto.setDescripcion(s.getDescripcion());
         dto.setDuracion(s.getDuracion());
         dto.setPrecio(s.getPrecio());
+        dto.setFotoPerfil(s.getFotoPerfil().getFotoValida());
 
         dto.setNombreSucursal(s.getSucursal().getNombre());
         dto.setDireccionSucursal(s.getSucursal().getDireccion());

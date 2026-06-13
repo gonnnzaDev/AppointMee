@@ -12,4 +12,5 @@ public class ServicioMiniDTO {
     private Integer id;
     private String nombre;
     private Integer duracion;
+    private String fotoPerfil;
 }

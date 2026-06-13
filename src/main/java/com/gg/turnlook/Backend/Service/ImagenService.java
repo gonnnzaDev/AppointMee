@@ -1,12 +1,16 @@
 package com.gg.turnlook.Backend.Service;
 
 
+import com.gg.turnlook.Backend.DTO.Imagen.ImagenResponseDTO;
+import com.gg.turnlook.Backend.Excepciones.NotFoundException;
 import com.gg.turnlook.Backend.Model.Imagen;
 import com.gg.turnlook.Backend.Model.Servicio;
 import com.gg.turnlook.Backend.Model.Sucursal;
 import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Repository.ImagenRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 @Service
@@ -25,15 +29,6 @@ public class ImagenService {
 
     ///  METODOS
 
-
-    public void crearImagenServicio(Servicio servicio, String url){
-
-        Imagen imagen = new Imagen();
-        imagen.setServicio(servicio);
-        imagen.setUrl(url);
-
-        imagenRepo.save(imagen);
-    }
 
 
     public void crearImagenSucursal(Sucursal sucursal, String url){
@@ -55,6 +50,18 @@ public class ImagenService {
         }
 
         return imagenRepo.save(imagen);
+    }
+
+
+    public void eliminarFotoPerfilUsuario(Usuario usuario){
+
+        Imagen imagen = usuario.getFotoPerfil();
+
+        if(imagen == null) return;
+
+        imagen.setUrl(null);
+
+        imagenRepo.save(imagen);
     }
 
 
@@ -102,5 +109,32 @@ public class ImagenService {
         imagenRepo.save(imagen);
     }
 
+
+    public List<ImagenResponseDTO> listarImagenesPorSucursal(Sucursal sucursal){
+
+        return imagenRepo.findBySucursal(sucursal).stream()
+                .map(img -> new ImagenResponseDTO(img.getId(), img.getFotoValida()))
+                .toList();
+    }
+
+
+    public long cuantasImagenesPorSucursal(Sucursal sucursal){
+
+        return imagenRepo.countBySucursal(sucursal);
+    }
+
+
+    public Imagen listarImagenPorId(Integer imagenId){
+
+        return imagenRepo.findById(imagenId)
+                .orElseThrow(() -> new NotFoundException("No se encontró la imagen"));
+    }
+
+
+    // ver mas este
+    public void eliminarImagen(Imagen imagen){
+
+        imagenRepo.delete(imagen);
+    }
 
 }

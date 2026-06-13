@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -20,5 +21,5 @@ public class UsuarioPerfilResponseDTO {
     private LocalDate fechaCreacion;
     private String fotoPerfil;
     private Set<String> roles;
-    private Set<SucursalMiniDTO> sucursalesEmpleado;
+    private List<SucursalMiniDTO> sucursalesEmpleado;
 }
