@@ -4,7 +4,7 @@ import com.gg.turnlook.Backend.DTO.Usuario.*;
 import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
 import com.gg.turnlook.Backend.Model.Usuario;
-import com.gg.turnlook.Backend.Service.JwtService;
+import com.gg.turnlook.Backend.Security.JwtService;
 import com.gg.turnlook.Backend.Service.SesionService;
 import com.gg.turnlook.Backend.Service.UsuarioService;
 import jakarta.validation.Valid;

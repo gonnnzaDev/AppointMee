@@ -1,9 +1,10 @@
-package com.gg.turnlook.Backend.Service;
+package com.gg.turnlook.Backend.Security;
 
 
 
 import com.gg.turnlook.Backend.Excepciones.NotFoundException;
 import com.gg.turnlook.Backend.Model.Usuario;
+import com.gg.turnlook.Backend.Service.UsuarioService;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

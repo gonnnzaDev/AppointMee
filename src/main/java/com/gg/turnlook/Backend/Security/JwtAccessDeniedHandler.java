@@ -1,4 +1,4 @@
-package com.gg.turnlook.Backend.config;
+package com.gg.turnlook.Backend.Security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

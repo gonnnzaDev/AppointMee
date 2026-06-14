@@ -1,8 +1,10 @@
 package com.gg.turnlook.Backend.config;
 
 
-import com.gg.turnlook.Backend.Service.CustomUserDetailsService;
-import org.apache.catalina.User;
+import com.gg.turnlook.Backend.Security.JwtAccessDeniedHandler;
+import com.gg.turnlook.Backend.Security.JwtAuthenticationEntryPoint;
+import com.gg.turnlook.Backend.Security.JwtFilter;
+import com.gg.turnlook.Backend.Security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

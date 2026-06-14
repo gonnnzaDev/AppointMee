@@ -1,8 +1,6 @@
-package com.gg.turnlook.Backend.config;
+package com.gg.turnlook.Backend.Security;
 
 
-import com.gg.turnlook.Backend.Service.CustomUserDetailsService;
-import com.gg.turnlook.Backend.Service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

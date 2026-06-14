@@ -1,4 +1,4 @@
-package com.gg.turnlook.Backend.Service;
+package com.gg.turnlook.Backend.Security;
 
 
 import com.gg.turnlook.Backend.Model.Usuario;
