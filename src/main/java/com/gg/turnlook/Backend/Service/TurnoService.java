@@ -48,17 +48,17 @@ public class TurnoService {
 
     public void registrarTurno(TurnoCrearDTO turno, String clienteEmail) {
 
-        Usuario cliente = usuarioService.listarUsuarioPorId(turno.getClienteId());
-
-        if (!cliente.getEmail().equals(clienteEmail)) {
-            throw new ForbiddenException("No podes reservar turnos para otros usuarios");
-        }
-
         if (!turno.getFechaHora().isAfter(LocalDateTime.now())) {
             throw new BadRequestException("La fecha del turno no puede haber pasado");
         }
 
         Usuario empleado = usuarioService.listarUsuarioPorId(turno.getEmpleadoId());
+
+        if(empleado.getEmail().equals(clienteEmail)){
+            throw new ConflictException("No podes reservar un turno siendo vos el empleado");
+        }
+
+        Usuario cliente = usuarioService.listarUsuarioPorEmail(clienteEmail);
         Servicio servicio = servicioService.listarServicioPorId(turno.getServicioId());
 
         if (empleado.getRoles().stream().noneMatch(r -> r.getRol() == ERol.EMPLEADO ||
