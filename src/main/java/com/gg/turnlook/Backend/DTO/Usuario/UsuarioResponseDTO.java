@@ -14,4 +14,5 @@ public class UsuarioResponseDTO {
     private String apellido;
     private String email;
     private String urlFotoPerfil;
+    // puntuacion aca CREO
 }

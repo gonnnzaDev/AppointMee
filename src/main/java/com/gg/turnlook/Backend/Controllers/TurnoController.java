@@ -1,24 +1,19 @@
 package com.gg.turnlook.Backend.Controllers;
 
+
+
+
 import com.gg.turnlook.Backend.DTO.Turno.TurnoCrearDTO;
-import com.gg.turnlook.Backend.Enum.ERol;
-import com.gg.turnlook.Backend.Enum.EstadoTurno;
-import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
-import com.gg.turnlook.Backend.Model.Sucursal;
-import com.gg.turnlook.Backend.Model.Turno;
-import com.gg.turnlook.Backend.Model.Usuario;
-import com.gg.turnlook.Backend.Service.SesionService;
 import com.gg.turnlook.Backend.Service.SucursalService;
 import com.gg.turnlook.Backend.Service.TurnoService;
 import com.gg.turnlook.Backend.Service.UsuarioService;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
+
 
 
 @RestController
@@ -28,39 +23,27 @@ public class TurnoController {
 
 
     private final TurnoService turnoService;
-    private final SesionService sesionService;
     private final UsuarioService usuarioService;
     private final SucursalService sucursalService;
 
 
-    public TurnoController(TurnoService turnoService, SesionService sesionService, UsuarioService usuarioService, SucursalService sucursalService) {
+    public TurnoController(TurnoService turnoService, UsuarioService usuarioService, SucursalService sucursalService) {
         this.turnoService = turnoService;
-        this.sesionService = sesionService;
+
         this.usuarioService = usuarioService;
         this.sucursalService = sucursalService;
     }
 
 
-
     /// ENDPOINTS
-
 
 
     @PreAuthorize("hasRole('CLIENTE')")
     @PostMapping("/registrar")
-    // solo clientes
     public ResponseEntity<?> registrarTurno(@Valid @RequestBody TurnoCrearDTO turno,
-                                            Authentication auth) {
+                                            @AuthenticationPrincipal String clienteEmail) {
 
-        String email = (String) auth.getPrincipal();
-
-        Usuario user = usuarioService.listarUsuarioPorEmail(email);
-
-        if (!Objects.equals(turno.getClienteId(), user.getId())) {
-            throw new ForbiddenException("No podes reservar turnos para otros usuarios");
-        }
-
-        turnoService.registrarTurno(turno);
+        turnoService.registrarTurno(turno, clienteEmail);
         return ResponseEntity.ok().body("Se reservó el turno correctamente");
     }
 
@@ -68,8 +51,7 @@ public class TurnoController {
     @PreAuthorize("hasRole('CLIENTE')")
     @GetMapping("/disponibilidad/empleado/{empleadoId}/servicio/{servicioId}")
     public ResponseEntity<?> verDisponibilidad(@PathVariable("empleadoId") Integer empleadoId,
-                                               @PathVariable("servicioId") Integer servicioId,
-                                               Authentication auth) {
+                                               @PathVariable("servicioId") Integer servicioId) {
 
         return ResponseEntity.ok().body(turnoService.verDisponibilidad(empleadoId, servicioId));
     }
@@ -79,20 +61,9 @@ public class TurnoController {
     @PreAuthorize("hasRole('EMPLEADOR')")
     @DeleteMapping("/cancelar/{turnoId}")
     public ResponseEntity<?> cancelarTurno(@PathVariable("turnoId") Integer turnoId,
-                                           Authentication auth) {
+                                           @AuthenticationPrincipal String empleadorEmail) {
 
-        String email = (String) auth.getPrincipal();
-
-        Usuario user = usuarioService.listarUsuarioPorEmail(email);
-
-        Turno turno = turnoService.listarTurnoPorId(turnoId);
-
-        if (!Objects.equals(user.getId(),
-                turno.getServicio().getSucursal().getEmpleador().getId())) {
-            throw new ForbiddenException("No tenes permisos");
-        }
-
-        turnoService.cancelarTurno(turno);
+        turnoService.cancelarTurno(turnoId, empleadorEmail);
         return ResponseEntity.ok().body("Se canceló el turno correctamente");
     }
 
@@ -100,93 +71,58 @@ public class TurnoController {
     @PreAuthorize("hasAnyRole('EMPLEADOR','EMPLEADO')")
     @PatchMapping("/finalizar/{turnoId}")
     public ResponseEntity<?> finalizarTurno(@PathVariable("turnoId") Integer turnoId,
-                                            Authentication auth) {
+                                            @AuthenticationPrincipal String userEmail) {
 
-        String email = (String) auth.getPrincipal();
-
-        Usuario user = usuarioService.listarUsuarioPorEmail(email);
-
-        Turno turno = turnoService.listarTurnoPorId(turnoId);
-
-        if(!sucursalService.enSucursal(user.getId(), turno.getServicio().getSucursal().getId())){
-            throw new ForbiddenException("No tenes permisos");
-        }
-
-        turnoService.finalizarTurno(turno);
+        turnoService.finalizarTurno(turnoId, userEmail);
         return ResponseEntity.ok().body("Se finalizó el turno correctamente");
     }
 
 
     // ver si ADMIN tmb 67
     @PreAuthorize("hasAnyRole('EMPLEADOR','EMPLEADO')")
-    @GetMapping("/{estadoTurno}/sucursal/{sucursalId}")
+    @GetMapping("/de-sucursal/{sucursalId}")
     public ResponseEntity<?> listarTurnosPorSucursal(
-            @PathVariable("estadoTurno") EstadoTurno estadoTurno,
             @PathVariable("sucursalId") Integer sucursalId,
-            Authentication auth) {
+            @AuthenticationPrincipal String userEmail) {
 
-        String email = (String) auth.getPrincipal();
-
-        Usuario user = usuarioService.listarUsuarioPorEmail(email);
-
-        Sucursal sucursal = sucursalService.listarSucursalPorId(sucursalId);
-
-        if(!sucursalService.enSucursal(user.getId(), sucursal.getId())){
-            throw new ForbiddenException("No tenes permisos");
-        }
-
-        return ResponseEntity.ok().body(turnoService.listarTurnosPorSucursalYEstado(
-                sucursal, user, estadoTurno));
+        return ResponseEntity.ok().body(turnoService.listarTurnosPorSucursal(
+                sucursalId, userEmail));
     }
 
 
     // ver si ADMIN tmb 69
     @PreAuthorize("hasAnyRole('EMPLEADOR','EMPLEADO')")
-    @GetMapping("/{turnoId}/sucursal/{sucursalId}")
+    @GetMapping("/de-sucursal/detalles/{turnoId}")
     public ResponseEntity<?> verDetallesTurnosPorSucursal(
             @PathVariable("turnoId") Integer turnoId,
-            @PathVariable("sucursalId") Integer sucursalId, Authentication auth) {
+            @AuthenticationPrincipal String userEmail) {
 
-        String email = (String) auth.getPrincipal();
-
-        Usuario user = usuarioService.listarUsuarioPorEmail(email);
-
-        Turno turno =  turnoService.listarTurnoPorId(turnoId);
-
-        Sucursal sucursal = turno.getServicio().getSucursal(); // ver si puede dar null pero no creo
-
-        if(!sucursalService.enSucursal(user.getId(), sucursal.getId())){
-            throw new ForbiddenException("No tenes permisos");
-        }
-
-        return ResponseEntity.ok().body(turnoService.verDetalleTurnoPorSucursal(turno));
+        return ResponseEntity.ok().body(turnoService.verDetalleTurnoPorSucursal(
+                turnoId, userEmail));
     }
 
 
-    @PreAuthorize("hasAnyRole('CLIENTE','EMPLEADO','EMPLEADOR')")
-    @GetMapping("/propios/{estadoTurno}")
-    public ResponseEntity<?> listarTurnosPropios(@PathVariable("estadoTurno") EstadoTurno estadoTurno,
-                                                 Authentication auth) {
+    @PreAuthorize("hasRole('CLIENTE')")
+    @GetMapping("/propios")
+    public ResponseEntity<?> listarTurnosPropios(@AuthenticationPrincipal String clienteEmail) {
 
-        String email = (String) auth.getPrincipal();
-
-        Usuario cliente = usuarioService.listarUsuarioPorEmail(email);
-
-        return ResponseEntity.ok().body(turnoService.listarTurnosPorCliente(cliente, estadoTurno));
+        return ResponseEntity.ok().body(turnoService.listarTurnosPorCliente(clienteEmail));
     }
 
 
-    @PreAuthorize("hasAnyRole('CLIENTE','EMPLEADO','EMPLEADOR')")
+    @PreAuthorize("hasAnyRole('CLIENTE')")
     @GetMapping("/propios/detalles/{turnoId}")
-    public ResponseEntity<?> verDetallesTurnosPropios(@PathVariable("turnoId") Integer turnoId,
-                                                      Authentication auth) {
+    public ResponseEntity<?> verDetallesTurnosPropios(
+            @PathVariable("turnoId") Integer turnoId,
+            @AuthenticationPrincipal String clienteEmail) {
 
-        String email = (String) auth.getPrincipal();
-
-        Usuario cliente = usuarioService.listarUsuarioPorEmail(email);
-
-        return ResponseEntity.ok().body(turnoService.verDetalleTurnoPropio(cliente, turnoId));
+        return ResponseEntity.ok().body(turnoService.verDetalleTurnoPropio(
+                clienteEmail, turnoId));
     }
 
 
 }
+
+
+
+

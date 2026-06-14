@@ -7,9 +7,11 @@ import com.gg.turnlook.Backend.DTO.Servicio.ServicioMiniDTO;
 import com.gg.turnlook.Backend.DTO.Servicio.ServicioModificarDTO;
 import com.gg.turnlook.Backend.DTO.Servicio.ServicioResponseDTO;
 import com.gg.turnlook.Backend.Excepciones.BadRequestException;
+import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
 import com.gg.turnlook.Backend.Excepciones.NotFoundException;
 import com.gg.turnlook.Backend.Model.Servicio;
 import com.gg.turnlook.Backend.Model.Sucursal;
+import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Repository.ServicioRepository;
 import org.springframework.stereotype.Service;
 
@@ -25,13 +27,15 @@ public class ServicioService {
     private final ServicioRepository servRepo;
     private final SucursalService sucService;
     private final ImagenService imagenService;
+    private final UsuarioService usuarioService;
 
 
 
-    public ServicioService(ServicioRepository servRepo, SucursalService sucService, ImagenService imagenService) {
+    public ServicioService(ServicioRepository servRepo, SucursalService sucService, ImagenService imagenService, UsuarioService usuarioService) {
         this.servRepo = servRepo;
         this.sucService = sucService;
         this.imagenService = imagenService;
+        this.usuarioService = usuarioService;
     }
 
 
@@ -39,13 +43,19 @@ public class ServicioService {
     /// METODOS
 
 
-    public void crearServicio(ServicioCrearDTO servicio) {
+
+    public void crearServicio(ServicioCrearDTO servicio, String userEmail) {
+
+        Sucursal sucursal = sucService.listarSucursalPorId(servicio.getSucursalId());
+
+        if(!sucService.enSucursal(userEmail, sucursal)){
+            throw new ForbiddenException("No tenes permisos");
+        }
 
         if(servicio.getDuracion() % 30 != 0){
             throw new BadRequestException("La duracion tiene que ser en intervalos de 30 minutos");
         }
 
-        Sucursal sucursal = sucService.listarSucursalPorId(servicio.getSucursalId());
         Servicio serv = new Servicio(
                 servicio.getNombre(), servicio.getDescripcion(), servicio.getDuracion(),
                 servicio.getPrecio(), sucursal
@@ -57,7 +67,14 @@ public class ServicioService {
     }
 
 
-    public void modificarServicio(ServicioModificarDTO servicio, Servicio servOld) {
+    public void modificarServicio(ServicioModificarDTO servicio, Integer servicioId,
+                                  String userEmail) {
+
+        Servicio servOld = listarServicioPorId(servicioId);
+
+        if(!sucService.enSucursal(userEmail, servOld.getSucursal())){
+            throw new ForbiddenException("No tenes permisos");
+        }
 
         if (servicio.getNombre() != null) servOld.setNombre(servicio.getNombre());
 
@@ -79,8 +96,16 @@ public class ServicioService {
     }
 
 
-    public void eliminarServicio(Servicio servicio) {
+    public void eliminarServicio(Integer servicioId, String empleadorEmail) {
+
+        Servicio servicio = listarServicioPorId(servicioId);
+
+        if(!servicio.getSucursal().getEmpleador().getEmail().equals(empleadorEmail)){
+            throw new ForbiddenException("No tenes permisos");
+        }
+
         servicio.setActivo(false);
+
         servRepo.save(servicio);
     }
 
@@ -129,4 +154,10 @@ public class ServicioService {
         return servRepo.findById(servicioId).
                 orElseThrow(() -> new NotFoundException("Servicio no encontrado"));
     }
+
+
 }
+
+
+
+

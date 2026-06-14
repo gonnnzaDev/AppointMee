@@ -5,6 +5,7 @@ import com.gg.turnlook.Backend.DTO.Sucursal.SucursalMiniDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.*;
 import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Excepciones.ConflictException;
+import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
 import com.gg.turnlook.Backend.Excepciones.NotFoundException;
 import com.gg.turnlook.Backend.Excepciones.UnauthorizedException;
 import com.gg.turnlook.Backend.Model.Rol;
@@ -14,14 +15,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 
-
 @Service
 public class UsuarioService {
-
 
 
     private final UsuarioRepository usRepo;
@@ -36,12 +36,11 @@ public class UsuarioService {
         this.rolService = rolService;
         this.imagenService = imagenService;
         this.passEncoder = passEncoder;
+
     }
 
 
-
     /// METODOS
-
 
 
     public void recuperarCuenta(LoginDTO login) {
@@ -79,17 +78,42 @@ public class UsuarioService {
     }
 
 
-    public void eliminarUsuario(Integer id) {
-        Usuario u = listarUsuarioPorId(id);
-        // usRepo.delete(u);  ver si dejo el delete o el activo -> false
+    public void eliminarUsuario(Integer userId, String userEmail) {
+
+        Usuario admin = listarUsuarioPorEmail(userEmail);
+
+        if (Objects.equals(userId, admin.getId())) {
+            throw new ConflictException("No podes eliminar tu cuenta siendo Administrador");
+        }
+
+        Usuario u = listarUsuarioPorId(userId);
+
         u.setActivo(false);
+
         usRepo.save(u);
     }
 
 
-    public void modificarUsuario(UsuarioModificarDTO usuario, Integer userId) {
+    public void borrarCuentaPropia(String userEmail) {
+
+        Usuario usuario = listarUsuarioPorEmail(userEmail);
+
+        usuario.setActivo(false);
+
+        usRepo.save(usuario);
+    }
+
+
+    public void modificarUsuario(UsuarioModificarDTO usuario, Integer userId, String userEmail) {
+
+        Usuario activo = listarUsuarioPorEmail(userEmail);
 
         Usuario user = listarUsuarioPorId(userId);
+
+        if (!esAdmin(activo) &&
+                !Objects.equals(activo.getId(), user.getId())) {
+            throw new ForbiddenException("No tenes permisos");
+        }
 
         if (usuario.getNombre() != null && !usuario.getNombre().isBlank()) user.setNombre(usuario.getNombre());
 
@@ -113,28 +137,18 @@ public class UsuarioService {
 
 
     public List<UsuarioMiniAdminDTO> listarUsuarios() {
-        return usRepo.findByActivoTrue().stream()
-                .map(u -> new UsuarioMiniAdminDTO(
-                        u.getId(), u.getNombre(), u.getApellido(), u.isActivo()))
-                .toList();
-    }
-
-
-    // ver si despues lo saco
-    public List<UsuarioMiniAdminDTO> listarUsuariosEliminados() {
-        return usRepo.findByActivoFalse().stream()
-                .map(u -> new UsuarioMiniAdminDTO(
-                        u.getId(), u.getNombre(), u.getApellido(), u.isActivo()))
-                .toList();
-    }
-
-
-    // ver si despues lo saco
-    public List<Usuario> filtrarListaUsuarios(String nombre, String apellido, Boolean activo) {
         return usRepo.findAll().stream()
+                .map(u -> new UsuarioMiniAdminDTO(
+                        u.getId(), u.getNombre(), u.getApellido(), u.isActivo()))
+                .toList();
+    }
+
+
+    public List<UsuarioMiniAdminDTO> filtrarListaUsuarios(String nombre, String apellido, Boolean activo) {
+        return listarUsuarios().stream()
                 .filter(u -> nombre == null || u.getNombre().equalsIgnoreCase(nombre))
                 .filter(u -> apellido == null || u.getApellido().equalsIgnoreCase(apellido))
-                .filter(u -> activo == null || u.isActivo() == activo)
+                .filter(u -> activo == null || u.isEstado() == activo)
                 .toList();
     }
 
@@ -160,13 +174,21 @@ public class UsuarioService {
     }
 
 
-    public UsuarioPerfilResponseDTO verPerfilPorId(Integer id) {
-        return mapearUsuario(id);
+    public UsuarioPerfilResponseDTO verPerfilPorId(Integer userId, String userEmail) {
+
+        Usuario activo = listarUsuarioPorEmail(userEmail);
+
+        if (!esAdmin(activo) &&
+                !Objects.equals(activo.getId(), userId)) {
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        return mapearUsuario(userId);
     }
 
 
-    private UsuarioPerfilResponseDTO mapearUsuario(Integer id) {
-        Usuario u = listarUsuarioPorId(id);
+    private UsuarioPerfilResponseDTO mapearUsuario(Integer userId) {
+        Usuario u = listarUsuarioPorId(userId);
         UsuarioPerfilResponseDTO uPerfil = new UsuarioPerfilResponseDTO();
 
         uPerfil.setId(u.getId());
@@ -186,9 +208,9 @@ public class UsuarioService {
     }
 
 
-    public void solicitudRolEmpleador(Integer userId) {
+    public void solicitudRolEmpleador(String userEmail) {
 
-        Usuario usuario = listarUsuarioPorId(userId);
+        Usuario usuario = listarUsuarioPorEmail(userEmail);
 
         // ver q le llegue una noti a un admin para aprobar o no aprobar la solicitud
         // quizas un formulario o algo asi nosE
@@ -199,11 +221,30 @@ public class UsuarioService {
     }
 
 
-    public void eliminarFotoPerfil(String userEmail){
+    public void eliminarFotoPerfil(String userEmail) {
 
         Usuario usuario = listarUsuarioPorEmail(userEmail);
 
         imagenService.eliminarFotoPerfilUsuario(usuario);
     }
+
+
+    public UsuarioMeDTO getMe(String userEmail) {
+
+        Usuario usuario = listarUsuarioPorEmail(userEmail);
+
+        return new UsuarioMeDTO(usuario.getId(), setRolesComoString(usuario));
+    }
+
+
+    public boolean esAdmin(Usuario usuario){
+        Set<String> roles = setRolesComoString(usuario);
+        return roles != null && roles.contains(ERol.ADMINISTRADOR.name());
+    }
+
+
 }
+
+
+
 

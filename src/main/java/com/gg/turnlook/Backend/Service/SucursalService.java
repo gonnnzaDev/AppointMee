@@ -1,15 +1,17 @@
 package com.gg.turnlook.Backend.Service;
 
+
+
 import com.gg.turnlook.Backend.DTO.Imagen.ImagenDTO;
 import com.gg.turnlook.Backend.DTO.Imagen.ImagenResponseDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalCrearDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalMiniDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalModificarDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalResponseDTO;
-import com.gg.turnlook.Backend.DTO.Usuario.UsuarioMiniAdminDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmailDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioResponseDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioMiniDTO;
+import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Excepciones.BadRequestException;
 import com.gg.turnlook.Backend.Excepciones.ConflictException;
 import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
@@ -21,17 +23,14 @@ import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Repository.CategoriaRepository;
 import com.gg.turnlook.Backend.Repository.SucursalRepository;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 
-
 @Service
 public class SucursalService {
-
 
 
     private final SucursalRepository sucRepo;
@@ -46,6 +45,7 @@ public class SucursalService {
         this.catRepo = catRepo;
         this.usuarioService = usuarioService;
         this.imagenService = imagenService;
+
     }
 
 
@@ -54,37 +54,28 @@ public class SucursalService {
 
 
 
-    public boolean enSucursal(Integer idUsuario, Integer idSucursal) {
+    public boolean enSucursal(String userEmail, Sucursal sucursal) {
 
-        Sucursal sucursal;
-        Usuario usuario;
-        try {
-            sucursal = listarSucursalPorId(idSucursal);
-            usuario = usuarioService.listarUsuarioPorId(idUsuario);
-        } catch (NotFoundException e) {
-            return false;
-        }
-
-        return sucursal.getEmpleador().getId().equals(usuario.getId()) ||
+        return sucursal.getEmpleador().getEmail().equals(userEmail) ||
                 sucursal.getEmpleados().stream()
-                        .anyMatch(u -> u.getId().equals(usuario.getId()));
+                        .anyMatch(u -> u.getEmail().equals(userEmail));
     }
 
 
-    public void crearSucursal(SucursalCrearDTO sucursal, Integer userId) {
+    public void crearSucursal(SucursalCrearDTO sucursal, String empleadorEmail) {
 
         if (!sucursal.getHoraCierre().isAfter(sucursal.getHoraApertura())) {
             throw new BadRequestException("El horario de cierre tiene que ser posterior al de apertura");
         }
 
-        if(sucRepo.existsByDireccionIgnoreCase(sucursal.getDireccion())){
+        if (sucRepo.existsByDireccionIgnoreCase(sucursal.getDireccion())) {
             throw new ConflictException("La direccion ingresada ya existe");
         }
 
         Categoria cat = catRepo.findById(sucursal.getCategoriaId()).
                 orElseThrow(() -> new NotFoundException("No se encontró la categoria"));
 
-        Usuario empleador = usuarioService.listarUsuarioPorId(userId);
+        Usuario empleador = usuarioService.listarUsuarioPorEmail(empleadorEmail);
 
         Sucursal suc = new Sucursal(sucursal.getNombre(), sucursal.getDireccion(),
                 sucursal.getTelefono(), sucursal.getDescripcion(),
@@ -97,7 +88,14 @@ public class SucursalService {
     }
 
 
-    public void modificarSucursal(SucursalModificarDTO sucursal, Sucursal suc) {
+    public void modificarSucursal(SucursalModificarDTO sucursal,
+                                  Integer sucursalId, String empleadorEmail) {
+
+        Sucursal suc = listarSucursalPorId(sucursalId);
+
+        if (!suc.getEmpleador().getEmail().equals(empleadorEmail)) {
+            throw new ForbiddenException("No tenes permisos");
+        }
 
         if (sucursal.getCategoriaId() != null) {
             Categoria cat = catRepo.findById(sucursal.getCategoriaId()).
@@ -128,7 +126,7 @@ public class SucursalService {
         }
 
         // ver si valida bien como ultimo dsp
-        if (sucursal.getFotoUrl() != null && !sucursal.getFotoUrl().isBlank()){
+        if (sucursal.getFotoUrl() != null && !sucursal.getFotoUrl().isBlank()) {
             imagenService.cambiarFotoPerfilSucursal(suc, sucursal.getFotoUrl());
         }
 
@@ -136,21 +134,35 @@ public class SucursalService {
     }
 
 
-    public List<ImagenResponseDTO> listarImagenesPorSucursal(Sucursal suc){
+    public List<ImagenResponseDTO> listarImagenesPorSucursal(Integer sucursalId,
+                                                             String empleadorEmail) {
 
-        return imagenService.listarImagenesPorSucursal(suc);
+        Sucursal sucursal = listarSucursalPorId(sucursalId);
+
+        if (!esEmpleadorAca(sucursal, empleadorEmail)) {
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        return imagenService.listarImagenesPorSucursal(sucursal);
     }
 
 
-    public void agregarImagenes(ImagenDTO imagenes, Sucursal sucursal){
+    public void agregarImagenes(ImagenDTO imagenes, Integer sucursalId,
+                                String empleadorEmail) {
+
+        Sucursal sucursal = listarSucursalPorId(sucursalId);
+
+        if (!esEmpleadorAca(sucursal, empleadorEmail)) {
+            throw new ForbiddenException("No tenes permisos");
+        }
 
         long totalImagenes = imagenService.cuantasImagenesPorSucursal(sucursal);
 
-        if(imagenes.getUrls().size() + totalImagenes > 5){
+        if (imagenes.getUrls().size() + totalImagenes > 5) {
             throw new ConflictException("Una sucursal no puede tener mas de 5 imagenes");
         }
 
-        for(String imagen : imagenes.getUrls()){
+        for (String imagen : imagenes.getUrls()) {
 
             imagenService.crearImagenSucursal(sucursal, imagen);
         }
@@ -158,22 +170,45 @@ public class SucursalService {
     }
 
 
-    public void eliminarImagen(Integer imagenId, Sucursal suc){
+    public void eliminarImagen(Integer imagenId, Integer sucursalId,
+                               String empleadorEmail) {
+
+        Sucursal sucursal = listarSucursalPorId(sucursalId);
+
+        if (!esEmpleadorAca(sucursal, empleadorEmail)) {
+            throw new ForbiddenException("No tenes permisos");
+        }
 
         Imagen img = imagenService.listarImagenPorId(imagenId);
 
-        if(!Objects.equals(img.getSucursal().getId(), suc.getId())){
+        if (!Objects.equals(img.getSucursal().getId(), sucursal.getId())) {
             throw new ForbiddenException("La imagen no le corresponde a esta sucursal");
         }
-        
+
         imagenService.eliminarImagen(img);
     }
 
 
-    public void eliminarSucursal(Integer id) {
-        Sucursal sucursal = listarSucursalPorId(id);
-        //sucRepo.delete(sucursal.get());  ver si dejo este o el de activo -> false
+    public void eliminarSucursal(Integer sucursalId) {
+
+        Sucursal sucursal = listarSucursalPorId(sucursalId);
+
         sucursal.setActivo(false);
+
+        sucRepo.save(sucursal);
+    }
+
+
+    public void borrarSucursalPropia(Integer sucursalId, String empleadorEmail) {
+
+        Sucursal sucursal = listarSucursalPorId(sucursalId);
+
+        if (!esEmpleadorAca(sucursal, empleadorEmail)) {
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        sucursal.setActivo(false);
+
         sucRepo.save(sucursal);
     }
 
@@ -191,21 +226,32 @@ public class SucursalService {
 
 
     public SucursalResponseDTO verSucursalPorId(Integer id) {
+
         Sucursal sucursal = listarSucursalPorId(id);
+
         return mapearSucursal(sucursal);
     }
 
 
     private SucursalResponseDTO mapearSucursal(Sucursal suc) {
+
         SucursalResponseDTO dto = new SucursalResponseDTO();
         dto.setNombre(suc.getNombre());
+
         dto.setDireccion(suc.getDireccion());
+
         dto.setTelefono(suc.getTelefono());
+
         dto.setDescripcion(suc.getDescripcion());
+
         dto.setFechaCreacion(suc.getFechaCreacion());
+
         dto.setCategoria(suc.getCategoria().getCategoria().name());
+
         dto.setHoraApertura(suc.getHoraApertura());
+
         dto.setHoraCierre(suc.getHoraCierre());
+
         dto.setFotoPerfil(suc.getFotoPerfil().getFotoValida());
 
         UsuarioMiniDTO empleador = new UsuarioMiniDTO(
@@ -256,37 +302,65 @@ public class SucursalService {
     }
 
 
-    public Set<UsuarioMiniAdminDTO> verEmpleadosAdmin(Integer sucursalId) {
+    public Set<UsuarioResponseDTO> verEmpleados(Integer sucursalId, String userEmail) {
+
         Sucursal suc = listarSucursalPorId(sucursalId);
-        return suc.getEmpleados().stream().
-                map(u -> new UsuarioMiniAdminDTO(u.getId(),
-                        u.getNombre(), u.getApellido(), u.isActivo()))
-                .collect(Collectors.toSet());
+
+        Usuario usuario = usuarioService.listarUsuarioPorEmail(userEmail);
+
+        if (!usuarioService.esAdmin(usuario) &&
+                !esEmpleadorAca(suc, userEmail)){
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+            return suc.getEmpleados().stream().
+                    map(u -> new UsuarioResponseDTO(u.getId(), u.getNombre(),
+                            u.getApellido(), u.getEmail(), u.getFotoPerfil().getFotoValida()))
+                    .collect(Collectors.toSet());
     }
 
 
-    // est
-    public Set<UsuarioResponseDTO> verEmpleadosEmpleador(Integer sucursalId) {
-        Sucursal suc = listarSucursalPorId(sucursalId);
-        return suc.getEmpleados().stream().
-                map(u -> new UsuarioResponseDTO(u.getId(), u.getNombre(),
-                        u.getApellido(), u.getEmail(), u.getFotoPerfil().getFotoValida()))
-                .collect(Collectors.toSet());
-    }
+    public void agregarEmpleado(Integer sucursalId, UsuarioEmailDTO userEmail,
+                                String empleadorEmail) {
 
+        Sucursal sucursal = listarSucursalPorId(sucursalId);
 
-    public void agregarEmpleado(Sucursal sucursal, UsuarioEmailDTO userEmail) {
+        if (!esEmpleadorAca(sucursal, empleadorEmail)) {
+            throw new ForbiddenException("No tenes permisos");
+        }
 
-        Usuario usuario = usuarioService.listarUsuarioPorEmail(userEmail.getEmail());
-        sucursal.getEmpleados().add(usuario);  // dsp ver lo de notificaciones
+        Usuario empleado = usuarioService.listarUsuarioPorEmail(userEmail.getEmail());
+
+        sucursal.getEmpleados().add(empleado);  // dsp ver lo de notificaciones
+
         sucRepo.save(sucursal);
     }
 
 
-    public void eliminarEmpleado(Sucursal sucursal, Integer userId) {
+    public void eliminarEmpleado(Integer sucursalId, Integer empleadoId,
+                                 String empleadorEmail) {
 
-        Usuario usuario = usuarioService.listarUsuarioPorId(userId);
-        sucursal.getEmpleados().remove(usuario);   // dsp ver lo de notificacion
+        Sucursal sucursal = listarSucursalPorId(sucursalId);
+
+        if (!esEmpleadorAca(sucursal, empleadorEmail)) {
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        Usuario empleado = usuarioService.listarUsuarioPorId(empleadoId);
+
+        sucursal.getEmpleados().remove(empleado);   // dsp ver lo de notificacion
+
         sucRepo.save(sucursal);
     }
+
+
+    private boolean esEmpleadorAca(Sucursal sucursal, String empleadorEmail) {
+
+        return sucursal.getEmpleador().getEmail().equals(empleadorEmail);
+    }
+
+
 }
+
+
+

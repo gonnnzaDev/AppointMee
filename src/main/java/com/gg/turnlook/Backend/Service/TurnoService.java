@@ -25,7 +25,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-
 @Service
 public class TurnoService {
 
@@ -36,7 +35,6 @@ public class TurnoService {
     private final SucursalService sucursalService;
 
 
-
     public TurnoService(TurnoRepository turnoRepo, UsuarioService usuarioService, ServicioService servicioService, SucursalService sucursalService) {
         this.turnoRepo = turnoRepo;
         this.usuarioService = usuarioService;
@@ -45,18 +43,21 @@ public class TurnoService {
     }
 
 
-
     /// METODOS
 
 
+    public void registrarTurno(TurnoCrearDTO turno, String clienteEmail) {
 
-    public void registrarTurno(TurnoCrearDTO turno) {
+        Usuario cliente = usuarioService.listarUsuarioPorId(turno.getClienteId());
+
+        if (!cliente.getEmail().equals(clienteEmail)) {
+            throw new ForbiddenException("No podes reservar turnos para otros usuarios");
+        }
 
         if (!turno.getFechaHora().isAfter(LocalDateTime.now())) {
             throw new BadRequestException("La fecha del turno no puede haber pasado");
         }
 
-        Usuario cliente = usuarioService.listarUsuarioPorId(turno.getClienteId());
         Usuario empleado = usuarioService.listarUsuarioPorId(turno.getEmpleadoId());
         Servicio servicio = servicioService.listarServicioPorId(turno.getServicioId());
 
@@ -65,7 +66,7 @@ public class TurnoService {
             throw new BadRequestException("El usuario elegido no puede atender turnos");
         }
 
-        if (!sucursalService.enSucursal(empleado.getId(), servicio.getSucursal().getId())) {
+        if (!sucursalService.enSucursal(empleado.getEmail(), servicio.getSucursal())) {
             throw new BadRequestException("El empleado elegido no pertenece a esa sucursal");
         }
 
@@ -89,7 +90,7 @@ public class TurnoService {
         Servicio servicio = servicioService.listarServicioPorId(servicioId);
         Sucursal sucursal = servicio.getSucursal();
 
-        if (!sucursalService.enSucursal(empleado.getId(), sucursal.getId())) {
+        if (!sucursalService.enSucursal(empleado.getEmail(), sucursal)) {
             throw new BadRequestException("El empleado no pertenece a la sucursal");
         }
 
@@ -151,8 +152,16 @@ public class TurnoService {
 
 
     // ver si faltan mas validaciones
-    public void cancelarTurno(Turno turno) {
+    public void cancelarTurno(Integer turnoId, String empleadorEmail) {
 
+        Turno turno = listarTurnoPorId(turnoId);
+
+        if (!turno.getServicio().getSucursal().getEmpleador().getEmail()
+                .equals(empleadorEmail)) {
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        // ver si saco o no CONFIRMADO para ver si lo meto o no aca tmb
         if (turno.getEstado() != EstadoTurno.PENDIENTE) {
             throw new ConflictException("El turno no está pendiente");
         }
@@ -162,7 +171,13 @@ public class TurnoService {
     }
 
 
-    public void finalizarTurno(Turno turno) {
+    public void finalizarTurno(Integer turnoId, String userEmail) {
+
+        Turno turno = listarTurnoPorId(turnoId);
+
+        if (!sucursalService.enSucursal(userEmail, turno.getServicio().getSucursal())) {
+            throw new ForbiddenException("No tenes permisos");
+        }
 
         // ver si dejo el estado confirmado y si si agregarlo ak tmb
         if (turno.getEstado() != EstadoTurno.PENDIENTE) {
@@ -177,18 +192,30 @@ public class TurnoService {
     // uno para cancelar y reservar uno nuevo x cambio
 
 
-    public List<TurnoMiniDTO> listarTurnosPorSucursalYEstado(
-            Sucursal sucursal, Usuario usuario, EstadoTurno estadoTurno) {
+    public List<TurnoMiniDTO> listarTurnosPorSucursal(
+            Integer sucursalId, String userEmail) {
 
-        return turnoRepo.findByServicioSucursalIdAndEstado(sucursal.getId(),
-                        estadoTurno).stream()
+        Sucursal sucursal = sucursalService.listarSucursalPorId(sucursalId);
+
+        if (!sucursalService.enSucursal(userEmail, sucursal)) {
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        return turnoRepo.findByServicioSucursalId(sucursal.getId())
+                .stream()
                 .map(t -> new TurnoMiniDTO(t.getId(), t.getServicio().getNombre(),
                         t.getFechaHora()))
                 .toList();
     }
 
 
-    public TurnoResponseDTO verDetalleTurnoPorSucursal(Turno t) {
+    public TurnoResponseDTO verDetalleTurnoPorSucursal(Integer turnoId, String userEmail) {
+
+        Turno t = listarTurnoPorId(turnoId);
+
+        if (!sucursalService.enSucursal(userEmail, t.getServicio().getSucursal())) {
+            throw new ForbiddenException("No tenes permisos");
+        }
 
         Usuario c = t.getCliente();
         Usuario e = t.getEmpleado();
@@ -205,20 +232,23 @@ public class TurnoService {
     }
 
 
-    public List<TurnoMiniDTO> listarTurnosPorCliente(Usuario cliente, EstadoTurno estadoTurno) {
+    public List<TurnoMiniDTO> listarTurnosPorCliente(String clienteEmail) {
 
-        return turnoRepo.findByClienteAndEstado(cliente, estadoTurno).stream()
+        Usuario cliente = usuarioService.listarUsuarioPorEmail(clienteEmail);
+
+        return turnoRepo.findByCliente(cliente).stream()
                 .map(t -> new TurnoMiniDTO(
                         t.getId(), t.getServicio().getNombre(), t.getFechaHora()))
                 .toList();
     }
 
 
-    public TurnoClienteResponseDTO verDetalleTurnoPropio(Usuario cliente, Integer turnoId) {
+    public TurnoClienteResponseDTO verDetalleTurnoPropio(String clienteEmail,
+                                                         Integer turnoId) {
 
         Turno t = listarTurnoPorId(turnoId);
 
-        if (!Objects.equals(t.getCliente().getId(), cliente.getId())) {
+        if (!t.getCliente().getEmail().equals(clienteEmail)) {
             throw new ForbiddenException("No tenes permisos");
         }
 
@@ -239,4 +269,9 @@ public class TurnoService {
         return turnoRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("No se encontró el turno"));
     }
+
+
 }
+
+
+

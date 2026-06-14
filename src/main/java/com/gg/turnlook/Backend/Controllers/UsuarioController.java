@@ -1,11 +1,10 @@
 package com.gg.turnlook.Backend.Controllers;
 
+
+
 import com.gg.turnlook.Backend.DTO.Usuario.*;
-import com.gg.turnlook.Backend.Enum.ERol;
-import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
 import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Security.JwtService;
-import com.gg.turnlook.Backend.Service.SesionService;
 import com.gg.turnlook.Backend.Service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
+
+
+
 
 @RestController
 @RequestMapping("/usuarios")
@@ -27,15 +28,13 @@ public class UsuarioController {
 
 
     private final UsuarioService usuarioService;
-    private final SesionService sesionService;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
 
 
 
-    public UsuarioController(UsuarioService usuarioService, SesionService sesionService, AuthenticationManager authenticationManager, JwtService jwtService) {
+    public UsuarioController(UsuarioService usuarioService, AuthenticationManager authenticationManager, JwtService jwtService) {
         this.usuarioService = usuarioService;
-        this.sesionService = sesionService;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
     }
@@ -46,6 +45,7 @@ public class UsuarioController {
 
 
 
+    // ver si lo muevo o lo dejo asi
     @PostMapping("/inicio-sesion")
     public ResponseEntity<?> iniciarSesion(@Valid @RequestBody LoginDTO login) {
 
@@ -71,125 +71,78 @@ public class UsuarioController {
 
 
     @GetMapping("/me")
-    public ResponseEntity<UsuarioMeDTO> getMe(Authentication auth){
+    public ResponseEntity<UsuarioMeDTO> getMe(@AuthenticationPrincipal String userEmail){
 
-        String email = (String) auth.getPrincipal();
-
-        Usuario u = usuarioService.listarUsuarioPorEmail(email);
-
-        return ResponseEntity.ok().body(new UsuarioMeDTO(
-                u.getId(), usuarioService.setRolesComoString(u)));
+        return ResponseEntity.ok().body(usuarioService.getMe(userEmail));
     }
 
 
     @PostMapping("/crear")
     public ResponseEntity<?> crearUsuario(@Valid @RequestBody UsuarioCrearDTO u) {
+
         usuarioService.crearUsuario(u);
-        return ResponseEntity.ok().body("Se creo al usuario");
+        return ResponseEntity.ok().body("Se creó al usuario");
     }
 
 
-    @PatchMapping("/modificar/{id}")
-    public ResponseEntity<?> modificarUsuario(@PathVariable("id") Integer id,
+    @PatchMapping("/modificar/{userId}")
+    public ResponseEntity<?> modificarUsuario(@PathVariable("userId") Integer userId,
                                               @Valid @RequestBody UsuarioModificarDTO usuario,
-                                              Authentication auth) {
+                                              @AuthenticationPrincipal String userEmail) {
 
-        String email = (String) auth.getPrincipal();
-
-        Usuario user = usuarioService.listarUsuarioPorEmail(email);
-
-        if (!sesionService.tieneRol(user, ERol.ADMINISTRADOR.name())
-                && !Objects.equals(id, user.getId())) {
-            throw new ForbiddenException("No tenes permisos");
-        }
-
-        usuarioService.modificarUsuario(usuario, id);
+        usuarioService.modificarUsuario(usuario, userId, userEmail);
         return ResponseEntity.ok().body("Usuario modificado");
     }
 
 
     @PreAuthorize("hasRole('ADMINISTRADOR')")
-    @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<?> eliminarUsuario(@PathVariable("id") Integer id,
-                                             Authentication auth) {
+    @DeleteMapping("/eliminar/{userId}")
+    public ResponseEntity<?> eliminarUsuario(@PathVariable("userId") Integer userId,
+                                             @AuthenticationPrincipal String userEmail) {
 
-        String email = (String) auth.getPrincipal();
-
-        Usuario usuario = usuarioService.listarUsuarioPorEmail(email);
-
-        if(!Objects.equals(usuario.getId(), id)){
-            throw new ForbiddenException("No podes eliminar tu cuenta siendo Administrador");
-        }
-
-        usuarioService.eliminarUsuario(id);
+        usuarioService.eliminarUsuario(userId, userEmail);
         return ResponseEntity.ok().body("Se eliminó al usuario");
     }
 
 
     @PreAuthorize("hasRole('CLIENTE')")
-    @DeleteMapping("/borrar-cuenta/{usuarioId}")
-    public ResponseEntity<?> borrarUsuario(@PathVariable("usuarioId") Integer usuarioId,
-                                           Authentication auth) {
+    @DeleteMapping("/borrar-cuenta")
+    public ResponseEntity<?> borrarUsuario(@AuthenticationPrincipal String userEmail) {
 
-        String email = (String) auth.getPrincipal();
-
-        Usuario usuario = usuarioService.listarUsuarioPorEmail(email);
-
-        if(!Objects.equals(usuario.getId(), usuarioId)){
-            throw new ForbiddenException("No tenes permisos");
-        }
-
-        usuarioService.eliminarUsuario(usuarioId);
+        usuarioService.borrarCuentaPropia(userEmail);
         return ResponseEntity.ok().body("Se eliminó la cuenta");
     }
 
 
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/listar")
-    public ResponseEntity<?> listarUsuarios(Authentication auth) {
+    public ResponseEntity<?> listarUsuarios() {
 
         return ResponseEntity.ok().body(usuarioService.listarUsuarios());
     }
 
 
-    // ver si out
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
-    @GetMapping("/listar/eliminados")
-    public ResponseEntity<?> listarUsuariosEliminados(Authentication auth) {
-
-        return ResponseEntity.ok().body(usuarioService.listarUsuariosEliminados());
-    }
-
-
-    // borrar x otro distinto si pinta un filtrado
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/listar/filtrar")
     public ResponseEntity<?> filtrarListaUsuarios(
             @RequestParam(required = false) String nombre,
             @RequestParam(required = false) String apellido,
-            @RequestParam(required = false) Boolean activo,
-            Authentication auth) {
+            @RequestParam(required = false) Boolean activo) {
 
-        return ResponseEntity.ok().body(usuarioService.filtrarListaUsuarios(nombre, apellido, activo));
+        return ResponseEntity.ok().body(usuarioService.filtrarListaUsuarios(
+                nombre, apellido, activo));
     }
 
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> filtrarUsuariosId(@PathVariable Integer id, Authentication auth) {
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> filtrarUsuariosId(@PathVariable("userId") Integer userId,
+                                               @AuthenticationPrincipal String userEmail) {
 
-        String email = (String) auth.getPrincipal();
-
-        Usuario user = usuarioService.listarUsuarioPorEmail(email);
-
-        if (!sesionService.tieneRol(user, ERol.ADMINISTRADOR.name()) &&
-                !Objects.equals(id, user.getId())) {
-            throw new ForbiddenException("No tenes permisos");
-        }
-
-        return ResponseEntity.ok().body(usuarioService.verPerfilPorId(id));
+        return ResponseEntity.ok().body(usuarioService.verPerfilPorId(userId, userEmail));
     }
 
 
+    // ver q hago con este o lo dejo asi
     @PreAuthorize("hasAnyRole('EMPLEADOR','ADMINISTRADOR')")
     @GetMapping("/email")
     public ResponseEntity<?> filtrarUsuariosEmail(@Valid @RequestBody UsuarioEmailDTO userEmail,
@@ -201,11 +154,10 @@ public class UsuarioController {
 
     // ver si es con formulario o notif a admin (DESPUES VER CON G)
     @PreAuthorize("!hasRole('ADMIN') && !hasRole('EMPLEADOR')")
-    @PatchMapping("/{userId}/solicitar-ser-empleador")
-    public ResponseEntity<?> solicitarRolEmpleador(@PathVariable("userId") Integer userId,
-                                                   Authentication auth){
+    @PatchMapping("/solicitar-ser-empleador")
+    public ResponseEntity<?> solicitarRolEmpleador(@AuthenticationPrincipal String userEmail){
 
-        usuarioService.solicitudRolEmpleador(userId);
+        usuarioService.solicitudRolEmpleador(userEmail);
         return ResponseEntity.ok().body("Se te otorgó el rol Empleador");
     }
 

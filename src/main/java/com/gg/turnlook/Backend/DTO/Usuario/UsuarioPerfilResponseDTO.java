@@ -1,5 +1,7 @@
 package com.gg.turnlook.Backend.DTO.Usuario;
 
+
+
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalMiniDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,10 +11,13 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
+
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class UsuarioPerfilResponseDTO {
+
 
     private Integer id;
     private String nombre;
@@ -22,4 +27,8 @@ public class UsuarioPerfilResponseDTO {
     private String fotoPerfil;
     private Set<String> roles;
     private List<SucursalMiniDTO> sucursalesEmpleado;
+
+
 }
+
+
