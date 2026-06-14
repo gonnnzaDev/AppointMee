@@ -4,9 +4,7 @@ package com.gg.turnlook.Backend.Controllers;
 
 
 import com.gg.turnlook.Backend.DTO.Turno.TurnoCrearDTO;
-import com.gg.turnlook.Backend.Service.SucursalService;
 import com.gg.turnlook.Backend.Service.TurnoService;
-import com.gg.turnlook.Backend.Service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,15 +21,11 @@ public class TurnoController {
 
 
     private final TurnoService turnoService;
-    private final UsuarioService usuarioService;
-    private final SucursalService sucursalService;
 
 
-    public TurnoController(TurnoService turnoService, UsuarioService usuarioService, SucursalService sucursalService) {
+
+    public TurnoController(TurnoService turnoService) {
         this.turnoService = turnoService;
-
-        this.usuarioService = usuarioService;
-        this.sucursalService = sucursalService;
     }
 
 

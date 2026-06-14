@@ -204,7 +204,7 @@ public class TurnoService {
         return turnoRepo.findByServicioSucursalId(sucursal.getId())
                 .stream()
                 .map(t -> new TurnoMiniDTO(t.getId(), t.getServicio().getNombre(),
-                        t.getFechaHora()))
+                        t.getFechaHora(), t.getEstado()))
                 .toList();
     }
 
@@ -238,7 +238,8 @@ public class TurnoService {
 
         return turnoRepo.findByCliente(cliente).stream()
                 .map(t -> new TurnoMiniDTO(
-                        t.getId(), t.getServicio().getNombre(), t.getFechaHora()))
+                        t.getId(), t.getServicio().getNombre(),
+                        t.getFechaHora(), t.getEstado()))
                 .toList();
     }
 
