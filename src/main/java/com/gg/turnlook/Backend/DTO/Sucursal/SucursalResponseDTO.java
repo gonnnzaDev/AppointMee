@@ -23,7 +23,10 @@ public class SucursalResponseDTO {
      private String categoria;
      private LocalTime horaApertura;
      private LocalTime horaCierre;
+     private Integer puntuacion;
+     private Long cantidadPuntuaciones;
      private UsuarioMiniDTO empleador;
      private Set<UsuarioMiniDTO> empleados;
      private String fotoPerfil;
+
 }

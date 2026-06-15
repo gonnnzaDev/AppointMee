@@ -1,6 +1,7 @@
 package com.gg.turnlook.Backend.DTO.Turno;
 
 
+import com.gg.turnlook.Backend.DTO.Renia.ReseniaResponseDTO;
 import com.gg.turnlook.Backend.DTO.Servicio.ServicioTurnoResponseDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioResponseDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioMiniDTO;
@@ -21,5 +22,6 @@ public class TurnoResponseDTO {
     private UsuarioMiniDTO cliente;
     private UsuarioResponseDTO empleado;
     private ServicioTurnoResponseDTO servicio;
+    private ReseniaResponseDTO resenia;
 
 }

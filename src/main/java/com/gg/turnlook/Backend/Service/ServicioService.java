@@ -27,15 +27,15 @@ public class ServicioService {
     private final ServicioRepository servRepo;
     private final SucursalService sucService;
     private final ImagenService imagenService;
-    private final UsuarioService usuarioService;
+    private final ReseniaService reseniaService;
 
 
 
-    public ServicioService(ServicioRepository servRepo, SucursalService sucService, ImagenService imagenService, UsuarioService usuarioService) {
+    public ServicioService(ServicioRepository servRepo, SucursalService sucService, ImagenService imagenService, ReseniaService reseniaService) {
         this.servRepo = servRepo;
         this.sucService = sucService;
         this.imagenService = imagenService;
-        this.usuarioService = usuarioService;
+        this.reseniaService = reseniaService;
     }
 
 
@@ -122,7 +122,10 @@ public class ServicioService {
 
         return servRepo.findBySucursalId(sucursalId).stream()
                 .map(s -> new ServicioMiniDTO(s.getId(), s.getNombre(),
-                        s.getDuracion(), s.getFotoPerfil().getFotoValida()))
+                        s.getDuracion(), s.getFotoPerfil().getFotoValida(),
+                        reseniaService.getPuntuacionPromedioServicio(s.getId()),
+                        reseniaService.getPuntuacionesTotalesServicio(s.getId()))
+                )
                 .toList();
     }
 
@@ -136,14 +139,25 @@ public class ServicioService {
         ServicioResponseDTO dto = new ServicioResponseDTO();
 
         dto.setId(s.getId());
+
         dto.setNombre(s.getNombre());
+
         dto.setDescripcion(s.getDescripcion());
+
         dto.setDuracion(s.getDuracion());
+
         dto.setPrecio(s.getPrecio());
+
         dto.setFotoPerfil(s.getFotoPerfil().getFotoValida());
 
+        dto.setPuntuacion(reseniaService.getPuntuacionPromedioServicio(s.getId()));
+
+        dto.setCantidadPuntuaciones(reseniaService.getPuntuacionesTotalesServicio(s.getId()));
+
         dto.setNombreSucursal(s.getSucursal().getNombre());
+
         dto.setDireccionSucursal(s.getSucursal().getDireccion());
+
         dto.setCategoriaSucursal(s.getSucursal().getCategoria().getCategoria().name());
 
         return dto;

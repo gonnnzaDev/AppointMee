@@ -27,13 +27,15 @@ public class UsuarioService {
     private final UsuarioRepository usRepo;
     private final RolService rolService;
     private final ImagenService imagenService;
+    private final ReseniaService reseniaService;
     private final PasswordEncoder passEncoder;
 
 
-    public UsuarioService(UsuarioRepository usRepo, RolService rolService, ImagenService imagenService, PasswordEncoder passEncoder) {
+    public UsuarioService(UsuarioRepository usRepo, RolService rolService, ImagenService imagenService, ReseniaService reseniaService, PasswordEncoder passEncoder) {
         this.usRepo = usRepo;
         this.rolService = rolService;
         this.imagenService = imagenService;
+        this.reseniaService = reseniaService;
         this.passEncoder = passEncoder;
 
     }
@@ -191,16 +193,26 @@ public class UsuarioService {
         UsuarioPerfilResponseDTO uPerfil = new UsuarioPerfilResponseDTO();
 
         uPerfil.setId(u.getId());
+
         uPerfil.setNombre(u.getNombre());
+
         uPerfil.setApellido(u.getApellido());
+
         uPerfil.setEmail(u.getEmail());
+
         uPerfil.setFechaCreacion(u.getFechaCreacion());
+
         uPerfil.setRoles(setRolesComoString(u));
+
         uPerfil.setFotoPerfil(u.getFotoPerfil().getFotoValida());
+
         uPerfil.setSucursalesEmpleado(u.getSucursalesEmpleado().stream()
                 .map(suc -> new SucursalMiniDTO(suc.getId(), suc.getNombre(),
                         suc.getCategoria().getCategoria().name(),
-                        suc.getFotoPerfil().getFotoValida()))
+                        suc.getFotoPerfil().getFotoValida(),
+                        reseniaService.getPuntuacionPromedioSucursal(suc.getId()),
+                        reseniaService.getPuntuacionesTotalesSucursal(suc.getId()))
+                )
                 .toList());
 
         return uPerfil;

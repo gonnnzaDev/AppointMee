@@ -21,6 +21,7 @@ public class TurnoMiniDTO {
     private String nombreServicio;
     private LocalDateTime fechaTurno;
     private EstadoTurno estadoTurno;
+    private Integer puntuacion;
 
 }
 

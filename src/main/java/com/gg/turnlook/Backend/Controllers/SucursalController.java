@@ -132,11 +132,12 @@ public class SucursalController {
     }
 
 
-    // ver si lo dejo como antes (con preauth de admin y empleador) no creo
+    @PreAuthorize("hasAnyRole('EMPLEADOR','ADMINISTRADOR')")
     @GetMapping("/{sucursalId}/empleados")
-    public ResponseEntity<?> empleadosPorSucursal(@PathVariable("sucursalId") Integer sucursalId) {
+    public ResponseEntity<?> empleadosPorSucursal(@PathVariable("sucursalId") Integer sucursalId,
+                                                  @AuthenticationPrincipal String userEmail) {
 
-        return ResponseEntity.ok().body(sucursalService.verEmpleados(sucursalId));
+        return ResponseEntity.ok().body(sucursalService.verEmpleados(sucursalId, userEmail));
     }
 
 
@@ -160,6 +161,14 @@ public class SucursalController {
 
         sucursalService.eliminarEmpleado(sucursalId, empleadoId, empleadorEmail);
         return ResponseEntity.ok().body("Se eliminó al empleado correctamente");
+    }
+
+
+    @PreAuthorize("hasRole('CLIENTE')")
+    @GetMapping("/{sucursalId}/elegir-empleado")
+    public ResponseEntity<?> elegirEmpleado(@PathVariable("sucursalId") Integer sucursalId) {
+
+        return ResponseEntity.ok().body(sucursalService.verEmpleadosParaElegir(sucursalId));
     }
 
 

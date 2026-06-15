@@ -7,6 +7,7 @@ import com.gg.turnlook.Backend.DTO.Sucursal.SucursalCrearDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalMiniDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalModificarDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalResponseDTO;
+import com.gg.turnlook.Backend.DTO.Usuario.EmpleadoResponseDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmailDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioResponseDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioMiniDTO;
@@ -38,14 +39,15 @@ public class SucursalService {
     private final CategoriaRepository catRepo;
     private final UsuarioService usuarioService;
     private final ImagenService imagenService;
+    private final ReseniaService reseniaService;
 
 
-    public SucursalService(SucursalRepository sucRepo, CategoriaRepository catRepo, UsuarioService usuarioService, ImagenService imagenService) {
+    public SucursalService(SucursalRepository sucRepo, CategoriaRepository catRepo, UsuarioService usuarioService, ImagenService imagenService, ReseniaService reseniaService) {
         this.sucRepo = sucRepo;
         this.catRepo = catRepo;
         this.usuarioService = usuarioService;
         this.imagenService = imagenService;
-
+        this.reseniaService = reseniaService;
     }
 
 
@@ -212,10 +214,14 @@ public class SucursalService {
 
 
     public List<SucursalMiniDTO> listarSucursales() {
+
         return sucRepo.findByActivoTrue().stream()
                 .map(suc -> new SucursalMiniDTO(suc.getId(), suc.getNombre(),
                         suc.getCategoria().getCategoria().name(),
-                        suc.getFotoPerfil().getFotoValida()))
+                        suc.getFotoPerfil().getFotoValida(),
+                        reseniaService.getPuntuacionPromedioSucursal(suc.getId()),
+                        reseniaService.getPuntuacionesTotalesSucursal(suc.getId()))
+                )
                 .toList();
     }
 
@@ -251,6 +257,10 @@ public class SucursalService {
         dto.setHoraCierre(suc.getHoraCierre());
 
         dto.setFotoPerfil(suc.getFotoPerfil().getFotoValida());
+
+        dto.setPuntuacion(reseniaService.getPuntuacionPromedioSucursal(suc.getId()));
+
+        dto.setCantidadPuntuaciones(reseniaService.getPuntuacionesTotalesSucursal(suc.getId()));
 
         UsuarioMiniDTO empleador = new UsuarioMiniDTO(
                 suc.getEmpleador().getNombre(),
@@ -292,7 +302,9 @@ public class SucursalService {
 
         return sucursales.stream().map(s -> new SucursalMiniDTO(
                         s.getId(), s.getNombre(), s.getCategoria().getCategoria().name(),
-                        s.getFotoPerfil().getFotoValida()))
+                        s.getFotoPerfil().getFotoValida(),
+                        reseniaService.getPuntuacionPromedioSucursal(s.getId()),
+                        reseniaService.getPuntuacionesTotalesSucursal(s.getId())))
                 .toList();
     }
 
@@ -303,9 +315,32 @@ public class SucursalService {
     }
 
 
-    public Set<UsuarioResponseDTO> verEmpleados(Integer sucursalId) {
+    public List<EmpleadoResponseDTO> verEmpleadosParaElegir(Integer sucursalId){
 
         Sucursal suc = listarSucursalPorId(sucursalId);
+
+        // ver si falta valid
+
+        return suc.getEmpleados().stream().
+                map(emp -> new EmpleadoResponseDTO(
+                        emp.getId(), emp.getNombre(), emp.getApellido(),
+                        emp.getFotoPerfil().getFotoValida(),
+                        reseniaService.getPuntuacionPromedioEmpleado(emp.getId()),
+                        reseniaService.getPuntuacionesTotalesEmpleado(emp.getId())
+                )).toList();
+    }
+
+
+    public Set<UsuarioResponseDTO> verEmpleados(Integer sucursalId, String userEmail) {
+
+        Sucursal suc = listarSucursalPorId(sucursalId);
+
+        Usuario usuario = usuarioService.listarUsuarioPorEmail(userEmail);
+
+        if (!usuarioService.esAdmin(usuario) &&
+                !esEmpleadorAca(suc, userEmail)) {
+            throw new ForbiddenException("No tenes permisos");
+        }
 
         return suc.getEmpleados().stream().
                 map(u -> new UsuarioResponseDTO(u.getId(), u.getNombre(),

@@ -1,5 +1,4 @@
-package com.gg.turnlook.Backend.DTO.Servicio;
-
+package com.gg.turnlook.Backend.DTO.Usuario;
 
 
 
@@ -12,13 +11,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServicioMiniDTO {
-
+public class EmpleadoResponseDTO {
 
     private Integer id;
     private String nombre;
-    private Integer duracion;
-    private String fotoPerfil;
+    private String apellido;
+    private String urlFotoPerfil;
     private Integer puntuacion;
     private Long cantidadPuntuaciones;
 

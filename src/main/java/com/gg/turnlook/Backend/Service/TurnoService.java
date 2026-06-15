@@ -1,6 +1,8 @@
 package com.gg.turnlook.Backend.Service;
 
 
+import com.gg.turnlook.Backend.DTO.Renia.ReseniaCrearDTO;
+import com.gg.turnlook.Backend.DTO.Renia.ReseniaResponseDTO;
 import com.gg.turnlook.Backend.DTO.Servicio.ServicioTurnoResponseDTO;
 import com.gg.turnlook.Backend.DTO.Turno.*;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioResponseDTO;
@@ -11,10 +13,7 @@ import com.gg.turnlook.Backend.Excepciones.BadRequestException;
 import com.gg.turnlook.Backend.Excepciones.ConflictException;
 import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
 import com.gg.turnlook.Backend.Excepciones.NotFoundException;
-import com.gg.turnlook.Backend.Model.Servicio;
-import com.gg.turnlook.Backend.Model.Sucursal;
-import com.gg.turnlook.Backend.Model.Turno;
-import com.gg.turnlook.Backend.Model.Usuario;
+import com.gg.turnlook.Backend.Model.*;
 import com.gg.turnlook.Backend.Repository.TurnoRepository;
 import org.springframework.stereotype.Service;
 
@@ -33,13 +32,15 @@ public class TurnoService {
     private final UsuarioService usuarioService;
     private final ServicioService servicioService;
     private final SucursalService sucursalService;
+    private final ReseniaService reseniaService;
 
 
-    public TurnoService(TurnoRepository turnoRepo, UsuarioService usuarioService, ServicioService servicioService, SucursalService sucursalService) {
+    public TurnoService(TurnoRepository turnoRepo, UsuarioService usuarioService, ServicioService servicioService, SucursalService sucursalService, ReseniaService reseniaService) {
         this.turnoRepo = turnoRepo;
         this.usuarioService = usuarioService;
         this.servicioService = servicioService;
         this.sucursalService = sucursalService;
+        this.reseniaService = reseniaService;
     }
 
 
@@ -54,7 +55,7 @@ public class TurnoService {
 
         Usuario empleado = usuarioService.listarUsuarioPorId(turno.getEmpleadoId());
 
-        if(empleado.getEmail().equals(clienteEmail)){
+        if (empleado.getEmail().equals(clienteEmail)) {
             throw new ConflictException("No podes reservar un turno siendo vos el empleado");
         }
 
@@ -204,7 +205,9 @@ public class TurnoService {
         return turnoRepo.findByServicioSucursalId(sucursal.getId())
                 .stream()
                 .map(t -> new TurnoMiniDTO(t.getId(), t.getServicio().getNombre(),
-                        t.getFechaHora(), t.getEstado()))
+                        t.getFechaHora(), t.getEstado(),
+                        t.getResenia() != null ?
+                                t.getResenia().getPuntuacion() : null))
                 .toList();
     }
 
@@ -222,13 +225,25 @@ public class TurnoService {
         Servicio s = t.getServicio();
 
         UsuarioMiniDTO cliente = new UsuarioMiniDTO(c.getNombre(), c.getApellido());
+
         UsuarioResponseDTO empleado = new UsuarioResponseDTO(
-                e.getId(), e.getNombre(), e.getApellido(), e.getEmail(), e.getFotoPerfil().getFotoValida());
+                e.getId(), e.getNombre(), e.getApellido(), e.getEmail(),
+                e.getFotoPerfil().getFotoValida());
+
         ServicioTurnoResponseDTO servicio = new ServicioTurnoResponseDTO(
                 s.getId(), s.getNombre(), s.getPrecio(), s.getDuracion());
 
+        ReseniaResponseDTO resenia = null;
+
+        if(t.getResenia() != null){
+            Resenia r = t.getResenia();
+            resenia = new ReseniaResponseDTO(
+                    r.getPuntuacion(), r.getComentario(), r.getFechaResenia());
+        }
+
         return new TurnoResponseDTO(
-                t.getId(), t.getFechaReserva(), t.getFechaHora(), cliente, empleado, servicio);
+                t.getId(), t.getFechaReserva(), t.getFechaHora(),
+                cliente, empleado, servicio, resenia);
     }
 
 
@@ -239,7 +254,9 @@ public class TurnoService {
         return turnoRepo.findByCliente(cliente).stream()
                 .map(t -> new TurnoMiniDTO(
                         t.getId(), t.getServicio().getNombre(),
-                        t.getFechaHora(), t.getEstado()))
+                        t.getFechaHora(), t.getEstado(),
+                        t.getResenia() != null ?
+                                t.getResenia().getPuntuacion() : null))
                 .toList();
     }
 
@@ -258,17 +275,49 @@ public class TurnoService {
         Servicio s = t.getServicio();
 
         UsuarioMiniDTO cl = new UsuarioMiniDTO(c.getNombre(), c.getApellido());
+
         UsuarioMiniDTO emp = new UsuarioMiniDTO(e.getNombre(), e.getApellido());
+
         ServicioTurnoResponseDTO serv = new ServicioTurnoResponseDTO(
                 s.getId(), s.getNombre(), s.getPrecio(), s.getDuracion());
 
-        return new TurnoClienteResponseDTO(t.getFechaReserva(), t.getFechaHora(), emp, serv, cl);
+        ReseniaResponseDTO resenia = null;
+
+        if(t.getResenia() != null){
+            Resenia r = t.getResenia();
+            resenia = new ReseniaResponseDTO(
+                    r.getPuntuacion(), r.getComentario(), r.getFechaResenia());
+        }
+
+        return new TurnoClienteResponseDTO(t.getFechaReserva(), t.getFechaHora(),
+                emp, serv, cl, resenia);
     }
 
 
     public Turno listarTurnoPorId(Integer id) {
         return turnoRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("No se encontró el turno"));
+    }
+
+
+    public void reseniarTurno(Integer turnoId, ReseniaCrearDTO reseniaDto,
+                              String clienteEmail) {
+
+        Turno turno = listarTurnoPorId(turnoId);
+
+        if (!turno.getCliente().getEmail().equals(clienteEmail)) {
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        if (turno.getEstado() != EstadoTurno.REALIZADO) {
+            throw new ConflictException("Solo se pueden reseñar turnos finalizados");
+        }
+
+        if (turno.getResenia() != null) {
+            throw new ConflictException("El turno ya fue reseñado");
+        }
+
+        reseniaService.guardarResenia(reseniaDto, turno);
     }
 
 

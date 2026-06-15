@@ -3,6 +3,7 @@ package com.gg.turnlook.Backend.Controllers;
 
 
 
+import com.gg.turnlook.Backend.DTO.Renia.ReseniaCrearDTO;
 import com.gg.turnlook.Backend.DTO.Turno.TurnoCrearDTO;
 import com.gg.turnlook.Backend.Service.TurnoService;
 import jakarta.validation.Valid;
@@ -114,6 +115,16 @@ public class TurnoController {
                 clienteEmail, turnoId));
     }
 
+
+    @PreAuthorize("hasRole('CLIENTE')")
+    @PostMapping("/{turnoId}/resenia")
+    public ResponseEntity<?> reseniarTurnoPropio(@PathVariable("turnoId") Integer turnoId,
+                                                 @Valid @RequestBody ReseniaCrearDTO resenia,
+                                                 @AuthenticationPrincipal String clienteEmail) {
+
+        turnoService.reseniarTurno(turnoId, resenia, clienteEmail);
+        return ResponseEntity.ok().body("Reseña guardada correctamente");
+    }
 
 }
 
