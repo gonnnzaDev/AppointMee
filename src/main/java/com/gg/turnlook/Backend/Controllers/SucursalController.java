@@ -132,12 +132,11 @@ public class SucursalController {
     }
 
 
-    @PreAuthorize("hasAnyRole('EMPLEADOR','ADMINISTRADOR')")
+    // ver si lo dejo como antes (con preauth de admin y empleador) no creo
     @GetMapping("/{sucursalId}/empleados")
-    public ResponseEntity<?> empleadosPorSucursal(@PathVariable("sucursalId") Integer sucursalId,
-                                                  @AuthenticationPrincipal String userEmail) {
+    public ResponseEntity<?> empleadosPorSucursal(@PathVariable("sucursalId") Integer sucursalId) {
 
-        return ResponseEntity.ok().body(sucursalService.verEmpleados(sucursalId, userEmail));
+        return ResponseEntity.ok().body(sucursalService.verEmpleados(sucursalId));
     }
 
 

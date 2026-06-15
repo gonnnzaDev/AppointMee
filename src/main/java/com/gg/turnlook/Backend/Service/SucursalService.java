@@ -1,7 +1,6 @@
 package com.gg.turnlook.Backend.Service;
 
 
-
 import com.gg.turnlook.Backend.DTO.Imagen.ImagenDTO;
 import com.gg.turnlook.Backend.DTO.Imagen.ImagenResponseDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalCrearDTO;
@@ -24,6 +23,7 @@ import com.gg.turnlook.Backend.Model.Usuario;
 import com.gg.turnlook.Backend.Repository.CategoriaRepository;
 import com.gg.turnlook.Backend.Repository.SucursalRepository;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -40,7 +40,6 @@ public class SucursalService {
     private final ImagenService imagenService;
 
 
-
     public SucursalService(SucursalRepository sucRepo, CategoriaRepository catRepo, UsuarioService usuarioService, ImagenService imagenService) {
         this.sucRepo = sucRepo;
         this.catRepo = catRepo;
@@ -50,9 +49,7 @@ public class SucursalService {
     }
 
 
-
     /// METODOS
-
 
 
     public boolean enSucursal(String userEmail, Sucursal sucursal) {
@@ -284,7 +281,7 @@ public class SucursalService {
         if (categoria != null && tieneNombre) {
             sucursales =
                     sucRepo.findByNombreContainingIgnoreCaseAndCategoriaCategoriaAndActivoTrue(
-                    nombre, categoria);
+                            nombre, categoria);
         } else if (categoria == null && tieneNombre) {
             sucursales = sucRepo.findByNombreContainingIgnoreCaseAndActivoTrue(nombre);
         } else if (categoria != null) {
@@ -306,21 +303,14 @@ public class SucursalService {
     }
 
 
-    public Set<UsuarioResponseDTO> verEmpleados(Integer sucursalId, String userEmail) {
+    public Set<UsuarioResponseDTO> verEmpleados(Integer sucursalId) {
 
         Sucursal suc = listarSucursalPorId(sucursalId);
 
-        Usuario usuario = usuarioService.listarUsuarioPorEmail(userEmail);
-
-        if (!usuarioService.esAdmin(usuario) &&
-                !esEmpleadorAca(suc, userEmail)){
-            throw new ForbiddenException("No tenes permisos");
-        }
-
-            return suc.getEmpleados().stream().
-                    map(u -> new UsuarioResponseDTO(u.getId(), u.getNombre(),
-                            u.getApellido(), u.getEmail(), u.getFotoPerfil().getFotoValida()))
-                    .collect(Collectors.toSet());
+        return suc.getEmpleados().stream().
+                map(u -> new UsuarioResponseDTO(u.getId(), u.getNombre(),
+                        u.getApellido(), u.getEmail(), u.getFotoPerfil().getFotoValida()))
+                .collect(Collectors.toSet());
     }
 
 
