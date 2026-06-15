@@ -1,8 +1,8 @@
 package com.gg.turnlook.Backend.Service;
 
 
-import com.gg.turnlook.Backend.DTO.Renia.ReseniaCrearDTO;
-import com.gg.turnlook.Backend.DTO.Renia.ReseniaResponseDTO;
+import com.gg.turnlook.Backend.DTO.Resenia.ReseniaCrearDTO;
+import com.gg.turnlook.Backend.DTO.Resenia.ReseniaResponseDTO;
 import com.gg.turnlook.Backend.DTO.Servicio.ServicioTurnoResponseDTO;
 import com.gg.turnlook.Backend.DTO.Turno.*;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioResponseDTO;

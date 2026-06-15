@@ -3,7 +3,7 @@ package com.gg.turnlook.Backend.Controllers;
 
 
 
-import com.gg.turnlook.Backend.DTO.Renia.ReseniaCrearDTO;
+import com.gg.turnlook.Backend.DTO.Resenia.ReseniaCrearDTO;
 import com.gg.turnlook.Backend.DTO.Turno.TurnoCrearDTO;
 import com.gg.turnlook.Backend.Service.TurnoService;
 import jakarta.validation.Valid;

@@ -2,7 +2,7 @@ package com.gg.turnlook.Backend.DTO.Turno;
 
 
 
-import com.gg.turnlook.Backend.DTO.Renia.ReseniaResponseDTO;
+import com.gg.turnlook.Backend.DTO.Resenia.ReseniaResponseDTO;
 import com.gg.turnlook.Backend.DTO.Servicio.ServicioTurnoResponseDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioMiniDTO;
 import lombok.AllArgsConstructor;

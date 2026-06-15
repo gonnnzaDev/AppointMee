@@ -1,4 +1,4 @@
-package com.gg.turnlook.Backend.DTO.Renia;
+package com.gg.turnlook.Backend.DTO.Resenia;
 
 
 
