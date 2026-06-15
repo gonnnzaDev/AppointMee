@@ -31,7 +31,10 @@ function renderLogin() {
               </button>
               <hr>
               <button type="button" id="register-button">Register</button>
-            </div>
+                    <a href="../PerdisteCuenta-folder/PerdiMiCuenta.html">
+                    Olvide Mi Cuenta
+                    </a>
+           </div>
           </div>
         </div>
 

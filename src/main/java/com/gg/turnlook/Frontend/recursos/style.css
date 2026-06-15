@@ -2403,14 +2403,16 @@ button:hover {
     justify-content: center;
     background-color: var(--bg-glass);
     margin: 20px 0;
-    padding: 20px;
+    padding: 15px;
     border-radius: 10px;
     border: 1px solid var(--dk-border);
-
+    gap: 40px;
 }
 
 .documentacion-links-container svg {
     color: white;
+    width: 40px;
+    height: 40px;
 
 }
 

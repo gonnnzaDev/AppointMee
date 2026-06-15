@@ -1,30 +1,40 @@
 const cancelar = document.getElementById("cancelar");
 const enviar = document.getElementById("enviar");
-const email = document.getElementById("email-denuncia-input").value;
-const descripcion = document.getElementById("descripcion-denuncia-input").value;
-const pass = document.getElementById("pass-denuncia-input").value;
 
 
-if (!cancelar || !enviar || !email || !descripcion || !pass) return;
+if (!cancelar || !enviar) {
+    window.history.back();
 
-if (email === "") {
+};
 
-    alert("El email es obligatorio");
 
-}
-if (descripcion === "") {
-    alert("La descripcion es obligatoria");
 
-}
+enviar.addEventListener('click', e => {
+    const email = document.getElementById("email-denuncia-input").value;
+    const descripcion = document.getElementById("descripcion-denuncia-input").value;
+    const pass = document.getElementById("pass-denuncia-input").value;
 
-enviar.addEventListener(e => {
+    if (email === "") {
+
+        alert("El email es obligatorio");
+        return;
+    }
+    if (descripcion === "") {
+        alert("La descripcion es obligatoria");
+        return;
+
+    }
 
     if (email !== "" && descripcion !== "") {
         postFormulario(email, descripcion, pass);
     }
 
 });
+cancelar.addEventListener('click', e => {
 
+    window.history.back();
+
+});
 
 function postFormulario(email, descripcion, pass) {
 

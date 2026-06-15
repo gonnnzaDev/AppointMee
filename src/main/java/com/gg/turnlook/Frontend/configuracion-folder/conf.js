@@ -47,7 +47,7 @@ function render() {
 
                 <h2>Perdiste Tu Cuenta?</h2>
                 <p>Rellena este formulario para hacer el reclamo
-                    <a href="../creditos-folder/Creditos.html">
+                    <a href="../PerdisteCuenta-folder/PerdiMiCuenta.html">
                         Formulario
                     </a>
                 </p>
