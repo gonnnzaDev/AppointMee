@@ -2,6 +2,7 @@ package com.gg.turnlook.Backend.Repository;
 
 
 
+import com.gg.turnlook.Backend.Enum.ECategoria;
 import com.gg.turnlook.Backend.Model.Sucursal;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -18,12 +19,12 @@ public interface SucursalRepository extends JpaRepository<Sucursal, Integer> {
 
     boolean existsByDireccionIgnoreCase(String direccion);
 
-    List<Sucursal> findByNombreContainingIgnoreCaseAndCategoriaIdAndActivoTrue(
-            String nombre, Integer catId);
+    List<Sucursal> findByNombreContainingIgnoreCaseAndCategoriaCategoriaAndActivoTrue(
+            String nombre, ECategoria categoria);
 
     List<Sucursal> findByNombreContainingIgnoreCaseAndActivoTrue(String nombre);
 
-    List<Sucursal> findByCategoriaIdAndActivoTrue(Integer catId);
+    List<Sucursal> findByCategoriaCategoriaAndActivoTrue(ECategoria categoria);
 
 }
 

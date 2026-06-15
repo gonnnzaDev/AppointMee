@@ -1,19 +1,17 @@
 package com.gg.turnlook.Backend.Controllers;
 
 
-
 import com.gg.turnlook.Backend.DTO.Imagen.ImagenDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalCrearDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalModificarDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmailDTO;
+import com.gg.turnlook.Backend.Enum.ECategoria;
 import com.gg.turnlook.Backend.Service.SucursalService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-
 
 
 @RestController
@@ -25,12 +23,9 @@ public class SucursalController {
     private final SucursalService sucursalService;
 
 
-
     public SucursalController(SucursalService sucursalService) {
         this.sucursalService = sucursalService;
     }
-
-
 
 
     /// ENDPOINTS
@@ -122,10 +117,11 @@ public class SucursalController {
 
 
     @GetMapping("/listar/filtrar")
-    public ResponseEntity<?> filtrarListaSucursales(@RequestParam(required = false) Integer catId,
-                                                    @RequestParam(required = false) String nombre) {
+    public ResponseEntity<?> filtrarListaSucursales(
+            @RequestParam(required = false) ECategoria categoria,
+            @RequestParam(required = false) String nombre) {
 
-        return ResponseEntity.ok().body(sucursalService.filtrarListaSucursales(catId, nombre));
+        return ResponseEntity.ok().body(sucursalService.filtrarListaSucursales(categoria, nombre));
     }
 
 
@@ -165,6 +161,13 @@ public class SucursalController {
 
         sucursalService.eliminarEmpleado(sucursalId, empleadoId, empleadorEmail);
         return ResponseEntity.ok().body("Se eliminó al empleado correctamente");
+    }
+
+
+    @GetMapping("/categorias")
+    public ResponseEntity<?> listarCategorias(){
+
+        return ResponseEntity.ok().body(ECategoria.values());
     }
 
 

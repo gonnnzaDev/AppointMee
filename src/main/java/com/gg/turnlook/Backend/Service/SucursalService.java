@@ -11,6 +11,7 @@ import com.gg.turnlook.Backend.DTO.Sucursal.SucursalResponseDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmailDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioResponseDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioMiniDTO;
+import com.gg.turnlook.Backend.Enum.ECategoria;
 import com.gg.turnlook.Backend.Enum.ERol;
 import com.gg.turnlook.Backend.Excepciones.BadRequestException;
 import com.gg.turnlook.Backend.Excepciones.ConflictException;
@@ -273,18 +274,21 @@ public class SucursalService {
     }
 
 
-    public List<SucursalMiniDTO> filtrarListaSucursales(Integer catId, String nombre) {
+    public List<SucursalMiniDTO> filtrarListaSucursales(ECategoria categoria,
+                                                        String nombre) {
 
         List<Sucursal> sucursales;
 
         boolean tieneNombre = nombre != null && !nombre.isBlank();
 
-        if (catId != null && tieneNombre) {
-            sucursales = sucRepo.findByNombreContainingIgnoreCaseAndCategoriaIdAndActivoTrue(nombre, catId);
-        } else if (catId == null && tieneNombre) {
+        if (categoria != null && tieneNombre) {
+            sucursales =
+                    sucRepo.findByNombreContainingIgnoreCaseAndCategoriaCategoriaAndActivoTrue(
+                    nombre, categoria);
+        } else if (categoria == null && tieneNombre) {
             sucursales = sucRepo.findByNombreContainingIgnoreCaseAndActivoTrue(nombre);
-        } else if (catId != null) {
-            sucursales = sucRepo.findByCategoriaIdAndActivoTrue(catId);
+        } else if (categoria != null) {
+            sucursales = sucRepo.findByCategoriaCategoriaAndActivoTrue(categoria);
         } else {
             return listarSucursales();
         }
