@@ -2462,3 +2462,14 @@ button:hover {
     margin: 10px;
     
 }
+
+.metodo-proximo{
+    opacity: 1;
+    transition: all var(--transition);
+
+}
+
+.metodo-proximo:hover{
+    opacity: 0.3;
+}
+
