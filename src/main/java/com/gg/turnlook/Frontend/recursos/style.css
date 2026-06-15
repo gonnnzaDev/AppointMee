@@ -2427,26 +2427,40 @@ button:hover {
 }
 
 .perdiMiCuenta-container,
-.pago-container {
+.pago-container,
+.agregarServicio-container {
 
     display: flex;
     width: auto;
-    height: 100vh;
+    min-height: 100vh;
+    height: auto;
     justify-content: center;
     align-items: center;
 }
 
+.agregarServicio-container{
+    margin: 10vh 0;
+}
+
+
+
 .perdiMiCuenta-info,
-.pago-info  {
+.pago-info,
+.agregarServicio-info  {
     padding: 20px;
     border-radius: 10px;
     border: 1px solid var(--dk-border);
 
 
 }
+.agregarServicio-info{
+    width: 60%;
+}
 
 .perdiMiCuenta-botones,
-.pago-botones {
+.pago-botones
+,
+.agregarServicio-botones {
     display: flex;
     justify-content: center;
     align-items: center;
