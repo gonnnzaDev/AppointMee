@@ -1,7 +1,7 @@
 const apiBaseURL = "http://localhost:8080/turnos";
 const imagenURLAlternativa = "https://xent ra.glomastore.mx/img/sin_imagen.png";
 
-
+renderTurnos();
 //en empleados container debe ingresar los html de la otra funcion
 
 function renderTurnos() {

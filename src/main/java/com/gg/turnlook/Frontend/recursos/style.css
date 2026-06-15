@@ -1451,6 +1451,7 @@ button:hover {
 }
 
 .turnos-persona-info {
+    
     width: 100%;
     height: 60vh;
     display: flex;
@@ -1981,12 +1982,15 @@ button:hover {
 
 
     .turnos-persona-info {
-        flex-direction: column;
         height: auto;
+        flex-direction: column;
     }
 
     .persona-info {
         margin: 12px 12px;
+        min-height: 60vh;
+    width: 80%;
+    margin: 0 auto;
     }
 
     .filtrar {
@@ -2156,7 +2160,7 @@ button:hover {
     }
 
     .persona-info {
-        margin: 8px 0;
+        margin: 0 auto;
     }
 
     .filtrar {
@@ -2422,7 +2426,8 @@ button:hover {
 
 }
 
-.perdiMiCuenta-container {
+.perdiMiCuenta-container,
+.pago-container {
 
     display: flex;
     width: auto;
@@ -2431,7 +2436,8 @@ button:hover {
     align-items: center;
 }
 
-.perdiMiCuenta-info {
+.perdiMiCuenta-info,
+.pago-info  {
     padding: 20px;
     border-radius: 10px;
     border: 1px solid var(--dk-border);
@@ -2439,9 +2445,20 @@ button:hover {
 
 }
 
-.perdiMiCuenta-botones {
+.perdiMiCuenta-botones,
+.pago-botones {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 20px;
+    margin: 10px;
+}
+
+.metodos-Pago{
+     display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin: 10px;
+    
 }
