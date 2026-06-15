@@ -30,7 +30,6 @@ public class UsuarioService {
     private final PasswordEncoder passEncoder;
 
 
-
     public UsuarioService(UsuarioRepository usRepo, RolService rolService, ImagenService imagenService, PasswordEncoder passEncoder) {
         this.usRepo = usRepo;
         this.rolService = rolService;
@@ -237,7 +236,7 @@ public class UsuarioService {
     }
 
 
-    public boolean esAdmin(Usuario usuario){
+    public boolean esAdmin(Usuario usuario) {
         Set<String> roles = setRolesComoString(usuario);
         return roles != null && roles.contains(ERol.ADMINISTRADOR.name());
     }
