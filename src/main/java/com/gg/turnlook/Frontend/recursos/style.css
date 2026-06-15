@@ -2398,7 +2398,7 @@ button:hover {
 }
 
 .documentacion-links-container {
-    
+
     display: flex;
     justify-content: center;
     background-color: var(--bg-glass);
@@ -2408,7 +2408,38 @@ button:hover {
     border: 1px solid var(--dk-border);
 
 }
-.documentacion-links-container svg{
+
+.documentacion-links-container svg {
     color: white;
 
+}
+
+#admin-panel-container {
+
+    margin: 10vh 20px;
+
+}
+
+.perdiMiCuenta-container {
+
+    display: flex;
+    width: auto;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+
+.perdiMiCuenta-info {
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid var(--dk-border);
+
+
+}
+
+.perdiMiCuenta-botones {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
 }

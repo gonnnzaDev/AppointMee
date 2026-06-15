@@ -2,11 +2,11 @@ import { sesionActiva, authHeaders } from "../recursos/modulos.js";
 
 
 const user = await sesionActiva();
-
+/*
 if (!user) {
     window.location.href = "../login.html";
 }
-
+*/
 renderPerfil(user.id);
 
 //CAMBIAR EL RENDER DE ABAJO TAMBIEN!!!

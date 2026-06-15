@@ -2,9 +2,11 @@ import { authHeaders } from "../recursos/modulos";
 
 const user = await sesionActiva();
 
+/*
 if (!user) {
     window.location.href = "../login.html";
 }
+*/
 
 renderTurnos(user.id);
 
@@ -14,21 +16,26 @@ function renderTurnos(id) {
 
     if (container) {
 
-        const turnosLista = buscarMisTurnos("Pendientes");
 
+        const estadoP = document.getElementById("estado").value;
 
-        turnosLista.forEach(turnos => {
+        const turnosLista = buscarMisTurnos();
 
-            container.innerHTML +=
-                `
+        turnosLista.forEach(turno => {
+
+            if (turno.estado === estadoP) {
+
+                container.innerHTML +=
+                    `
 
              <div class="turno-misTurnos">
-                        <p>${turnos.nombreS}</p>
-                        <p>${turnos.fechaT}</p>
+                        <p>${turno.nombreS}</p>
+                        <p>${turno.fechaT}</p>
             </div>
 
                 `
 
+            }
         });
 
 
@@ -40,13 +47,7 @@ function renderTurnos(id) {
 
 }
 
-function cargarTurnos() {
-
-
-}
-
-
-function buscarMisTurnos(estadoTurno) {
+function buscarMisTurnos() {
     try {
         const response = await fetch(`http://localhost:8080/turnos/propios/${estadoTurno}`,
             {
@@ -57,6 +58,7 @@ function buscarMisTurnos(estadoTurno) {
         if (!response.ok) {
             throw new Error(`Error ${response.status}`);
         }
+
 
         return await response.json();
     } catch (error) {

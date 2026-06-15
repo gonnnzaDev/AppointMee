@@ -1,14 +1,14 @@
 render();
 
-function render(){
+function render() {
 
 
     const container = document.getElementById("info");
 
-    if(container){
+    if (container) {
         container.innerHTML =
-        
-    `  <div class="configuracion-titulo" >   
+
+            `  <div class="configuracion-titulo" >   
         <h1>Configuracion</h1>
             </div>
 
@@ -39,6 +39,16 @@ function render(){
                 <p>Deseas ver la documentacion del proyecto?
                     <a href="../creditos-folder/Creditos.html">
                         Documentacion
+                    </a>
+                </p>
+            </div>
+
+              <div class="seccion-configuracion">
+
+                <h2>Perdiste Tu Cuenta?</h2>
+                <p>Rellena este formulario para hacer el reclamo
+                    <a href="../creditos-folder/Creditos.html">
+                        Formulario
                     </a>
                 </p>
             </div>
