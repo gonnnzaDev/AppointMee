@@ -98,12 +98,10 @@ async function eliminarCuenta(id) {
 
     try {
 
-        const response = await fetch(`http://localhost:8080/usuarios/borrar-cuenta/${id}`,
-            {
-                headers: authHeaders(),
-                method: "DELETE"
-            }
-        );
+        const response = await fetch(`http://localhost:8080/usuarios/borrar-cuenta`, {
+            headers: authHeaders(),
+            method: "DELETE"
+        });
 
         if (!response.ok) {
             return false;

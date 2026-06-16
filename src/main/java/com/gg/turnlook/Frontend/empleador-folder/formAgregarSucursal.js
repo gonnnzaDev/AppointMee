@@ -76,7 +76,7 @@ async function render() {
             const direccion = document.getElementById("direccion-input").value;
             const telefono = document.getElementById("telefono-input").value;
             const descripcion = document.getElementById("descripcion-input").value;
-            const categoriaId = parseInt(document.getElementById("categoria-input").value);
+            const categoriaId = document.getElementById("categoria-input").value;
             const horaApertura = document.getElementById("hora-apertura-input").value;
             const horaCierre = document.getElementById("hora-cierre-input").value;
             const fotoUrl = document.getElementById("foto-url-input").value;
@@ -101,7 +101,7 @@ async function cargarCategorias() {
 
         categorias.forEach((cat, index) => {
             const option = document.createElement("option");
-            option.value = index + 1;
+            option.value = cat;
             option.textContent = cat;
             select.appendChild(option);
         });

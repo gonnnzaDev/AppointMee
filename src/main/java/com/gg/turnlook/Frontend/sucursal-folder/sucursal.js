@@ -1,74 +1,38 @@
+import { authHeaders } from "../recursos/modulos.js";
+
 const apiBaseURL = "http://localhost:8080/sucursales";
 
 render();
 
 async function render() {
-
     const container = document.getElementById("container-info-sucursal");
-    if (!container) {
-        return;
-    }
-    //Leo la id de la sucursal en la url
+    if (!container) return;
+
     const sucursalId = getSucursalIdFromUrl();
+    if (!sucursalId) return;
 
-    if (!sucursalId) {
-        container.innerHTML = `<p>No se encontró el ID de la sucursal en la URL.</p>`;
-        return;
-    }
-    //busco los datos
     const sucursal = await fetchSucursal(sucursalId);
+    if (!sucursal) return;
 
+    container.innerHTML += `
+        <article class="turn-article">
+            <img src="${sucursal.fotoPerfil || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQPQenKJTzexez3E1uN7qtSwZ8tgPQsVJ9DQ&s'}">
+            <div class="turn-content">
+                <h2>${sucursal.nombre}</h2>
+                <p>${sucursal.descripcion}</p>
+            </div>
+        </article>
+        <button id="btn-volver">Volver</button>
+        <button id="btn-reservar">Reservar turno</button>
+    `;
 
-    console.log(sucursal);
-    if (!sucursal) {
-        container.innerHTML = `<p>No se encontró la sucursal con ID ${sucursalId}.</p>`;
-        return;
-    }
+    document.getElementById("btn-volver")
+        .addEventListener("click", () => window.history.back());
 
-    const imgNoDispo = "https://static.vecteezy.com/system/resources/previews/022/059/000/non_2x/no-image-available-icon-vector.jpg";
-    
-    container.innerHTML =
-     `
-      <button id="btn-volver">Volver</button>
-      <div class="principal-imagen-sucursal">
-          <img src="${sucursal.imagen || imgNoDispo}">
-      </div>
-
-      <div class="info-sucursal">
-          <h3 id="nombre-sucursal">${sucursal.nombre}</h3>
-          <p id="categoria-sucursal">Categoria: ${sucursal.categoria}</p>
-          <p id="descripcion-sucursal">Descripcion: ${sucursal.descripcion}</p>
-          <p id="direccion-sucursal">Direccion: ${sucursal.direccion}</p>
-          <p id="horario-sucursal">Horario: ${sucursal.horario}</p>
-          <p id="telefono-sucursal">Telefono: ${sucursal.telefono}</p>
-          
-          <div class="botones-sucursal-container">
-          <div class="botones-sucursal">
-              <button id="btn-reservar">Reservar Servicio</button>
-          </div>
-          </div>
-      </div>
-
-      <div class="interior-imagenes-sucursal">
-          <a href="${sucursal.imagen || imgNoDispo}">
-              <img src="${sucursal.imagen || imgNoDispo}" >
-              </a>
-      </div>
-
-      <div class="acciones-sucursal">
-          <button id="btn-contactar">Contactar</button>
-          <button id="btn-denunciar">Denunciar</button>
-      </div>`;
-
-    const btnVolver = document.getElementById('btn-volver');
-    if (btnVolver) {
-        btnVolver.addEventListener('click', () => window.history.back());
-    }
-
-    const btnReservar = document.getElementById('btn-reservar');
-    if (btnReservar) {
-
-    }
+    document.getElementById("btn-reservar")
+        .addEventListener("click", () => {
+            window.location.href = `../turnos-folder/Turnos.html?sucursalId=${sucursal.id}`;
+        });
 }
 
 function getSucursalIdFromUrl() {
@@ -84,7 +48,9 @@ function getSucursalIdFromUrl() {
 
 async function fetchSucursal(id) {
     try {
-        const response = await fetch(`${apiBaseURL}/${id}`);
+        const response = await fetch(`${apiBaseURL}/${id}`, {
+            headers: authHeaders()
+        });
         if (!response.ok) {
             return null;
         }

@@ -1,5 +1,5 @@
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 import { authHeaders } from "../recursos/modulos.js";
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 renderLogin();
 
 
