@@ -1,3 +1,5 @@
+import { authHeaders } from "../recursos/modulos";
+
 const apiBaseURL = "http://localhost:8080/servicios";
 
 const params = new URLSearchParams(window.location.search);
@@ -80,10 +82,7 @@ async function postServicio(nombre, descripcion, duracion, precio, sucursalId, f
     try {
         const response = await fetch(apiBaseURL + '/crear', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            },
+            headers: authHeaders(),
             body: JSON.stringify(datos)
         });
 

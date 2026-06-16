@@ -1,3 +1,5 @@
+import { authHeaders } from "../recursos/modulos.js";
+
 const apiBaseURL = "http://localhost:8080/sucursales";
 
 render();
@@ -89,9 +91,7 @@ async function render() {
 async function cargarCategorias() {
     try {
         const response = await fetch("http://localhost:8080/sucursales/categorias", {
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            }
+            headers: authHeaders()
         });
 
         if (!response.ok) throw new Error(`Error ${response.status}`);
@@ -126,10 +126,7 @@ async function postSucursal(nombre, direccion, telefono, descripcion, categoriaI
     try {
         const response = await fetch(apiBaseURL + '/crear', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            },
+            headers: authHeaders(),
             body: JSON.stringify(datos)
         });
 

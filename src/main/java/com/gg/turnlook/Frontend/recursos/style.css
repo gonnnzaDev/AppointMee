@@ -1451,7 +1451,7 @@ button:hover {
 }
 
 .turnos-persona-info {
-    
+
     width: 100%;
     height: 60vh;
     display: flex;
@@ -1989,8 +1989,8 @@ button:hover {
     .persona-info {
         margin: 12px 12px;
         min-height: 60vh;
-    width: 80%;
-    margin: 0 auto;
+        width: 80%;
+        margin: 0 auto;
     }
 
     .filtrar {
@@ -2438,7 +2438,7 @@ button:hover {
     align-items: center;
 }
 
-.agregarServicio-container{
+.agregarServicio-container {
     margin: 10vh 0;
 }
 
@@ -2446,20 +2446,20 @@ button:hover {
 
 .perdiMiCuenta-info,
 .pago-info,
-.agregarServicio-info  {
+.agregarServicio-info {
     padding: 20px;
     border-radius: 10px;
     border: 1px solid var(--dk-border);
 
 
 }
-.agregarServicio-info{
+
+.agregarServicio-info {
     width: 60%;
 }
 
 .perdiMiCuenta-botones,
-.pago-botones
-,
+.pago-botones,
 .agregarServicio-botones {
     display: flex;
     justify-content: center;
@@ -2468,22 +2468,44 @@ button:hover {
     margin: 10px;
 }
 
-.metodos-Pago{
-     display: flex;
+.metodos-Pago {
+    display: flex;
     justify-content: center;
     align-items: center;
     gap: 20px;
     margin: 10px;
-    
+
 }
 
-.metodo-proximo{
+.metodo-proximo {
     opacity: 1;
     transition: all var(--transition);
 
 }
 
-.metodo-proximo:hover{
+.metodo-proximo:hover {
     opacity: 0.3;
 }
 
+.formulario-transformar-empleador {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+}
+
+.formulario-transformar-empleador-info {
+    align-items: center;
+    width: 70%;
+
+
+}
+
+.formulario-transformar-empleador-botones {
+    display: flex;
+    justify-content: end;
+    gap: 20px;
+
+
+}
