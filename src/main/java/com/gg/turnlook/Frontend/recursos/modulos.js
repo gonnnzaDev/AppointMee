@@ -33,3 +33,8 @@ export async function sesionActiva() {
 export const baseUrl = window.location.origin;
 
 export const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // regla q todos los email deben cumplir
+
+export function cerrarSesion() {
+    localStorage.removeItem("token");
+    window.location.href = "../login-folder/Login.html";
+}

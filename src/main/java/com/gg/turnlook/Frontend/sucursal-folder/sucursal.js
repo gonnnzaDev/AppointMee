@@ -10,6 +10,7 @@ async function render() {
 
     const sucursalId = getSucursalIdFromUrl();
     if (!sucursalId) return;
+    console.log(sucursalId);
 
     const sucursal = await fetchSucursal(sucursalId);
     if (!sucursal) return;
@@ -31,7 +32,7 @@ async function render() {
 
     document.getElementById("btn-reservar")
         .addEventListener("click", () => {
-            window.location.href = `../turnos-folder/Turnos.html?sucursalId=${sucursal.id}`;
+            window.location.href = `../turnos-folder/Turnos.html?sucursalId=${sucursalId}`;
         });
 }
 

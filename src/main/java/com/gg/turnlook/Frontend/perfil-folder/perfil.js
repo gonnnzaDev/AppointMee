@@ -1,25 +1,23 @@
-import { sesionActiva, authHeaders } from "../recursos/modulos.js";
+import { sesionActiva, authHeaders, cerrarSesion } from "../recursos/modulos.js";
 
 
 const user = await sesionActiva();
-/*
+
 if (!user) {
     window.location.href = "../login.html";
 }
-*/
-renderPerfil(user.id);
 
-//CAMBIAR EL RENDER DE ABAJO TAMBIEN!!!
+const usuario = await cargarUsuario(user.id);
 
-async function renderPerfil(id) {
+renderPerfil(usuario);
+
+async function renderPerfil(usuario) {
 
     const infoAccountDiv = document.getElementById("info-account");
 
     if (infoAccountDiv) {
 
-        const usuario = await cargarUsuario(id);
 
-        console.log(usuario);
 
         infoAccountDiv.innerHTML = `
         <div class="profile-card">
@@ -27,6 +25,7 @@ async function renderPerfil(id) {
     <h3>Nombre: ${usuario.nombre}</h3>
     <h3>Apellido: ${usuario.apellido}</h3>
     <h3>Email: ${usuario.email}</h3>
+    <h3>Email: ${usuario.id}</h3>
     <h3>Fecha De Creacion: ${usuario.fechaCreacion}</h3>
     <button type="button" id="btn-opciones-perfil">Opciones</button>
     
@@ -37,7 +36,7 @@ async function renderPerfil(id) {
 
         opciones.addEventListener("click", () => {
 
-            renderOpciones(id);
+            renderOpciones(usuario);
 
 
         });
@@ -45,7 +44,7 @@ async function renderPerfil(id) {
     }
 }
 
-function renderOpciones(id) {
+function renderOpciones(usuario) {
 
     const infoAccountDiv = document.getElementById("info-account");
 
@@ -57,6 +56,8 @@ function renderOpciones(id) {
     <button id="btn-eliminar-perfil">Eliminar Cuenta</button>
     <button id="btn-editar-perfil">Editar</button>
     <button id="btn-volver-perfil">Volver</button>
+    <div id="dependiendo-rol">
+    </div>
             </div>
             </div>
     
@@ -66,10 +67,18 @@ function renderOpciones(id) {
         const eliminar = document.getElementById("btn-eliminar-perfil");
         const editar = document.getElementById("btn-editar-perfil");
         const volver = document.getElementById("btn-volver-perfil");
+        const containerrol = document.getElementById("dependiendo-rol");
 
+        if (!containerrol) return;
+/*
+        if(usuario.roles =="xd")
+        containerrol.innerHTML = `
+        <button id="btn-ejemplo-perfil">Ejemplo</button>
+         `;
+*/
 
         volver.addEventListener('click', () => {
-            renderPerfil(id);
+            renderPerfil(usuario);
 
         });
 
@@ -81,7 +90,7 @@ function renderOpciones(id) {
         eliminar.addEventListener('click', async () => {
 
 
-            const rta = await eliminarCuenta(id);
+            const rta = await eliminarCuenta();
 
 
             if (rta) { alert("Eliminacion Realizada con exito") }
@@ -94,7 +103,7 @@ function renderOpciones(id) {
     }
 }
 
-async function eliminarCuenta(id) {
+async function eliminarCuenta() {
 
     try {
 
@@ -107,6 +116,7 @@ async function eliminarCuenta(id) {
             return false;
         }
 
+        cerrarSesion();
         return true;
 
     } catch (error) {

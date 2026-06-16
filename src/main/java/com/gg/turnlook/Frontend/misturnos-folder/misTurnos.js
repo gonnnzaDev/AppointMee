@@ -1,16 +1,10 @@
-import { authHeaders } from "../recursos/modulos";
+import { authHeaders } from "../recursos/modulos.js";
 
 const user = await sesionActiva();
 
-/*
-if (!user) {
-    window.location.href = "../login.html";
-}
-*/
+renderTurnos();
 
-renderTurnos(user.id);
-
-function renderTurnos(id) {
+function renderTurnos() {
 
     const container = document.getElementById("info");
 
@@ -19,11 +13,10 @@ function renderTurnos(id) {
 
         const estadoP = document.getElementById("estado").value;
 
-        const turnosLista = buscarMisTurnos();
+        const turnosLista = buscarMisTurnos(estadoP);
 
         turnosLista.forEach(turno => {
 
-            if (turno.estado === estadoP) {
 
                 container.innerHTML +=
                     `
@@ -35,7 +28,6 @@ function renderTurnos(id) {
 
                 `
 
-            }
         });
 
 
@@ -47,7 +39,7 @@ function renderTurnos(id) {
 
 }
 
-function buscarMisTurnos() {
+function buscarMisTurnos(estadoTurno) {
     try {
         const response = await fetch(`http://localhost:8080/turnos/propios/${estadoTurno}`,
             {

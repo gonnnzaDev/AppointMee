@@ -1,3 +1,9 @@
+import { sesionActiva, cerrarSesion } from "../recursos/modulos.js";
+
+const u = await sesionActiva();
+
+if(!u) window.location.href = "../login-folder/Login.html";
+
 render();
 
 function render() {
@@ -18,7 +24,7 @@ function render() {
                 <p>¿Sos empleador y todavia no tenes tu Cuenta de Empleador?
                 </p>
                 <p>Llena este
-                    <a href="../formularioempleador-folder/FormularioEmpleador.html">
+                    <a href="../formularioempleador-transformarse-folder/FormularioEmpleador.html">
                         Formulario
                     </a>
                 </p>
@@ -55,11 +61,23 @@ function render() {
             
 
             <div class="configuracion-botones">
-                <button>Cerrar Sesion</button>
+                <button id="boton-cerrar">Cerrar Sesion</button>
             </div>`;
     }
 
 
 
 
+}
+
+
+
+const btn = document.getElementById("boton-cerrar");
+if (btn) {
+
+    btn.addEventListener('click', () => {
+
+        cerrarSesion();
+
+    });
 }
