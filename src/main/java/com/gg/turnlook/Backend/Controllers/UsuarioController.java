@@ -152,16 +152,6 @@ public class UsuarioController {
     }
 
 
-    // ver si es con formulario o notif a admin (DESPUES VER CON G)
-    @PreAuthorize("!hasRole('ADMIN') && !hasRole('EMPLEADOR')")
-    @PatchMapping("/solicitar-ser-empleador")
-    public ResponseEntity<?> solicitarRolEmpleador(@AuthenticationPrincipal String userEmail){
-
-        usuarioService.solicitudRolEmpleador(userEmail);
-        return ResponseEntity.ok().body("Se te otorgó el rol Empleador");
-    }
-
-
     @DeleteMapping("/eliminar/foto-perfil")
     public ResponseEntity<?> eliminarFotoPerfil(@AuthenticationPrincipal String email){
 

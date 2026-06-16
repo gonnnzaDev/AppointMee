@@ -40,14 +40,17 @@ public class SucursalService {
     private final UsuarioService usuarioService;
     private final ImagenService imagenService;
     private final ReseniaService reseniaService;
+    private final GestionEmpleadoService gestionEmpleadoService;
 
 
-    public SucursalService(SucursalRepository sucRepo, CategoriaRepository catRepo, UsuarioService usuarioService, ImagenService imagenService, ReseniaService reseniaService) {
+    public SucursalService(SucursalRepository sucRepo, CategoriaRepository catRepo, UsuarioService usuarioService, ImagenService imagenService, ReseniaService reseniaService, GestionEmpleadoService gestionEmpleadoService) {
         this.sucRepo = sucRepo;
         this.catRepo = catRepo;
         this.usuarioService = usuarioService;
         this.imagenService = imagenService;
         this.reseniaService = reseniaService;
+        this.gestionEmpleadoService = gestionEmpleadoService;
+
     }
 
 
@@ -352,6 +355,10 @@ public class SucursalService {
     public void agregarEmpleado(Integer sucursalId, UsuarioEmailDTO userEmail,
                                 String empleadorEmail) {
 
+        if(userEmail.getEmail().equals(empleadorEmail)){
+            throw new BadRequestException("No te podes agregar a vos mismo como empleado");
+        }
+
         Sucursal sucursal = listarSucursalPorId(sucursalId);
 
         if (!esEmpleadorAca(sucursal, empleadorEmail)) {
@@ -360,9 +367,11 @@ public class SucursalService {
 
         Usuario empleado = usuarioService.listarUsuarioPorEmail(userEmail.getEmail());
 
-        sucursal.getEmpleados().add(empleado);  // dsp ver lo de notificaciones
+        if(sucursal.getEmpleados().contains(empleado)){
+            throw new ConflictException("El usuario ya es empleado de la sucursal");
+        }
 
-        sucRepo.save(sucursal);
+        gestionEmpleadoService.enviarSolicitud(empleado, sucursal);
     }
 
 
@@ -377,15 +386,28 @@ public class SucursalService {
 
         Usuario empleado = usuarioService.listarUsuarioPorId(empleadoId);
 
-        sucursal.getEmpleados().remove(empleado);   // dsp ver lo de notificacion
+        if(!sucursal.getEmpleados().contains(empleado)){
+            throw new ConflictException("El usuario no es empleado de la sucursal");
+        }
+
+        sucursal.getEmpleados().remove(empleado);
 
         sucRepo.save(sucursal);
     }
 
 
-    private boolean esEmpleadorAca(Sucursal sucursal, String empleadorEmail) {
+    public boolean esEmpleadorAca(Sucursal sucursal, String empleadorEmail) {
 
         return sucursal.getEmpleador().getEmail().equals(empleadorEmail);
+    }
+
+
+    public void guardarEmpleado(Usuario empleadoNuevo, Sucursal sucursal){
+
+        // ver si valido algo mas
+        sucursal.getEmpleados().add(empleadoNuevo);
+
+        sucRepo.save(sucursal);
     }
 
 

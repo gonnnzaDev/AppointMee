@@ -147,9 +147,8 @@ public class SucursalController {
                                              @Valid @RequestBody UsuarioEmailDTO userEmail,
                                              @AuthenticationPrincipal String empleadorEmail) {
 
-        // dsp cambiar a "se envió una notificación" o algo asi cuando tenga hecho lo de notif
         sucursalService.agregarEmpleado(sucursalId, userEmail, empleadorEmail);
-        return ResponseEntity.ok().body("Se agregó al empleado correctamente");
+        return ResponseEntity.ok().body("Se envió una solicitud al usuario");
     }
 
 
