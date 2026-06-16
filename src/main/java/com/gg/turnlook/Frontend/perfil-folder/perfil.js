@@ -83,7 +83,7 @@ function renderOpciones(usuario) {
 
 
         editar.addEventListener('click', () => {
-            rendferModificar();
+            renderModificar(usuario);
 
 
         });
@@ -103,7 +103,7 @@ function renderOpciones(usuario) {
     }
 }
 
-function rendferModificar() {
+function renderModificar(usuario) {
     const infoAccountDiv = document.getElementById("funcionalidadPerfil");
 
     infoAccountDiv.innerHTML = `
@@ -152,28 +152,29 @@ function rendferModificar() {
 <button id="cancelar">Cancelar</button>
 <button id="modificar">Modificar</button>
             `;
+
+
+    const cancelar = document.getElementById("cancelar");
+    const modificar = document.getElementById("modificar");
+
+
+    cancelar.addEventListener('click', () => {
+
+    renderOpciones(usuario);
+
+    });
+
+
+    modificar.addEventListener('click', () => {
+
+        console.log();
+
+        modificarUsuario(usuario.id);
+
+    });
+
+
 }
-
-const cancelar = document.getElementById("cancelar");
-const modificar = document.getElementById("modificar");
-
-cancelar.addEventListener('click', () => {
-
-    window.location.href = "../login-folder/Login.html";
-
-
-
-});
-
-
-modificar.addEventListener('click', () => {
-
-    console.log();
-
-    modificarUsuario(usuario.id);
-
-});
-
 
 
 async function modificarUsuario(id) {
@@ -196,6 +197,8 @@ async function modificarUsuario(id) {
         const response = await fetch(
             `http://localhost:8080/usuarios/modificar/${id}`,
             {
+                method: "PUT",
+                body: JSON.stringify(body),
                 headers: authHeaders(),
             }
         );
