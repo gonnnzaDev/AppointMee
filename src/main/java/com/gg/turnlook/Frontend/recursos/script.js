@@ -58,6 +58,32 @@ function initNavbar() {
 
   _bindToggle();
   _markActiveLink();
+  _bindSearch();
+}
+
+function _bindSearch() {
+  const input = document.getElementById("search-input");
+  if (!input) return;
+
+  document.dispatchEvent(new CustomEvent("navbar:ready", { detail: { input } }));
+
+  const enIndex = window.location.pathname
+    .toLowerCase()
+    .includes("/index-folder/index.html");
+
+  if (enIndex) return;
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+
+    const termino = input.value.trim();
+    const url = new URL("../index-folder/Index.html", window.location.href);
+    if (termino) {
+      url.searchParams.set("busqueda", termino);
+    }
+    window.location.href = url.toString();
+  });
 }
 
 function _bindToggle() {

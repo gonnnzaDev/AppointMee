@@ -49,15 +49,7 @@ function render() {
                 </p>
             </div>
 
-              <div class="seccion-configuracion">
-
-                <h2>Perdiste Tu Cuenta?</h2>
-                <p>Rellena este formulario para hacer el reclamo
-                    <a href="../PerdisteCuenta-folder/PerdiMiCuenta.html">
-                        Formulario
-                    </a>
-                </p>
-            </div>
+        
             
 
             <div class="configuracion-botones">

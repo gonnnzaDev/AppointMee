@@ -26,13 +26,7 @@ function render() {
 
         const mensaje = document.getElementById("mensaje").value;
 
-        if (!mensaje.lenght < 50) {
-            alert("Tiene que superar los 50 caracteres");
-        } else {
-
-            postMensaje(mensaje);
-
-        }
+        postMensaje(mensaje);
 
     });
 
@@ -48,7 +42,9 @@ async function postMensaje(mensaje) {
 
 
     try {
-        const response = await fetch(``, {
+        const response = await fetch(
+            `http://localhost:8080/solicitudes-empleador/solicitar`,
+             {
             method: 'POST',
             headers: authHeaders(),
             body: JSON.stringify(mensaje)
