@@ -25,7 +25,6 @@ async function renderPerfil(usuario) {
     <h3>Nombre: ${usuario.nombre}</h3>
     <h3>Apellido: ${usuario.apellido}</h3>
     <h3>Email: ${usuario.email}</h3>
-    <h3>Email: ${usuario.id}</h3>
     <h3>Fecha De Creacion: ${usuario.fechaCreacion}</h3>
     <button type="button" id="btn-opciones-perfil">Opciones</button>
     
@@ -52,7 +51,7 @@ function renderOpciones(usuario) {
 
         infoAccountDiv.innerHTML = `
     <div class="funcionalidad-perfil-container">
-    <div class="funcionalidad-perfil">
+    <div class="funcionalidad-perfil" id="funcionalidadPerfil">
     <button id="btn-eliminar-perfil">Eliminar Cuenta</button>
     <button id="btn-editar-perfil">Editar</button>
     <button id="btn-volver-perfil">Volver</button>
@@ -70,12 +69,12 @@ function renderOpciones(usuario) {
         const containerrol = document.getElementById("dependiendo-rol");
 
         if (!containerrol) return;
-/*
-        if(usuario.roles =="xd")
-        containerrol.innerHTML = `
-        <button id="btn-ejemplo-perfil">Ejemplo</button>
-         `;
-*/
+        /*
+                if(usuario.roles =="xd")
+                containerrol.innerHTML = `
+                <button id="btn-ejemplo-perfil">Ejemplo</button>
+                 `;
+        */
 
         volver.addEventListener('click', () => {
             renderPerfil(usuario);
@@ -84,6 +83,7 @@ function renderOpciones(usuario) {
 
 
         editar.addEventListener('click', () => {
+            rendferModificar();
 
 
         });
@@ -100,6 +100,116 @@ function renderOpciones(usuario) {
 
 
 
+    }
+}
+
+function rendferModificar() {
+    const infoAccountDiv = document.getElementById("funcionalidadPerfil");
+
+    infoAccountDiv.innerHTML = `
+            <div class="input-group mb-1">
+    <input type="text"
+           class="form-control"
+           placeholder="Nombre"
+           id="nombre-input"
+           minlength="3"
+           maxlength="60">
+</div>
+
+<div class="input-group mb-1">
+    <input type="text"
+           class="form-control"
+           placeholder="Apellido"
+           id="apellido-input"
+           minlength="3"
+           maxlength="60">
+</div>
+
+<div class="input-group mb-1">
+    <input type="password"
+           class="form-control"
+           placeholder="Contraseña"
+           id="password-input"
+           minlength="8"
+           maxlength="67">
+</div>
+
+<div class="input-group mb-1">
+    <input type="email"
+           class="form-control"
+           placeholder="Email"
+           id="email-input"
+           minlength="8"
+           maxlength="150">
+</div>
+
+<div class="input-group mb-1">
+    <input type="url"
+           class="form-control"
+           placeholder="URL de foto de perfil"
+           id="foto-url-input">
+</div>
+<button id="cancelar">Cancelar</button>
+<button id="modificar">Modificar</button>
+            `;
+}
+
+const cancelar = document.getElementById("cancelar");
+const modificar = document.getElementById("modificar");
+
+cancelar.addEventListener('click', () => {
+
+    window.location.href = "../login-folder/Login.html";
+
+
+
+});
+
+
+modificar.addEventListener('click', () => {
+
+    console.log();
+
+    modificarUsuario(usuario.id);
+
+});
+
+
+
+async function modificarUsuario(id) {
+    try {
+
+        const nombre = document.getElementById("nombre-input").value.trim();
+        const apellido = document.getElementById("apellido-input").value.trim();
+        const password = document.getElementById("password-input").value.trim();
+        const email = document.getElementById("email-input").value.trim();
+        const fotoUrl = document.getElementById("foto-url-input").value.trim();
+
+        const body = {};
+
+        if (nombre) body.nombre = nombre;
+        if (apellido) body.apellido = apellido;
+        if (password) body.password = password;
+        if (email) body.email = email;
+        if (fotoUrl) body.fotoUrl = fotoUrl;
+
+        const response = await fetch(
+            `http://localhost:8080/usuarios/modificar/${id}`,
+            {
+                headers: authHeaders(),
+            }
+        );
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(error || `Error ${response.status}`);
+        }
+
+        alert("Usuario modificado con éxito");
+
+    } catch (error) {
+        alert(error.message);
+        console.error(error);
     }
 }
 

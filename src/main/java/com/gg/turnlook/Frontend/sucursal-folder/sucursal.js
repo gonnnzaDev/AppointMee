@@ -61,3 +61,19 @@ async function fetchSucursal(id) {
         return null;
     }
 }
+
+
+async function fetchValoracionXSucursal(id) {
+    try {
+        const response = await fetch(`${apiBaseURL}/${id}`, {
+            headers: authHeaders()
+        });3
+        if (!response.ok) {
+            return null;
+        }
+        return await response.json();
+    } catch (error) {
+        alert(error);
+        return null;
+    }
+}
