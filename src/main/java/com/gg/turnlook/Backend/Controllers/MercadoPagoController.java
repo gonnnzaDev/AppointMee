@@ -6,13 +6,13 @@ import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
 @RequestMapping("/pagos")
 public class MercadoPagoController {
-
 
 
     private final MercadoPagoService mpService;
@@ -23,19 +23,36 @@ public class MercadoPagoController {
     }
 
 
+
     /// ENDPOINTS
 
 
+
+    @PreAuthorize("hasRole('CLIENTE')")
     @PostMapping("/preferencia/{turnoId}")
-    public ResponseEntity<?> realizarPago(@PathVariable("turnoId") Integer turnoId,
-                                          HttpSession sesion) throws MPException, MPApiException {
-      try {
-          return ResponseEntity.ok().body(mpService.pagar(turnoId));
-      }catch (MPException e1){
-          return ResponseEntity.status(500).body("Error mp1");  // test
-      }catch (MPApiException e2){
-          return ResponseEntity.status(500).body("Error mp2");  // test
-      }
+    public ResponseEntity<?> realizarPago(@PathVariable("turnoId") Integer turnoId
+    ) throws MPException, MPApiException {
+
+        try {
+            return ResponseEntity.ok().body(mpService.pagar(turnoId));
+        } catch (MPException e1) {
+            return ResponseEntity.status(500).body("Error mp1");  // test
+        } catch (MPApiException e2) {
+            return ResponseEntity.status(500).body("Error mp2");  // test
+        }
+    }
+
+
+    @PostMapping("/webhook")
+    public ResponseEntity<?> webhook(
+            @RequestParam(required = false) String topic,
+            @RequestParam(required = false) String id) {
+
+        System.out.println("Webhook recibido");
+        System.out.println("Topic: " + topic);
+        System.out.println("ID: " + id);
+
+        return ResponseEntity.ok().build();
     }
 
 

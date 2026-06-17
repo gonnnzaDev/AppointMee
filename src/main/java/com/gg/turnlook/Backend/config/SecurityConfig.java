@@ -54,6 +54,7 @@ public class SecurityConfig {
                                 "/usuarios/inicio-sesion",
                                 "/usuarios/recuperar-cuenta",
                                 "/usuarios/crear",
+                                "/pagos/preferencia/{turnoId}", // prueba rapida fast flash
 
                                 // para swagger
                                 "/v3/api-docs/**",

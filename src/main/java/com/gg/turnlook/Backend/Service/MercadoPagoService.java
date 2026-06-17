@@ -60,7 +60,10 @@ public class MercadoPagoService {
         items.add(item);
 
         PreferenceRequest preferenceRequest = PreferenceRequest.builder()
-                .items(items).build();
+                .items(items)
+                .externalReference(turno.getId().toString())
+                .notificationUrl("https://appointmee-vcs2.onrender.com/pagos/webhook")
+                .build();
 
         PreferenceClient client = new PreferenceClient();
         Preference preference = client.create(preferenceRequest);
