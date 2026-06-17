@@ -31,8 +31,8 @@ public class ServicioController {
     /// ENDPOINTS
 
 
-    // ver si saco empleado
-    @PreAuthorize("hasAnyRole('EMPLEADO','EMPLEADOR')")
+
+    @PreAuthorize("hasRole('EMPLEADOR')")
     @PostMapping("/crear")
     public ResponseEntity<?> crearServicio(@Valid @RequestBody ServicioCrearDTO servicio,
                                            @AuthenticationPrincipal String userEmail) {
@@ -42,8 +42,8 @@ public class ServicioController {
     }
 
 
-    // ver si saco empleado
-    @PreAuthorize("hasAnyRole('EMPLEADO','EMPLEADOR')")
+
+    @PreAuthorize("hasRole('EMPLEADOR')")
     @PatchMapping("/modificar/{servicioId}")
     public ResponseEntity<?> modificarServicio(@PathVariable("servicioId") Integer servicioId,
                                                @Valid @RequestBody ServicioModificarDTO servicio,
@@ -54,8 +54,7 @@ public class ServicioController {
     }
 
 
-    // ver si admin tmb pero no creo
-    @PreAuthorize("hasRole('EMPLEADOR')")
+    @PreAuthorize("hasRole('ADMINISTRADOR','EMPLEADOR')")
     @DeleteMapping("/eliminar/{servicioId}")
     public ResponseEntity<?> eliminarServicio(@PathVariable("servicioId") Integer servicioId,
                                               @AuthenticationPrincipal String empleadorEmail) {

@@ -14,17 +14,24 @@ import java.util.Optional;
 public interface SucursalRepository extends JpaRepository<Sucursal, Integer> {
 
 
-
     List<Sucursal> findByActivoTrue();
 
+
     boolean existsByDireccionIgnoreCase(String direccion);
+
 
     List<Sucursal> findByNombreContainingIgnoreCaseAndCategoriaCategoriaAndActivoTrue(
             String nombre, ECategoria categoria);
 
+
     List<Sucursal> findByNombreContainingIgnoreCaseAndActivoTrue(String nombre);
 
+
     List<Sucursal> findByCategoriaCategoriaAndActivoTrue(ECategoria categoria);
+
+
+    List<Sucursal> findByEmpleadorEmailAndActivoTrue(String empleadorEmail);
+
 
 }
 

@@ -125,6 +125,15 @@ public class SucursalController {
     }
 
 
+    @PreAuthorize("hasRole('EMPLEADOR')")
+    @GetMapping("/listar/propias")
+    public ResponseEntity<?> listarSucursalesPropias(
+            @AuthenticationPrincipal String empleadorEmail) {
+
+        return ResponseEntity.ok().body(sucursalService.listarSucursalesPropias(empleadorEmail));
+    }
+
+
     @GetMapping("/{sucursalId}")
     public ResponseEntity<?> sucursalPorId(@PathVariable("sucursalId") Integer sucursalId) {
 
@@ -172,7 +181,7 @@ public class SucursalController {
 
 
     @GetMapping("/categorias")
-    public ResponseEntity<?> listarCategorias(){
+    public ResponseEntity<?> listarCategorias() {
 
         return ResponseEntity.ok().body(ECategoria.values());
     }

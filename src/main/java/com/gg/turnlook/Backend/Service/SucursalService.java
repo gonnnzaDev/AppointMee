@@ -315,6 +315,20 @@ public class SucursalService {
     }
 
 
+    public List<SucursalMiniDTO> listarSucursalesPropias(String empleadorEmail){
+
+        return sucRepo.findByEmpleadorEmailAndActivoTrue(empleadorEmail)
+                .stream()
+                .map(suc -> new SucursalMiniDTO(suc.getId(), suc.getNombre(),
+                        suc.getCategoria().getCategoria().name(),
+                        suc.getFotoPerfil().getFotoValida(),
+                        reseniaService.getPuntuacionPromedioSucursal(suc.getId()),
+                        reseniaService.getPuntuacionesTotalesSucursal(suc.getId()))
+                )
+                .toList();
+    }
+
+
     public Sucursal listarSucursalPorId(Integer id) {
         return sucRepo.findById(id).
                 orElseThrow(() -> new NotFoundException("No se encontró la sucursal"));
