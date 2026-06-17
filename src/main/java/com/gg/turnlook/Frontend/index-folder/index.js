@@ -1,9 +1,28 @@
 import { authHeaders, sesionActiva } from "../recursos/modulos.js";
 
+let buscadorConectado = false;
+
 const u = await sesionActiva();
 
+const parametrosUrl = new URLSearchParams(window.location.search);
+const busquedaInicial = parametrosUrl.get("busqueda") || "";
+
 categoriasDisponibles();
-renderSucursales();
+
+if (busquedaInicial) {
+    filtrarPorNombre(busquedaInicial);
+} else {
+    renderSucursales();
+}
+
+document.addEventListener("navbar:ready", (e) => {
+    iniciarBuscador(busquedaInicial, e.detail.input);
+});
+
+const inputYaExistente = document.getElementById("search-input");
+if (inputYaExistente) {
+    iniciarBuscador(busquedaInicial, inputYaExistente);
+}
 
 
 
@@ -25,7 +44,7 @@ function renderListaSucursales(sucursales) {
                     <img src="${sucursal.fotoPerfil || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQPQenKJTzexez3E1uN7qtSwZ8tgPQsVJ9DQ&s'}">
                     <div class="turn-content">
                         <h2>${sucursal.nombre}</h2>
-                        <p>${sucursal.descripcion}</p>
+                        <p>${sucursal.categoria}</p>
                     </div>
                 </article>
             </a>
@@ -59,6 +78,59 @@ async function filtrarPorCategoria(categoria) {
     } catch (error) {
         alert(error.message);
     }
+}
+
+async function filtrarPorNombre(texto) {
+    try {
+        const parametros = new URLSearchParams();
+        if (texto) parametros.append("nombre", texto);
+
+        const response = await fetch(
+            `http://localhost:8080/sucursales/listar/filtrar?${parametros.toString()}`,
+            { headers: authHeaders() }
+        );
+        if (!response.ok) throw new Error(`Error ${response.status}`);
+        const sucursales = await response.json();
+        renderListaSucursales(sucursales);
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+function iniciarBuscador(valorInicial, input) {
+    if (buscadorConectado) return;
+
+    if (!input) {
+        input = document.getElementById("search-input");
+    }
+    if (!input) return;
+
+    buscadorConectado = true;
+
+    if (valorInicial) {
+        input.value = valorInicial;
+    }
+
+    input.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter") return;
+        e.preventDefault();
+
+        const texto = input.value.trim();
+
+        const url = new URL(window.location.href);
+        if (texto) {
+            url.searchParams.set("busqueda", texto);
+        } else {
+            url.searchParams.delete("busqueda");
+        }
+        window.history.replaceState({}, "", url);
+
+        if (texto) {
+            filtrarPorNombre(texto);
+        } else {
+            renderSucursales();
+        }
+    });
 }
 
 

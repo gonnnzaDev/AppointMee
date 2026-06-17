@@ -26,7 +26,7 @@ if (!sucursalId) {
     renderPaso1();
 }
 
-function renderPaso1() {
+function renderPaso2() {
     const c = document.getElementById("agendarTurno-container");
     c.innerHTML = `
         <div class="agendarTurno-info">
@@ -35,11 +35,23 @@ function renderPaso1() {
                 <p class="turno-sin-dia">Cargando profesionales…</p>
             </div>
             <div class="info-seleccionada" id="info-seleccionada"></div>
-            <button class="btn-proceso" id="btn-sig-1" disabled>Siguiente →</button>
+            <button class="btn-proceso" id="volver">Volver</button>
+            <button class="btn-proceso" id="siguiente" disabled>Siguiente</button>
+
         </div>`;
 
     cargarEmpleados();
-    document.getElementById("btn-sig-1").addEventListener("click", renderPaso2);
+
+    document.getElementById("volver").addEventListener("click", () => {
+        renderPaso1();
+    });
+
+    document.getElementById("siguiente").addEventListener("click", () => {
+
+        renderPaso3();
+
+    });
+
 }
 
 async function cargarEmpleados() {
@@ -64,7 +76,9 @@ async function cargarEmpleados() {
                      alt="Foto de ${e.nombre}"
                      onerror="this.src='${IMG_FALLBACK}'">
                 <p class="empleado-nombre">${e.nombre} ${e.apellido}</p>
-                <p class="empleado-valoracion">⭐ ${e.puntuacion ?? "–"} (${e.cantidadPuntuaciones ?? 0})</p>
+                <p class="empleado-valoracion">
+                    🐝:${e.puntuacion ? "🐝".repeat(Math.round(e.puntuacion)) : ""} 
+                </p>
             </article>`).join("");
 
     } catch (err) {
@@ -72,6 +86,7 @@ async function cargarEmpleados() {
         if (contenedor) contenedor.innerHTML = `<p class="turno-sin-dia">No se pudieron cargar los profesionales.</p>`;
     }
 }
+
 
 window.seleccionarEmpleado = function (id, el) {
     document.querySelectorAll(".empleado-article").forEach(a =>
@@ -81,8 +96,7 @@ window.seleccionarEmpleado = function (id, el) {
     empleadoSeleccionado = {
         id,
         nombre: el.querySelector(".empleado-nombre")?.textContent ?? "",
-        imagen: el.querySelector("img")?.src ?? IMG_FALLBACK,
-        puntuacion: el.querySelector(".empleado-valoracion")?.textContent ?? ""
+        imagen: el.querySelector("img")?.src ?? IMG_FALLBACK
     };
 
     const info = document.getElementById("info-seleccionada");
@@ -90,13 +104,12 @@ window.seleccionarEmpleado = function (id, el) {
         <img src="${empleadoSeleccionado.imagen}"
              alt="${empleadoSeleccionado.nombre}"
              onerror="this.src='${IMG_FALLBACK}'">
-        <h3>${empleadoSeleccionado.nombre}</h3>
-        <p>${empleadoSeleccionado.puntuacion}</p>`;
+        <h3>${empleadoSeleccionado.nombre}</h3>`;
 
-    document.getElementById("btn-sig-1").disabled = false;
+    document.getElementById("siguiente").disabled = false;
 };
 
-function renderPaso2() {
+function renderPaso1() {
     const c = document.getElementById("agendarTurno-container");
     c.innerHTML = `
         <div class="agendarTurno-info">
@@ -104,13 +117,15 @@ function renderPaso2() {
             <div class="servicios-container" id="servicios-container">
                 <p class="turno-sin-dia">Cargando servicios…</p>
             </div>
-            <button class="btn-proceso btn-proceso--secundario" id="btn-volver-1">← Volver</button>
-            <button class="btn-proceso" id="btn-sig-2" disabled>Siguiente →</button>
+            <button class="btn-proceso btn-proceso--secundario" id="volver">Volver</button>
+            <button class="btn-proceso" id="siguiente" disabled>Siguiente</button>
         </div>`;
 
     cargarServicios();
-    document.getElementById("btn-volver-1").addEventListener("click", renderPaso1);
-    document.getElementById("btn-sig-2").addEventListener("click", renderPaso3);
+    document.getElementById("siguiente").addEventListener("click", renderPaso2);
+    document.getElementById("volver").addEventListener("click", () => {
+        history.go(-1);
+    });
 }
 
 async function cargarServicios() {
@@ -135,7 +150,9 @@ async function cargarServicios() {
                      alt="${s.nombre}"
                      onerror="this.src='${IMG_FALLBACK}'">
                 <p class="empleado-nombre">${s.nombre}</p>
-                <p class="empleado-valoracion">⏱ ${s.duracion} min &nbsp;|&nbsp; ⭐ ${s.puntuacion ?? "–"}</p>
+                <p class="empleado-valoracion">
+                    ⏱ ${s.duracion} min 
+                </p>
             </article>`).join("");
 
     } catch (err) {
@@ -150,7 +167,7 @@ window.seleccionarServicio = function (id, el, nombre) {
     el.classList.add("empleado-article--seleccionado");
 
     servicioSeleccionado = { id, nombre };
-    document.getElementById("btn-sig-2").disabled = false;
+    document.getElementById("siguiente").disabled = false;
 };
 
 function escapar(str) {
@@ -206,8 +223,8 @@ function renderPaso3() {
                 </div>
 
                 <div class="turno-footer">
-                    <button class="btn-proceso btn-proceso--secundario" id="btn-volver-2">← Volver</button>
-                    <button class="turno-btn-siguiente" id="btn-sig-3" disabled>
+                    <button class="btn-proceso btn-proceso--secundario" id="volver">Volver</button>
+                    <button class="turno-btn-siguiente" id="siguiente" disabled>
                         Confirmar turno <span>→</span>
                     </button>
                 </div>
@@ -222,8 +239,8 @@ function renderPaso3() {
         if (++vistaMes > 11) { vistaMes = 0; vistaYear++; }
         renderCalendario();
     });
-    document.getElementById("btn-volver-2").addEventListener("click", renderPaso2);
-    document.getElementById("btn-sig-3").addEventListener("click", confirmarTurno);
+    document.getElementById("volver").addEventListener("click", renderPaso2);
+    document.getElementById("siguiente").addEventListener("click", confirmarTurno);
 
     cargarDisponibilidad();
 }
@@ -296,7 +313,7 @@ function seleccionarDia(d, m, y) {
     fechaHoraSeleccionada = null;
 
     const resumen = document.getElementById("turno-resumen");
-    const btnSig = document.getElementById("btn-sig-3");
+    const btnSig = document.getElementById("siguiente");
     if (resumen) resumen.style.display = "none";
     if (btnSig) btnSig.disabled = true;
 
@@ -341,8 +358,7 @@ function renderHorarios() {
             document.getElementById("turno-resumen-texto").innerHTML =
                 `Turno: <strong>${d} de ${MESES[m]} de ${y}</strong> a las <strong>${label} hs</strong>`;
             document.getElementById("turno-resumen").style.display = "flex";
-            document.getElementById("btn-sig-3").disabled = false;
-
+            document.getElementById("siguiente").disabled = false;
             renderHorarios();
         });
         grid.appendChild(btn);

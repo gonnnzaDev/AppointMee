@@ -42,68 +42,106 @@ async function renderPerfil(usuario) {
 
     }
 }
-
 function renderOpciones(usuario) {
 
     const infoAccountDiv = document.getElementById("info-account");
 
-    if (infoAccountDiv) {
+    if (!infoAccountDiv) return;
 
-        infoAccountDiv.innerHTML = `
-    <div class="funcionalidad-perfil-container">
-    <div class="funcionalidad-perfil" id="funcionalidadPerfil">
-    <button id="btn-eliminar-perfil">Eliminar Cuenta</button>
-    <button id="btn-editar-perfil">Editar</button>
-    <button id="btn-volver-perfil">Volver</button>
-    <div id="dependiendo-rol">
-    </div>
+    infoAccountDiv.innerHTML = `
+        <div class="funcionalidad-perfil-container">
+            <div class="funcionalidad-perfil" id="funcionalidadPerfil">
+                <button id="btn-volver-perfil">Volver</button>
+                <div id="dependiendo-rol"></div>
             </div>
-            </div>
-    
-
+        </div>
     `;
 
-        const eliminar = document.getElementById("btn-eliminar-perfil");
-        const editar = document.getElementById("btn-editar-perfil");
-        const volver = document.getElementById("btn-volver-perfil");
-        const containerrol = document.getElementById("dependiendo-rol");
+console.log(usuario);
 
-        if (!containerrol) return;
-        /*
-                if(usuario.roles =="xd")
-                containerrol.innerHTML = `
-                <button id="btn-ejemplo-perfil">Ejemplo</button>
-                 `;
-        */
+    const containerrol = document.getElementById("dependiendo-rol");
 
-        volver.addEventListener('click', () => {
-            renderPerfil(usuario);
+    let html = "";
 
+    if (usuario.roles.includes("ADMINISTRADOR")) {
+        html += `
+            <button id="btn-modo-admin">
+                Panel Administrador
+            </button>
+        `;
+    }
+
+    if (usuario.roles.includes("CLIENTE") && !usuario.roles.includes("ADMINISTRADOR") && !usuario.roles.includes("EMPLEADOR") ) {
+        html += `
+            <button id="btn-eliminar-perfil">
+                Eliminar Cuenta
+            </button>
+
+            <button id="btn-editar-perfil">
+                Editar
+            </button>
+        `;
+    }
+
+    if (usuario.roles.includes("EMPLEADOR")) {
+        html += `
+            <button id="btn-modo-empleador">
+                Panel Empleador
+            </button>
+        `;
+    }
+
+    containerrol.innerHTML = html;
+
+    const volver = document.getElementById("btn-volver-perfil");
+    const eliminar = document.getElementById("btn-eliminar-perfil");
+    const editar = document.getElementById("btn-editar-perfil");
+    const modoEmpleador = document.getElementById("btn-modo-empleador");
+    const modoAdmin = document.getElementById("btn-modo-admin");
+
+    volver.addEventListener("click", () => {
+        renderPerfil(usuario);
+    });
+
+    if (modoEmpleador) {
+        modoEmpleador.addEventListener("click", () => {
+            window.location.href = "../empleador-folder/empleador.html";
         });
+    }
 
-
-        editar.addEventListener('click', () => {
-            rendferModificar();
-
-
+    if (modoAdmin) {
+        modoAdmin.addEventListener("click", () => {
+            window.location.href = "../admin-folder/admin.html";
         });
-        eliminar.addEventListener('click', async () => {
+    }
 
+    if (editar) {
+        editar.addEventListener("click", () => {
+            renderModificar(usuario);
+        });
+    }
+
+    if (eliminar) {
+        eliminar.addEventListener("click", async () => {
+
+            const confirmar = confirm(
+                "¿Estás seguro de que querés eliminar tu cuenta?"
+            );
+
+            if (!confirmar) return;
 
             const rta = await eliminarCuenta();
 
-
-            if (rta) { alert("Eliminacion Realizada con exito") }
-            else { alert("No se pudo eliminar") }
-
+            if (rta) {
+                alert("Eliminación realizada con éxito");
+            } else {
+                alert("No se pudo eliminar la cuenta");
+            }
         });
-
-
-
     }
 }
 
-function rendferModificar() {
+function renderModificar(usuario) {
     const infoAccountDiv = document.getElementById("funcionalidadPerfil");
 
     infoAccountDiv.innerHTML = `
@@ -133,7 +171,14 @@ function rendferModificar() {
            minlength="8"
            maxlength="67">
 </div>
-
+<div class="input-group mb-1">
+    <input type="password"
+           class="form-control"
+           placeholder="Repetir Contraseña "
+           id="password-confirm-input"
+           minlength="8"
+           maxlength="67">
+</div>
 <div class="input-group mb-1">
     <input type="email"
            class="form-control"
@@ -149,31 +194,32 @@ function rendferModificar() {
            placeholder="URL de foto de perfil"
            id="foto-url-input">
 </div>
-<button id="cancelar">Cancelar</button>
+<button id="cancelar">Volver</button>
 <button id="modificar">Modificar</button>
             `;
+
+
+    const cancelar = document.getElementById("cancelar");
+    const modificar = document.getElementById("modificar");
+
+
+    cancelar.addEventListener('click', () => {
+
+        renderOpciones(usuario);
+
+    });
+
+
+    modificar.addEventListener('click', () => {
+
+        console.log();
+
+        modificarUsuario(usuario.id);
+
+    });
+
+
 }
-
-const cancelar = document.getElementById("cancelar");
-const modificar = document.getElementById("modificar");
-
-cancelar.addEventListener('click', () => {
-
-    window.location.href = "../login-folder/Login.html";
-
-
-
-});
-
-
-modificar.addEventListener('click', () => {
-
-    console.log();
-
-    modificarUsuario(usuario.id);
-
-});
-
 
 
 async function modificarUsuario(id) {
@@ -184,11 +230,29 @@ async function modificarUsuario(id) {
         const password = document.getElementById("password-input").value.trim();
         const email = document.getElementById("email-input").value.trim();
         const fotoUrl = document.getElementById("foto-url-input").value.trim();
+        const password2 = document.getElementById("password-confirm-input").value.trim();
 
         const body = {};
 
+        if (
+            nombre === "" &&
+            apellido === "" &&
+            email === "" &&
+            fotoUrl === "" &&
+            password2 === "" &&
+            password === ""
+        ) {
+            alert("Tenes que poner algo en los campos");
+            return;
+        }
+
         if (nombre) body.nombre = nombre;
         if (apellido) body.apellido = apellido;
+        if (password !== password2) {
+
+            alert("Las contraseñas no son iguales");
+            return;
+        }
         if (password) body.password = password;
         if (email) body.email = email;
         if (fotoUrl) body.fotoUrl = fotoUrl;
@@ -196,6 +260,8 @@ async function modificarUsuario(id) {
         const response = await fetch(
             `http://localhost:8080/usuarios/modificar/${id}`,
             {
+                method: "PATCH",
+                body: JSON.stringify(body),
                 headers: authHeaders(),
             }
         );
