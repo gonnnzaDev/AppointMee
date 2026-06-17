@@ -51,10 +51,32 @@ public class SecurityConfig {
                         cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/redireccion.js",
+                                "/admin-folder/**",
+                                "/configuracion-folder/**",
+                                "/creditos-folder/**",
+                                "/detalle-mis-turnos-folder/**",
+                                "/empleador-folder/**",
+                                "/error-folder/**",
+                                "/formularioempleador-transformarse-folder/**",
+                                "/index-folder/**",
+                                "/login-folder/**",
+                                "/misturnos-folder/**",
+                                "/pago-folder/**",
+                                "/PerdisteCuenta-folder/**",
+                                "/perfil-folder/**",
+                                "/recursos/**",
+                                "/register-folder/**",
+                                "/sucursal-folder/**",
+                                "/turnos-folder/**",
+
                                 "/usuarios/inicio-sesion",
                                 "/usuarios/recuperar-cuenta",
                                 "/usuarios/crear",
-                                "/pagos/preferencia/{turnoId}", // prueba rapida fast flash
+
+                                "/pagos/preferencia/**", // prueba rapida fast flash
 
                                 // para swagger
                                 "/v3/api-docs/**",
@@ -76,7 +98,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("http://127.0.0.1:3000"));
+        config.setAllowedOrigins(List.of("http://127.0.0.1:3000",
+                "https://appointmee-vcs2.onrender.com"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
