@@ -185,6 +185,10 @@ public class TurnoService {
             throw new ConflictException("El turno no está pendiente");
         }
 
+        if(turno.getFechaHora().isAfter(LocalDateTime.now())) {
+            throw new ConflictException("El turno no pasó todavia");
+        }
+
         turno.setEstado(EstadoTurno.REALIZADO);
         turnoRepo.save(turno);
     }
