@@ -185,7 +185,7 @@ public class TurnoService {
             throw new ConflictException("El turno no está pendiente");
         }
 
-        if(turno.getFechaHora().isAfter(LocalDateTime.now())) {
+        if (turno.getFechaHora().isAfter(LocalDateTime.now())) {
             throw new ConflictException("El turno no pasó todavia");
         }
 
@@ -239,7 +239,7 @@ public class TurnoService {
 
         ReseniaResponseDTO resenia = null;
 
-        if(t.getResenia() != null){
+        if (t.getResenia() != null) {
             Resenia r = t.getResenia();
             resenia = new ReseniaResponseDTO(
                     r.getPuntuacion(), r.getComentario(), r.getFechaResenia());
@@ -287,7 +287,7 @@ public class TurnoService {
 
         ReseniaResponseDTO resenia = null;
 
-        if(t.getResenia() != null){
+        if (t.getResenia() != null) {
             Resenia r = t.getResenia();
             resenia = new ReseniaResponseDTO(
                     r.getPuntuacion(), r.getComentario(), r.getFechaResenia());
@@ -313,7 +313,8 @@ public class TurnoService {
             throw new ForbiddenException("No tenes permisos");
         }
 
-        if (turno.getEstado() != EstadoTurno.REALIZADO) {
+        if (turno.getEstado() != EstadoTurno.REALIZADO &&
+                turno.getEstado() != EstadoTurno.CANCELADO) {
             throw new ConflictException("Solo se pueden reseñar turnos finalizados");
         }
 
@@ -325,9 +326,9 @@ public class TurnoService {
     }
 
 
-    public void setearPagoRechazado(Integer turnoId){
+    public void setearPagoRechazado(Integer turnoId) {
 
-        Turno turno =  listarTurnoPorId(turnoId);
+        Turno turno = listarTurnoPorId(turnoId);
         turno.setEstado(EstadoTurno.PAGO_RECHAZADO);
         turnoRepo.save(turno);
     }
