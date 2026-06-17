@@ -7,6 +7,7 @@ import com.mercadopago.exceptions.MPException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -30,11 +31,12 @@ public class MercadoPagoController {
 
     @PreAuthorize("hasRole('CLIENTE')")
     @PostMapping("/{turnoId}")
-    public ResponseEntity<?> realizarPago(@PathVariable("turnoId") Integer turnoId
+    public ResponseEntity<?> realizarPago(@PathVariable("turnoId") Integer turnoId,
+                                          @AuthenticationPrincipal String clienteEmail
     ) throws MPException, MPApiException {
 
         try {
-            return ResponseEntity.ok().body(mpService.pagar(turnoId));
+            return ResponseEntity.ok().body(mpService.pagar(turnoId, clienteEmail));
         } catch (MPException e1) {
             return ResponseEntity.status(500).body("Error mp1");  // test
         } catch (MPApiException e2) {

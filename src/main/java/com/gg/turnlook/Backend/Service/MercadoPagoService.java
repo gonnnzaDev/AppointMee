@@ -3,6 +3,8 @@ package com.gg.turnlook.Backend.Service;
 
 
 import com.gg.turnlook.Backend.Enum.EstadoTurno;
+import com.gg.turnlook.Backend.Excepciones.ConflictException;
+import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
 import com.gg.turnlook.Backend.Model.Servicio;
 import com.gg.turnlook.Backend.Model.Turno;
 import com.mercadopago.MercadoPagoConfig;
@@ -44,11 +46,21 @@ public class MercadoPagoService {
     /// METODOS
 
 
-    public String pagar(Integer turnoId) throws MPException, MPApiException {
+    public String pagar(Integer turnoId, String clienteEmail)
+            throws MPException, MPApiException {
 
         MercadoPagoConfig.setAccessToken(tokenMp);
 
         Turno turno = turnoService.listarTurnoPorId(turnoId);
+
+        if(!turno.getCliente().getEmail().equals(clienteEmail)){
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        if(turno.getEstado() != EstadoTurno.PENDIENTE){
+            throw new ConflictException("Solo se pueden pagar turnos pendientes");
+        }
+
         Servicio servicio = turno.getServicio();
 
         PreferenceItemRequest item = PreferenceItemRequest.builder()
