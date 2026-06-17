@@ -2,7 +2,6 @@ import { authHeaders, sesionActiva } from "../recursos/modulos.js";
 
 const usuariosBody = document.getElementById("usuariosBody");
 const sucursalesBody = document.getElementById("sucursalesBody");
-const serviciosBody = document.getElementById("serviciosBody");
 
 const user = await sesionActiva();
 
@@ -14,15 +13,13 @@ await render();
 
 async function render() {
 
-    const [usuarios, sucursales, servicios] = await Promise.all([
+    const [usuarios, sucursales] = await Promise.all([
         buscarUsuarios(),
-        buscarSucursales(),
-        buscarServicios()
+        buscarSucursales()
     ]);
 
     renderUsuarios(usuarios);
     renderSucursales(sucursales);
-    renderServicios(servicios);
 
 }
 
@@ -78,31 +75,6 @@ function renderSucursales(lista) {
 
 }
 
-function renderServicios(lista) {
-
-    serviciosBody.innerHTML = "";
-
-    lista.forEach(s => {
-
-        serviciosBody.innerHTML += `
-            <tr>
-                <td>${s.nombre}</td>
-                <td>${s.descripcion}</td>
-                <td>${s.duracion}</td>
-                <td>${s.precio}</td>
-                <td>
-                    <button
-                        class="btn btn-danger eliminar-servicio"
-                        data-id="${s.id}">
-                        Eliminar
-                    </button>
-                </td>
-            </tr>
-        `;
-    });
-
-}
-
 async function buscarUsuarios() {
 
     try {
@@ -113,6 +85,8 @@ async function buscarUsuarios() {
                 headers: authHeaders()
             }
         );
+
+        if (!response.ok) return [];
 
         return await response.json();
 
@@ -135,31 +109,7 @@ async function buscarSucursales() {
             }
         );
 
-        return await response.json();
-
-    } catch {
-
-        return [];
-
-    }
-
-}
-
-async function buscarServicios() {
-
-    try {
-
-        const response = await fetch(
-            "/servicios/listar",
-            {
-                headers: authHeaders()
-            }
-        );
-
-        if (!response.ok) {
-            console.error(response.status);
-            return [];
-        }
+        if (!response.ok) return [];
 
         return await response.json();
 
@@ -179,66 +129,51 @@ document.addEventListener("click", async e => {
 
     if (e.target.classList.contains("eliminar-usuario")) {
 
-        if (!confirm("Eliminar usuario?")) return;
+        if (!confirm("¿Eliminar usuario?")) return;
 
         await fetch(`/usuarios/${id}`, {
             method: "DELETE",
             headers: authHeaders()
         });
 
-        render();
-    }
-
-    if (e.target.classList.contains("eliminar-servicio")) {
-
-        if (!confirm("Eliminar servicio?")) return;
-
-        await fetch(`/servicios/${id}`, {
-            method: "DELETE",
-            headers: authHeaders()
-        });
-
-        render();
+        await render();
     }
 
     if (e.target.classList.contains("eliminar-sucursal")) {
 
-        if (!confirm("Eliminar sucursal?")) return;
+        if (!confirm("¿Eliminar sucursal?")) return;
 
         await fetch(`/sucursales/${id}`, {
             method: "DELETE",
             headers: authHeaders()
         });
 
-        render();
+        await render();
     }
 
 });
 
 function activarBuscador(inputId, tbodyId) {
 
-    document
-        .getElementById(inputId)
-        .addEventListener("input", function () {
+    const input = document.getElementById(inputId);
 
-            const texto = this.value.toLowerCase();
+    input.addEventListener("input", () => {
 
-            document
-                .querySelectorAll(`#${tbodyId} tr`)
-                .forEach(tr => {
+        const texto = input.value.toLowerCase();
 
-                    tr.style.display =
-                        tr.innerText
-                            .toLowerCase()
-                            .includes(texto)
-                            ? ""
-                            : "none";
-                });
+        document
+            .querySelectorAll(`#${tbodyId} tr`)
+            .forEach(tr => {
 
-        });
+                tr.style.display =
+                    tr.textContent.toLowerCase().includes(texto)
+                        ? ""
+                        : "none";
+            });
+
+    });
 
 }
 
 activarBuscador("buscarUsuario", "usuariosBody");
-activarBuscador("buscarServicio", "serviciosBody");
 activarBuscador("buscarSucursal", "sucursalesBody");
