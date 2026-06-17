@@ -60,7 +60,7 @@ function renderSucursales(sucursales) {
     body.innerHTML = "";
 
     if (!sucursales.length) {
-        body.innerHTML = `<tr><td colspan="6" style="color:var(--dk-text-3);font-family:var(--font-mono);font-size:12px;">Sin sucursales</td></tr>`;
+        body.innerHTML = `<tr><td colspan="4" style="color:var(--dk-text-3);font-family:var(--font-mono);font-size:12px;">Sin sucursales</td></tr>`;
         return;
     }
 
@@ -68,10 +68,8 @@ function renderSucursales(sucursales) {
         const tr = document.createElement("tr");
         tr.innerHTML = `
             <td>${s.nombre}</td>
-            <td>${s.direccion}</td>
-            <td>${s.telefono ?? "-"}</td>
             <td>${s.categoria}</td>
-            <td>${s.horaApertura} – ${s.horaCierre}</td>
+            <td>🐝 ${s.puntuacion ?? 'Sin calificar'} (${s.cantidadPuntuaciones ?? 0})</td>
             <td>
                 <div class="table-actions">
                     <button onclick="abrirModalModificarSucursal(${s.id})">Editar</button>
@@ -126,7 +124,7 @@ async function cargarServicios(sucursalId) {
         const servicios = await res.json();
 
         if (!servicios.length) {
-            body.innerHTML = `<tr><td colspan="5" style="color:var(--dk-text-3);font-family:var(--font-mono);font-size:12px;">Sin servicios</td></tr>`;
+            body.innerHTML = `<tr><td colspan="3" style="color:var(--dk-text-3);font-family:var(--font-mono);font-size:12px;">Sin servicios</td></tr>`;
             return;
         }
 
@@ -134,9 +132,7 @@ async function cargarServicios(sucursalId) {
             const tr = document.createElement("tr");
             tr.innerHTML = `
                 <td>${s.nombre}</td>
-                <td>${s.descripcion}</td>
                 <td>${s.duracion} min</td>
-                <td>$${s.precio}</td>
                 <td>
                     <div class="table-actions">
                         <button onclick="abrirModalModificarServicio(${s.id})">Editar</button>
@@ -181,21 +177,17 @@ async function cargarTurnos(sucursalId) {
         const turnos = await res.json();
 
         if (!turnos.length) {
-            body.innerHTML = `<tr><td colspan="6" style="color:var(--dk-text-3);font-family:var(--font-mono);font-size:12px;">Sin turnos</td></tr>`;
+            body.innerHTML = `<tr><td colspan="4" style="color:var(--dk-text-3);font-family:var(--font-mono);font-size:12px;">Sin turnos</td></tr>`;
             return;
         }
 
         turnos.forEach(t => {
             const fecha = new Date(t.fechaTurno).toLocaleString("es-AR");
-            const cliente = t.cliente ? `${t.cliente.nombre} ${t.cliente.apellido}` : "-";
-            const empleado = t.empleado ? `${t.empleado.nombre} ${t.empleado.apellido}` : "-";
             const estado = t.estadoTurno ?? "-";
 
             const tr = document.createElement("tr");
             tr.innerHTML = `
                 <td>${t.nombreServicio ?? "-"}</td>
-                <td>${cliente}</td>
-                <td>${empleado}</td>
                 <td>${fecha}</td>
                 <td><span class="badge badge--blue">${estado}</span></td>
                 <td>
@@ -320,8 +312,15 @@ async function eliminarEmpleado(sucursalId, empleadoId) {
 
 
 async function abrirModalModificarSucursal(sucursalId) {
-    const suc = misSucursales.find(s => s.id === sucursalId);
-    if (!suc) return;
+    let suc;
+    try {
+        const res = await fetch(`/sucursales/${sucursalId}`, { headers: authHeaders() });
+        if (!res.ok) throw new Error(`Error ${res.status}`);
+        suc = await res.json();
+    } catch (e) {
+        alert("Error al cargar la sucursal: " + e.message);
+        return;
+    }
 
     const input = (id, val) => `
         <p>${id}</p>
