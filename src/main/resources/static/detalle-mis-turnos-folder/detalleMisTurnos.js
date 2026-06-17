@@ -6,6 +6,8 @@ if (!user) {
     window.location.href = "../login.html";
 }
 
+renderComentarios();
+
 const urlParams = new URLSearchParams(window.location.search);
 const turnoId = urlParams.get('id');
 
@@ -158,8 +160,31 @@ function volver(){
     window.location.href = "../misturnos-folder/MisTurnos.html";
 }
 
-
-
-
 document.getElementById("btn-volver")
 .addEventListener('click', volver);
+
+
+function renderComentarios(){
+
+    const container = document.getElementById('comentarios');
+
+    const turno = obtenerDetalleTurno();
+    if(turno.estado === 'CANCELADO' || turno.estado === 'REALIZADO'){
+
+    container.innerHTML = 
+    `    
+            <div class="form-group">
+                <label for="mensaje">Tu Mensaje / Comentario (Opcional):</label>
+                <textarea id="mensaje" placeholder="Contanos qué te pareció el servicio..."></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit" id="btn-guardar-resenia">Guardar Reseña</button>
+            </div>
+            `;
+
+    }
+
+
+
+}
