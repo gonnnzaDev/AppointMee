@@ -42,14 +42,14 @@ async function renderTurnos() {
     container.querySelectorAll(".btn-ver-detalle").forEach(btn => {
         btn.addEventListener("click", (e) => {
             const id = e.target.getAttribute("data-id");
-            window.location.href = `./detalleTurno/detalle.html?id=${id}`;
+            window.location.href = `../detalleTurno/detalle.html?id=${id}`;
         });
     });
 }
 
 function obtenerClaseBadge(estado) {
-    if (estado === 'CANCELADO') return 'badge--amber';
-    if (estado === 'PENDIENTE') return 'badge--red';
+    if (estado === 'CANCELADO') return 'badge--red';
+    if (estado === 'PENDIENTE') return 'badge--yellow';
     if (estado === 'CONFIRMADO') return 'badge--blue';
     if (estado === 'REALIZADO') return 'badge--green';
     return 'badge--cyan';
