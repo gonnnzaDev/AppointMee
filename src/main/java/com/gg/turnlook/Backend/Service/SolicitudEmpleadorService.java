@@ -149,7 +149,7 @@ public class SolicitudEmpleadorService {
     }
 
 
-    public SolicitudEmpleador listarSolicitudEmpleadorPorId(Integer solicitudId) {
+    private SolicitudEmpleador listarSolicitudEmpleadorPorId(Integer solicitudId) {
 
         return solicitudEmpleadorRepo.findById(solicitudId)
                 .orElseThrow(() -> new NotFoundException("No se encontró la solicitud"));
