@@ -77,7 +77,7 @@ async function cargarEmpleados() {
                      onerror="this.src='${IMG_FALLBACK}'">
                 <p class="empleado-nombre">${e.nombre} ${e.apellido}</p>
                 <p class="empleado-valoracion">
-                    🐝:${e.puntuacion ? "🐝".repeat(Math.round(e.puntuacion)) : ""} 
+                    C:${e.puntuacion ? "🐝".repeat(Math.round(e.puntuacion)) : ""} 
                 </p>
             </article>`).join("");
 

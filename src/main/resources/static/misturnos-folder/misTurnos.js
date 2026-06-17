@@ -9,37 +9,45 @@ document.getElementById("estados").addEventListener("change", () => {
 });
 
 async function renderTurnos() {
-
     const container = document.getElementById("info");
-
     if (!container) return;
 
     const estadoP = document.getElementById("estados").value;
-
     const turnosLista = await buscarMisTurnos();
 
-    container.innerHTML=``;
-
-    console.log(estadoP);
+    container.innerHTML = ``;
 
     turnosLista.forEach(turno => {
-        console.log(turno.estadoTurno);
+        const idActual = turno.id || turno.idTurno; 
 
         if (turno.estadoTurno == estadoP) {
             container.innerHTML += `
             <div class="turno-misTurnos">
-                <p>${turno.nombreServicio}</p>
+                <p><strong>${turno.nombreServicio}</strong></p>
                 <p>${turno.fechaTurno}</p>
-                <p>${turno.estadoTurno}</p>
-                <p>${turno.puntuacion}</p>
+                <p><span class="badge ${obtenerClaseBadge(turno.estadoTurno)}">${turno.estadoTurno}</span></p>
+                <p>⭐ ${turno.puntuacion || 'Sin calificar'}</p>
+                <button class="btn-submit btn-ver-detalle" data-id="${idActual}">Ver Detalle</button>
             </div>
         `;
         }
+    });
 
-
-
+    container.querySelectorAll(".btn-ver-detalle").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            const id = e.target.getAttribute("data-id");
+            window.location.href = `./detalleTurno/detalle.html?id=${id}`;
+        });
     });
 }
+
+function obtenerClaseBadge(estado) {
+    if (estado === 'PENDIENTE') return 'badge--amber';
+    if (estado === 'CONFIRMADO') return 'badge--blue';
+    if (estado === 'REALIZADO') return 'badge--green';
+    return 'badge--cyan';
+}
+
 
 async function buscarMisTurnos() {
     try {
