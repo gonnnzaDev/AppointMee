@@ -371,5 +371,65 @@ function renderHorarios() {
 async function confirmarTurno() {
     if (!empleadoSeleccionado || !servicioSeleccionado || !fechaHoraSeleccionada) return;
 
-    window.location.href = "../pago-folder/Pago.html";
+    const btnSiguiente = document.getElementById("siguiente");
+    if (btnSiguiente) btnSiguiente.disabled = true;
+
+    try {
+        const resCrear = await fetch(`/turnos/registrar`, {
+            method: "POST",
+            headers: authHeaders(),
+            body: JSON.stringify({
+                fechaHora: fechaHoraSeleccionada,
+                empleadoId: empleadoSeleccionado.id,
+                servicioId: servicioSeleccionado.id
+            })
+        });
+
+        const msg = await resCrear.text();
+
+        if (!resCrear.ok) {
+            alert(msg || `No se pudo reservar el turno (código ${resCrear.status})`);
+            if (btnSiguiente) btnSiguiente.disabled = false;
+            return;
+        }
+
+        const turnoId = await buscarTurnoRecienCreado();
+
+        if (!turnoId) {
+            alert("El turno se reservó, pero no se pudo identificar para continuar con el pago. Revisalo en Mis Turnos.");
+            window.location.href = "../misturnos-folder/MisTurnos.html";
+            return;
+        }
+
+        window.location.href = `../pago-folder/Pago.html?turnoId=${turnoId}`;
+
+    } catch (e) {
+        alert("Error al reservar el turno: " + e.message);
+        if (btnSiguiente) btnSiguiente.disabled = false;
+    }
+}
+
+async function buscarTurnoRecienCreado() {
+    try {
+        const res = await fetch(`/turnos/propios`, { headers: authHeaders() });
+        if (!res.ok) return null;
+
+        const turnos = await res.json();
+
+        const fechaBuscada = new Date(fechaHoraSeleccionada).getTime();
+
+        const candidatos = turnos.filter(t =>
+            t.nombreServicio === servicioSeleccionado.nombre &&
+            t.estadoTurno === "PENDIENTE" &&
+            new Date(t.fechaTurno).getTime() === fechaBuscada
+        );
+
+        if (!candidatos.length) return null;
+
+        candidatos.sort((a, b) => b.id - a.id);
+        return candidatos[0].id;
+
+    } catch (e) {
+        return null;
+    }
 }
