@@ -1,81 +1,65 @@
+import { authHeaders } from "../recursos/modulos.js";
+
 const usuariosBody = document.getElementById("usuariosBody");
 const sucursalesBody = document.getElementById("sucursalesBody");
 const serviciosBody = document.getElementById("serviciosBody");
 
 render();
 
-function render() {
+async function render() {
+    if (!usuariosBody || !sucursalesBody || !serviciosBody) return;
 
+    const [usuariosList, sucursalesList, serviciosList] = await Promise.all([
+        buscarUsuarios(),
+        buscarSucursales(),
+        buscarServicios()
+    ]);
 
-    if (!usuariosBody || !sucursalesBody || !serviciosBody) null;
-
-    const usuariosList = buscarUsuarios();
-    const sucursalesList = buscarSucursales();
-    const serviciosList = buscarServicios();
-
+    let usuariosHTML = "";
     usuariosList.forEach(u => {
-        usuariosBody.innerHTML = +
-            `
-            <th>${u.id}</th>
-            <th>${u.nombre}</th>
-            <th>${u.apellido}</th>
-            <th>${u.email}</th>
-            <th>${u.rol}</th>
-            <th>${u.estado}</th>
-            <th>${u.acciones}</th>
-
-
-    `;
+        usuariosHTML += `
+            <tr>
+                <td>${u.id}</td>
+                <td>${u.nombre}</td>
+                <td>${u.apellido}</td>
+                <td>${u.email}</td>
+                <td>${u.rol}</td>
+                <td>${u.estado}</td>
+                <td>${u.acciones || ''}</td>
+            </tr>`;
     });
+    usuariosBody.innerHTML = usuariosHTML;
 
+    let sucursalesHTML = "";
+    sucursalesList.forEach(s => {
+        sucursalesHTML += `
+            <tr>
+                <td>${s.nombre}</td>
+                <td>${s.categoria}</td>
+                <td>${s.puntuacion}</td>
+                <td>${s.cantidadPuntuaciones}</td>
+                <td><button id="eliminar" data-id="${s.id}">Eliminar</button>  </td>
+            </tr>`;
+    });
+    sucursalesBody.innerHTML = sucursalesHTML;
 
-    sucursalesList.forEach(u => {
-
-        sucursalesBody.innerHTML = +
-            `
-            <th>${u.nombre}</th>
-            <th>${u.descripcion}</th>
-            <th>${u.duracion}</th>
-            <th>${u.precio}</th>
-    `;
-    }
-
-    );
-
-
-    serviciosList.forEach(u => {
-        serviciosBody.innerHTML = +
-            `
-
-            <th>${u.nombre}</th>
-            <th>${u.direccion}</th>
-            <th>${u.telefono}</th>
-            <th>${u.categoria}</th>
-            <th>${u.horario}</th>
-    `;
-    }
-    )
-
-
-
-
+    let serviciosHTML = "";
+    serviciosList.forEach(ser => {
+        serviciosHTML += `
+            <tr>
+                <td>${ser.nombre}</td>
+                <td>${ser.descripcion}</td>
+                <td>${ser.duracion}</td>
+                <td>${ser.precio}</td>
+            </tr>`;
+    });
+    serviciosBody.innerHTML = serviciosHTML;
 }
 
-
-
-function buscarUsuarios() {
+async function buscarUsuarios() {
     try {
-        const response = await fetch(`http://localhost:8080/usuarios`,
-            {
-                headers: authHeaders()
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error(`Error ${response.status}`);
-        }
-
-
+        const response = await fetch("http://localhost:8080/usuarios/listar", { headers: authHeaders() });
+        if (!response.ok) throw new Error(`Error ${response.status}`);
         return await response.json();
     } catch (error) {
         alert(error.message);
@@ -83,19 +67,10 @@ function buscarUsuarios() {
     }
 }
 
-function buscarSucursales() {
+async function buscarSucursales() {
     try {
-        const response = await fetch(`http://localhost:8080/sucursales`,
-            {
-                headers: authHeaders()
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error(`Error ${response.status}`);
-        }
-
-
+        const response = await fetch("http://localhost:8080/sucursales/listar", { headers: authHeaders() });
+        if (!response.ok) throw new Error(`Error ${response.status}`);
         return await response.json();
     } catch (error) {
         alert(error.message);
@@ -103,19 +78,10 @@ function buscarSucursales() {
     }
 }
 
-function buscarServicios() {
+async function buscarServicios() {
     try {
-        const response = await fetch(`http://localhost:8080/servicios`,
-            {
-                headers: authHeaders()
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error(`Error ${response.status}`);
-        }
-
-
+        const response = await fetch("http://localhost:8080/servicios/listar", { headers: authHeaders() });
+        if (!response.ok) throw new Error(`Error ${response.status}`);
         return await response.json();
     } catch (error) {
         alert(error.message);

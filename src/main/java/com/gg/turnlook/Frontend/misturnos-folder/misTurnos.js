@@ -16,25 +16,34 @@ async function renderTurnos() {
 
     const estadoP = document.getElementById("estados").value;
 
-    const turnosLista = await buscarMisTurnos(estadoP);
+    const turnosLista = await buscarMisTurnos();
+
+    container.innerHTML=``;
+
+    console.log(estadoP);
 
     turnosLista.forEach(turno => {
+        console.log(turno.estadoTurno);
 
-        console.log("pepe" +turno);
-        container.innerHTML += `
+        if (turno.estadoTurno == estadoP) {
+            container.innerHTML += `
             <div class="turno-misTurnos">
-                <p>${turno.nombreS}</p>
-                <p>${turno.fechaT}</p>
+                <p>${turno.nombreServicio}</p>
+                <p>${turno.fechaTurno}</p>
+                <p>${turno.estadoTurno}</p>
+                <p>${turno.puntuacion}</p>
             </div>
         `;
+        }
+
+
 
     });
 }
 
-async function buscarMisTurnos(estadoTurno) {
+async function buscarMisTurnos() {
     try {
 
-        console.log(estadoTurno);
         const response = await fetch(
             `http://localhost:8080/turnos/propios`,
             {
