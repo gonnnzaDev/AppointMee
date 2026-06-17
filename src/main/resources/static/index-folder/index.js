@@ -4,6 +4,10 @@ let buscadorConectado = false;
 
 const u = await sesionActiva();
 
+if (!u) {
+    window.location.href = "../Login.html";
+}
+
 const parametrosUrl = new URLSearchParams(window.location.search);
 const busquedaInicial = parametrosUrl.get("busqueda") || "";
 
@@ -39,7 +43,7 @@ function renderListaSucursales(sucursales) {
 
     sucursales.forEach(sucursal => {
         container.innerHTML += `
-            <a href="${window.location.origin}/src/main/java/com/gg/turnlook/Frontend/sucursal-folder/Sucursal.html?id=${sucursal.id}">
+            <a href="${window.location.origin}/sucursal-folder/Sucursal.html?id=${sucursal.id}">
                 <article class="turn-article">
                     <img src="${sucursal.fotoPerfil || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQPQenKJTzexez3E1uN7qtSwZ8tgPQsVJ9DQ&s'}">
                     <div class="turn-content">

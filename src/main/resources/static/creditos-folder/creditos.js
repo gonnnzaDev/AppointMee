@@ -1,4 +1,12 @@
+import { sesionActiva } from "../recursos/modulos.js";
+
 renderCreditos();
+
+const user = await sesionActiva();
+
+if (!user) {
+    window.location.href = "../login.html";
+}
 
 function renderCreditos() {
 

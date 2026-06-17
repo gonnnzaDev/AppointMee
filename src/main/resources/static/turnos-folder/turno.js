@@ -1,6 +1,9 @@
-import { authHeaders } from "../recursos/modulos.js";
+import { authHeaders,sesionActiva } from "../recursos/modulos.js";
 
-
+const user = await sesionActiva();
+if (!user) {
+    window.location.href = "../login.html";
+}
 
 
 const IMG_FALLBACK = "https://xentra.glomastore.mx/img/sin_imagen.png";

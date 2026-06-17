@@ -1,4 +1,10 @@
+import { sesionActiva } from "../recursos/modulos.js";
 
+const user = await sesionActiva();
+
+if (!user) {
+    window.location.href = "../login.html";
+}
 renderError();
 
 function renderError(){

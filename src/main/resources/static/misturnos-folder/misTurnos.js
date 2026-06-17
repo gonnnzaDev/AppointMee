@@ -2,6 +2,12 @@ import { authHeaders, sesionActiva } from "../recursos/modulos.js";
 
 const user = await sesionActiva();
 
+
+
+if (!user) {
+    window.location.href = "../login.html";
+}
+
 renderTurnos();
 
 document.getElementById("estados").addEventListener("change", () => {

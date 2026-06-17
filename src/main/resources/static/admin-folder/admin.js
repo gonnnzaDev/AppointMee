@@ -1,8 +1,14 @@
-import { authHeaders } from "../recursos/modulos.js";
+import { authHeaders, sesionActiva } from "../recursos/modulos.js";
 
 const usuariosBody = document.getElementById("usuariosBody");
 const sucursalesBody = document.getElementById("sucursalesBody");
 const serviciosBody = document.getElementById("serviciosBody");
+
+const user = await sesionActiva();
+
+if (!user) {
+    window.location.href = "../login.html";
+}
 
 render();
 

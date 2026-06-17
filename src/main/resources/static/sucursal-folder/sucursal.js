@@ -1,6 +1,9 @@
-import { authHeaders } from "../recursos/modulos.js";
+import { authHeaders,sesionActiva } from "../recursos/modulos.js";
 
-
+const user = await sesionActiva();
+if (!user) {
+    window.location.href = "../login.html";
+}
 
 render();
 

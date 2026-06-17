@@ -30,7 +30,6 @@ export async function sesionActiva() {
         return null;
     }
 }
-export const baseUrl = window.location.origin;
 
 export const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // regla q todos los email deben cumplir
 
