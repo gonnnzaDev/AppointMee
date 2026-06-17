@@ -1,6 +1,6 @@
 
 # AppointMee
-Red social de turnos para Trabajo Practico Final de la Materia Programacion III en la Universidad Tecnologica Nacional
+Gestor de turnos para Trabajo Practico Final de la Materia Programacion III en la Universidad Tecnologica Nacional
 <div align="center">
 <img src="https://mdp.utn.edu.ar/UTNMDQdata/thumbnail.jpg" height="300" >
 </div>
