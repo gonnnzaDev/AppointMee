@@ -39,9 +39,25 @@ async function obtenerDetalleTurno() {
 
 function renderDetalle(turno) {
     const infoContainer = document.getElementById("detalle-turno-info");
-    
+
     const fechaHora = new Date(turno.fechaHora).toLocaleString();
     const fechaReserva = new Date(turno.fechaReserva).toLocaleDateString();
+
+    const nombreEmpleado = turno.empleado
+        ? `${turno.empleado.nombre} ${turno.empleado.apellido}`
+        : 'No asignado';
+
+    const nombreCliente = turno.cliente
+        ? `${turno.cliente.nombre} ${turno.cliente.apellido}`
+        : 'N/A';
+
+    const precioServicio = turno.servicio?.precio != null
+        ? `$${turno.servicio.precio}`
+        : 'N/A';
+
+    const duracionServicio = turno.servicio?.duracion != null
+        ? `${turno.servicio.duracion} min`
+        : 'N/A';
 
     infoContainer.innerHTML = `
         <div class="form-group">
@@ -49,16 +65,24 @@ function renderDetalle(turno) {
             <p style="font-size: 16px; font-weight: 600; color: var(--blue);">${turno.servicio?.nombre || 'N/A'}</p>
         </div>
         <div class="form-group">
+            <label>Precio del Servicio</label>
+            <p style="font-family: var(--mono);">${precioServicio}</p>
+        </div>
+        <div class="form-group">
+            <label>Duración</label>
+            <p style="font-family: var(--mono);">${duracionServicio}</p>
+        </div>
+        <div class="form-group">
             <label>Fecha y Hora del Turno</label>
             <p style="font-family: var(--mono);">${fechaHora}</p>
         </div>
         <div class="form-group">
             <label>Profesional / Empleado</label>
-            <p>${turno.empleado?.nombre || 'No asignado'}</p>
+            <p>${nombreEmpleado}</p>
         </div>
         <div class="form-group">
             <label>Cliente</label>
-            <p>${turno.cliente?.nombre || 'N/A'}</p>
+            <p>${nombreCliente}</p>
         </div>
         <div class="form-group">
             <label>Fecha en que se solicitó la Reserva</label>
@@ -68,15 +92,27 @@ function renderDetalle(turno) {
 
     if (turno.resenia) {
         document.getElementById("puntuacion").value = turno.resenia.puntuacion;
-        document.getElementById("mensaje").value = turno.resenia.mensaje || '';
-        
+        document.getElementById("mensaje").value = turno.resenia.comentario || '';
+
         document.getElementById("puntuacion").disabled = true;
         document.getElementById("mensaje").disabled = true;
-        
+
         const btnGuardar = document.getElementById("btn-guardar-resenia");
         btnGuardar.textContent = "Turno ya Calificado";
         btnGuardar.disabled = true;
         btnGuardar.style.opacity = "0.5";
+
+        if (turno.resenia.fechaResenia) {
+            const fechaResenia = new Date(turno.resenia.fechaResenia).toLocaleDateString();
+            const reseniaInfo = document.createElement("p");
+            reseniaInfo.style.fontFamily = "var(--mono)";
+            reseniaInfo.style.color = "var(--t3)";
+            reseniaInfo.textContent = `Reseñado el ${fechaResenia}`;
+            document.getElementById("resenia-form").insertBefore(
+                reseniaInfo,
+                document.getElementById("resenia-form").firstChild.nextSibling
+            );
+        }
     }
 }
 
@@ -84,15 +120,20 @@ document.getElementById("resenia-form").addEventListener("submit", async (e) => 
     e.preventDefault();
 
     const puntuacionVal = document.getElementById("puntuacion").value;
-    const mensajeVal = document.getElementById("mensaje").value;
+    const comentarioVal = document.getElementById("mensaje").value.trim();
+
+    if (comentarioVal.length > 0 && comentarioVal.length < 8) {
+        alert("El comentario debe tener al menos 8 caracteres, o dejarse vacío.");
+        return;
+    }
 
     const reseniaPayload = {
         puntuacion: parseInt(puntuacionVal),
-        mensaje: mensajeVal
+        comentario: comentarioVal.length > 0 ? comentarioVal : null
     };
 
     try {
-        const response = await fetch(`/turnos/detalles/${turnoId}/resenia`, {
+        const response = await fetch(`/turnos/${turnoId}/resenia`, {
             method: 'POST',
             headers: {
                 ...authHeaders(),
@@ -114,7 +155,7 @@ document.getElementById("resenia-form").addEventListener("submit", async (e) => 
 });
 
 function volver(){
-    window.location.href = "../misturnos-folder/Misturnos.html";
+    window.location.href = "../misturnos-folder/MisTurnos.html";
 }
 
 
