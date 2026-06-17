@@ -1,20 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap');
 
-/* ─── TOKENS ──────────────────────────────────────────────── */
 :root {
-  /* surfaces */
   --bg:        #0a0b0d;
   --s0:        #0d0e11;
   --s1:        #12141a;
   --s2:        #1a1d25;
   --glass:     rgba(13,14,17,.88);
 
-  /* borders */
   --b:         rgba(255,255,255,.07);
   --b-md:      rgba(255,255,255,.12);
   --b-lg:      rgba(255,255,255,.18);
 
-  /* accent palette */
   --blue:      #1d94f5;
   --blue-dim:  rgba(29,148,245,.12);
   --blue-glow: rgba(29,148,245,.28);
@@ -24,34 +20,28 @@
   --amber:     #f59e0b;
   --red:       #ef4444;
 
-  /* text */
   --t:         #e8eaf0;
   --t2:        #9ca3af;
   --t3:        #6b7280;
   --t4:        #374151;
 
-  /* layout */
   --nav-h:     58px;
   --bar-w:     224px;
   --r-sm:      6px;
   --r-md:      10px;
   --r-lg:      14px;
 
-  /* type */
   --ui:  'Geist', system-ui, sans-serif;
   --mono:'Geist Mono','JetBrains Mono', monospace;
 
-  /* shadows */
   --sh-sm: 0 1px 6px rgba(0,0,0,.4);
   --sh-md: 0 4px 20px rgba(0,0,0,.55);
   --sh-lg: 0 8px 40px rgba(0,0,0,.7);
 
-  /* motion */
   --ease: .18s ease;
   --ease-out: .28s cubic-bezier(.22,1,.36,1);
 }
 
-/* ─── RESET ────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html {
@@ -70,7 +60,6 @@ body {
   line-height: 1.6;
 }
 
-/* Subtle scanline texture */
 body::before {
   content: '';
   pointer-events: none;
@@ -87,13 +76,11 @@ body:has(#login) {
   justify-content: center;
 }
 
-/* ─── SCROLLBAR ────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--b-md); border-radius: 99px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--b-lg); }
 
-/* ─── ANIMATIONS ───────────────────────────────────────────── */
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -115,12 +102,10 @@ body:has(#login) {
   50%      { opacity: .35; }
 }
 
-/* Entry animation helpers */
 .anim-fade-up   { animation: fade-up   var(--ease-out) both; }
 .anim-fade-in   { animation: fade-in   var(--ease-out) both; }
 .anim-slide-in  { animation: slide-in-left var(--ease-out) both; }
 
-/* Staggered children */
 [data-stagger] > * { animation: fade-up var(--ease-out) both; }
 [data-stagger] > *:nth-child(1)  { animation-delay: .04s; }
 [data-stagger] > *:nth-child(2)  { animation-delay: .08s; }
@@ -129,12 +114,10 @@ body:has(#login) {
 [data-stagger] > *:nth-child(5)  { animation-delay: .20s; }
 [data-stagger] > *:nth-child(n+6){ animation-delay: .24s; }
 
-/* Reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
 
-/* ─── GLASS CARD BASE ──────────────────────────────────────── */
 .card {
   background: var(--s1);
   border: 1px solid var(--b);
@@ -143,7 +126,6 @@ body:has(#login) {
   position: relative;
   overflow: hidden;
 }
-/* Top-edge glow */
 .card::before {
   content: '';
   position: absolute;
@@ -153,7 +135,6 @@ body:has(#login) {
   opacity: .5;
 }
 
-/* ─── FORMS – Login / Register ─────────────────────────────── */
 #login {
   min-height: 100vh;
   display: flex;
@@ -218,7 +199,6 @@ body:has(#login) {
 
 .credentials-form { width: 100%; display: flex; flex-direction: column; }
 
-/* ─── INPUTS ────────────────────────────────────────────────── */
 .input-group { width: 100%; position: relative; margin-bottom: 10px; }
 
 .form-control {
@@ -241,7 +221,6 @@ body:has(#login) {
 }
 .form-control::placeholder { color: var(--t4); font-weight: 300; }
 
-/* ─── BUTTONS ───────────────────────────────────────────────── */
 button {
   padding: 8px 14px;
   border-radius: var(--r-sm);
@@ -263,7 +242,6 @@ button:hover {
 }
 button:active { transform: scale(.97); }
 
-/* Primary action buttons */
 #login-button,
 #register-button,
 .btn-submit,
@@ -343,7 +321,6 @@ button:active { transform: scale(.97); }
 
 .credentials-form button { width: 100%; height: 40px; }
 
-/* ─── NAVBAR ────────────────────────────────────────────────── */
 .am-nav {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -388,7 +365,6 @@ button:active { transform: scale(.97); }
   white-space: nowrap;
 }
 
-/* Search */
 .am-nav__search {
   flex: 1;
   max-width: 280px;
@@ -420,7 +396,6 @@ button:active { transform: scale(.97); }
 .am-nav__search-input::-webkit-search-cancel-button { display: none; }
 .am-nav__search--mobile { display: none; }
 
-/* Nav links */
 .am-nav__links {
   display: flex;
   align-items: center;
@@ -455,7 +430,6 @@ button:active { transform: scale(.97); }
   animation: pulse-dot 2s infinite;
 }
 
-/* Hamburger */
 .am-nav__toggle {
   display: none;
   flex-direction: column;
@@ -484,7 +458,6 @@ button:active { transform: scale(.97); }
 .am-nav__toggle--open .am-nav__toggle-bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
 .am-nav__toggle--open .am-nav__toggle-bar:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
 
-/* ─── SIDEBAR ───────────────────────────────────────────────── */
 .left-container {
   position: fixed;
   left: 0; top: 0;
@@ -556,7 +529,6 @@ button:active { transform: scale(.97); }
   color: var(--blue);
 }
 
-/* ─── INDEX / CARD GRID ────────────────────────────────────── */
 #container-index { padding-top: calc(var(--nav-h) + 16px); }
 
 .turn-container {
@@ -620,7 +592,6 @@ button:active { transform: scale(.97); }
 .turn-content p { font-size: 11.5px; color: var(--t3); font-family: var(--mono); }
 .turn-container a, .turn-content a { text-decoration: none; color: inherit; }
 
-/* ─── GENERIC FORM LAYOUT ─────────────────────────────────── */
 .form-simple {
   background: var(--s1);
   border: 1px solid var(--b);
@@ -673,7 +644,6 @@ button:active { transform: scale(.97); }
 .form-group textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
 .form-actions { display: flex; gap: 10px; margin-top: 24px; }
 
-/* ─── TABLES ────────────────────────────────────────────────── */
 .table-container h1 {
   font-size: 1.1rem;
   font-weight: 600;
@@ -711,7 +681,6 @@ button:active { transform: scale(.97); }
 .table tbody tr:hover { background: var(--s1); }
 .table-actions { display: flex; gap: 6px; }
 
-/* ─── BADGES ────────────────────────────────────────────────── */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -738,7 +707,6 @@ button:active { transform: scale(.97); }
 .badge--red   { background: rgba(239,68,68,.12); color: var(--red); border-color: rgba(239,68,68,.2); }
 .badge--cyan  { background: rgba(34,211,238,.1); color: var(--cyan); border-color: rgba(34,211,238,.2); }
 
-/* ─── PROFILE / ACCOUNT ─────────────────────────────────────── */
 .account-container {
   display: flex;
   justify-content: center;
@@ -800,7 +768,6 @@ button:active { transform: scale(.97); }
 }
 .funcionalidad-perfil button { height: 36px; }
 
-/* ─── SUCURSAL ─────────────────────────────────────────────── */
 .sucursal-container {
   display: flex;
   flex-direction: column;
@@ -879,7 +846,6 @@ button:active { transform: scale(.97); }
 }
 .botones-sucursal-container { display: flex; justify-content: center; width: 100%; }
 
-/* ─── TURNOS / CALENDAR ─────────────────────────────────────── */
 .agendarTurno-info {
   display: flex;
   height: 100vh;
@@ -915,7 +881,6 @@ button:active { transform: scale(.97); }
 .turno-header h1 { font-size: 18px; font-weight: 600; color: var(--t); letter-spacing: -.03em; }
 .turno-header p  { font-size: 12px; color: var(--t3); margin-top: 3px; font-family: var(--mono); }
 
-/* Calendar */
 .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
 .cal-nav-btn {
   width: 30px; height: 30px;
@@ -987,7 +952,6 @@ button:active { transform: scale(.97); }
 .cal-dia--vacio  { cursor: default; pointer-events: none; }
 .cal-dia--pasado { opacity: .2; cursor: not-allowed; }
 
-/* Time slots */
 .turno-horarios-titulo {
   font-size: 10px;
   font-family: var(--mono);
@@ -1027,7 +991,6 @@ button:active { transform: scale(.97); }
 }
 .turno-sin-dia { font-size: 12px; color: var(--t4); font-style: italic; font-family: var(--mono); padding: 6px 0; }
 
-/* Summary */
 .turno-resumen {
   background: var(--blue-dim);
   border: 1px solid rgba(29,148,245,.2);
@@ -1072,7 +1035,6 @@ button:active { transform: scale(.97); }
 }
 .turno-btn-siguiente:not(:disabled):active { transform: scale(.98); }
 
-/* Mis Turnos list */
 .turnos-persona { width: 100%; min-height: 100vh; align-items: center; align-content: center; }
 .turnos-persona h1 {
   font-size: clamp(2rem, 6vw, 4.5rem);
@@ -1104,7 +1066,6 @@ button:active { transform: scale(.97); }
   letter-spacing: .08em;
 }
 
-/* Filter */
 .filtrar { margin: 16px 0 16px 16px; display: flex; align-items: center; gap: 8px; }
 .filtrar label { font-size: 11px; font-family: var(--mono); font-weight: 500; color: var(--t3); text-transform: uppercase; letter-spacing: .08em; }
 .filtrar select {
@@ -1146,7 +1107,6 @@ button:active { transform: scale(.97); }
 }
 .turno-misTurnos:hover { border-color: var(--b-md); background: var(--s2); transform: translateX(3px); }
 
-/* ─── ERROR PAGE ────────────────────────────────────────────── */
 .error-container {
   width: 100%;
   min-height: 100vh;
@@ -1173,7 +1133,6 @@ button:active { transform: scale(.97); }
   letter-spacing: .04em;
 }
 
-/* ─── CREDITS / ABOUT ──────────────────────────────────────── */
 .about-container {
   display: flex;
   flex-wrap: wrap;
@@ -1194,10 +1153,9 @@ button:active { transform: scale(.97); }
 }
 .about-info img:hover { filter: brightness(.95) saturate(.9); transform: scale(1.01); }
 
-/* ─── ADMIN PANEL ───────────────────────────────────────────── */
+ ─── ADMIN PANEL ───────────────────────────────────────────── */
 #admin-panel-container { margin: 10vh 20px; animation: fade-up .4s var(--ease-out) both; }
 
-/* ─── CONFIGURACION ─────────────────────────────────────────── */
 .configuracion-container {
   height: auto;
   min-height: 100vh;
@@ -1245,7 +1203,6 @@ button:active { transform: scale(.97); }
 .documentacion-links-container:hover { border-color: var(--b-md); }
 .documentacion-links-container svg { color: white; width: 40px; height: 40px; }
 
-/* ─── MISC CONTAINERS ──────────────────────────────────────── */
 .perdiMiCuenta-container,
 .pago-container,
 .agregarServicio-container {
@@ -1298,7 +1255,6 @@ button:active { transform: scale(.97); }
 .formulario-transformar-empleador-info { align-items: center; width: 70%; }
 .formulario-transformar-empleador-botones { display: flex; justify-content: flex-end; gap: 20px; }
 
-/* ─── RESPONSIVE ─────────────────────────────────────────────── */
 @media (max-width: 1280px) {
   .turn-container { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
   .form-simple    { margin-left: auto; margin-right: auto; }
@@ -1472,7 +1428,6 @@ button:active { transform: scale(.97); }
   button { padding: 8px 10px; font-size: 12px; }
 }
 
-/* Touch targets */
 @media (hover: none) and (pointer: coarse) {
   .cal-dia          { min-width: 36px; min-height: 36px; }
   .turno-hora-btn   { padding: 10px 14px; min-height: 40px; }
@@ -1483,7 +1438,6 @@ button:active { transform: scale(.97); }
   .table-container  { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }
 
-/* Print */
 @media print {
   .am-nav, .left-container, .am-nav__toggle,
   .btn-add, .btn-submit, .btn-cancel,
