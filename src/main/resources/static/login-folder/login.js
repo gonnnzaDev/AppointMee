@@ -69,7 +69,6 @@ async function userExists(mail, pass) {
         );
 
         if (!response.ok) {
-            alert("Credenciales Invalidas");
               return null;
         }
 
