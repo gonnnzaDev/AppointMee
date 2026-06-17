@@ -24,7 +24,7 @@ async function renderTurnos() {
     container.innerHTML = ``;
 
     turnosLista.forEach(turno => {
-        const idActual = turno.id || turno.idTurno; 
+        const idActual = turno.id || turno.idTurno;
 
         if (turno.estadoTurno == estadoP) {
             container.innerHTML += `
@@ -48,7 +48,8 @@ async function renderTurnos() {
 }
 
 function obtenerClaseBadge(estado) {
-    if (estado === 'PENDIENTE') return 'badge--amber';
+    if (estado === 'CANCELADO') return 'badge--amber';
+    if (estado === 'PENDIENTE') return 'badge--red';
     if (estado === 'CONFIRMADO') return 'badge--blue';
     if (estado === 'REALIZADO') return 'badge--green';
     return 'badge--cyan';
