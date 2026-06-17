@@ -50,7 +50,6 @@ async function renderTurnos() {
 function obtenerClaseBadge(estado) {
     if (estado === 'CANCELADO') return 'badge--red';
     if (estado === 'PENDIENTE') return 'badge--yellow';
-    if (estado === 'CONFIRMADO') return 'badge--blue';
     if (estado === 'REALIZADO') return 'badge--green';
     return 'badge--cyan';
 }
