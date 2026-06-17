@@ -1447,3 +1447,116 @@ button:active { transform: scale(.97); }
   .table th { background: #f0f0f0; color: #000; }
   .table td { border-color: #ccc; color: #000; }
 }
+
+.agendarTurno-container{
+    width:100%;
+    min-height:100vh;
+    padding-top:calc(var(--nav-h) + 30px);
+}
+
+.agendarTurno-info{
+    width:90%;
+    max-width:1200px;
+    margin:auto;
+    display:flex;
+    flex-direction:column;
+}
+
+.turno-paso-titulo{
+    font-size:1.1rem;
+    font-weight:600;
+    margin-bottom:20px;
+    color:var(--t);
+}
+
+.empleados-container,
+.servicios-container{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+    gap:12px;
+}
+
+.empleado-article{
+    background:var(--s1);
+    border:1px solid var(--b);
+    border-radius:var(--r-md);
+    overflow:hidden;
+    cursor:pointer;
+    transition:all .15s ease;
+}
+
+.empleado-article:hover{
+    border-color:var(--b-md);
+    transform:translateY(-2px);
+}
+
+.empleado-article--seleccionado{
+    border-color:var(--blue);
+    box-shadow:0 0 0 1px rgba(29,148,245,.35);
+}
+
+.empleado-article img{
+    width:100%;
+    height:170px;
+    object-fit:cover;
+    display:block;
+}
+
+.empleado-nombre{
+    padding:10px 12px 4px;
+    font-size:13px;
+    color:var(--t);
+    font-weight:500;
+}
+
+.empleado-valoracion{
+    padding:0 12px 10px;
+    font-size:11px;
+    color:var(--t3);
+    font-family:var(--mono);
+}
+
+.info-seleccionada{
+    margin:16px 0;
+    background:var(--s1);
+    border:1px solid var(--b);
+    border-radius:var(--r-md);
+    padding:14px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.info-seleccionada img{
+    width:48px;
+    height:48px;
+    border-radius:8px;
+    object-fit:cover;
+}
+
+.info-seleccionada h3{
+    font-size:13px;
+    margin:0;
+}
+
+.info-seleccionada p{
+    font-size:11px;
+    color:var(--t3);
+    margin-top:2px;
+}
+
+.btn-proceso{
+    margin-top:12px;
+    align-self:flex-end;
+    min-width:140px;
+}
+
+.turno-container{
+    width:100%;
+    max-width:650px;
+    margin:auto;
+    background:var(--s1);
+    border:1px solid var(--b);
+    border-radius:var(--r-lg);
+    padding:24px;
+}

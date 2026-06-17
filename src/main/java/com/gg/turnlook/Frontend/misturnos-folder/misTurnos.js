@@ -20,6 +20,7 @@ async function renderTurnos() {
 
     turnosLista.forEach(turno => {
 
+        console.log("pepe" +turno);
         container.innerHTML += `
             <div class="turno-misTurnos">
                 <p>${turno.nombreS}</p>

@@ -133,7 +133,14 @@ function renderModificar(usuario) {
            minlength="8"
            maxlength="67">
 </div>
-
+<div class="input-group mb-1">
+    <input type="password"
+           class="form-control"
+           placeholder="Repetir Contraseña "
+           id="password-confirm-input"
+           minlength="8"
+           maxlength="67">
+</div>
 <div class="input-group mb-1">
     <input type="email"
            class="form-control"
@@ -185,11 +192,17 @@ async function modificarUsuario(id) {
         const password = document.getElementById("password-input").value.trim();
         const email = document.getElementById("email-input").value.trim();
         const fotoUrl = document.getElementById("foto-url-input").value.trim();
+        const password2 = document.getElementById("password-confirm-input").value.trim();
 
         const body = {};
 
         if (nombre) body.nombre = nombre;
         if (apellido) body.apellido = apellido;
+        if(password !== password2) {
+            
+            alert("Las contraseñas no son iguales");
+            return;
+        }
         if (password) body.password = password;
         if (email) body.email = email;
         if (fotoUrl) body.fotoUrl = fotoUrl;
@@ -197,7 +210,7 @@ async function modificarUsuario(id) {
         const response = await fetch(
             `http://localhost:8080/usuarios/modificar/${id}`,
             {
-                method: "PUT",
+                method: "PATCH",
                 body: JSON.stringify(body),
                 headers: authHeaders(),
             }
