@@ -326,10 +326,10 @@ public class TurnoService {
     }
 
 
-    public void setearPagoRechazado(Integer turnoId) {
+    public void setearPagoRechazado(Integer turnoId, EstadoTurno estado) {
 
         Turno turno = listarTurnoPorId(turnoId);
-        turno.setEstado(EstadoTurno.PAGO_RECHAZADO);
+        turno.setEstado(estado);
         turnoRepo.save(turno);
     }
 
