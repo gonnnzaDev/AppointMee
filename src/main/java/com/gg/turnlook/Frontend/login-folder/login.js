@@ -142,7 +142,7 @@ if (registerButton) {
         window.location.href = "../register-folder/Register.html";
     });
 }
-
+/*
 
 const botonGoogle = document.getElementById("google-button");
 
@@ -192,3 +192,4 @@ window.renderGoogleButton = function () {
     });
 };
 
+*/
