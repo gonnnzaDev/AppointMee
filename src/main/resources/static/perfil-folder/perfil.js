@@ -91,6 +91,14 @@ console.log(usuario);
         `;
     }
 
+        if (usuario.roles.includes("EMPLEADO")) {
+        html += `
+            <button id="btn-modo-empleado">
+                Panel Empleado
+            </button>
+        `;
+    }
+
     containerrol.innerHTML = html;
 
     const volver = document.getElementById("btn-volver-perfil");
@@ -98,6 +106,7 @@ console.log(usuario);
     const editar = document.getElementById("btn-editar-perfil");
     const modoEmpleador = document.getElementById("btn-modo-empleador");
     const modoAdmin = document.getElementById("btn-modo-admin");
+    const modoEmpleado = document.getElementById("btn-modo-empleado");
 
     volver.addEventListener("click", () => {
         renderPerfil(usuario);
@@ -106,6 +115,12 @@ console.log(usuario);
     if (modoEmpleador) {
         modoEmpleador.addEventListener("click", () => {
             window.location.href = "../empleador-folder/empleador.html";
+        });
+    }
+
+        if (modoEmpleado) {
+        modoEmpleado.addEventListener("click", () => {
+            window.location.href = "../empleado-folder/empleado.html";
         });
     }
 
