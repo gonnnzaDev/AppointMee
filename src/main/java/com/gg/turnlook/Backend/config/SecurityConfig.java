@@ -76,7 +76,7 @@ public class SecurityConfig {
                                 "/usuarios/recuperar-cuenta",
                                 "/usuarios/crear",
 
-                                "/pagos/preferencia/**", // prueba rapida fast flash
+                                "/pagos/webhook",  // prueba rapida fast flash
 
                                 // para swagger
                                 "/v3/api-docs/**",

@@ -29,7 +29,7 @@ public class MercadoPagoController {
 
 
     @PreAuthorize("hasRole('CLIENTE')")
-    @PostMapping("/preferencia/{turnoId}")
+    @PostMapping("/{turnoId}")
     public ResponseEntity<?> realizarPago(@PathVariable("turnoId") Integer turnoId
     ) throws MPException, MPApiException {
 
@@ -46,13 +46,14 @@ public class MercadoPagoController {
     @PostMapping("/webhook")
     public ResponseEntity<?> webhook(
             @RequestParam(required = false) String topic,
-            @RequestParam(required = false) String id) {
+            @RequestParam(required = false) String pagoId) throws MPException, MPApiException {
 
         System.out.println("Webhook recibido");
         System.out.println("Topic: " + topic);
-        System.out.println("ID: " + id);
+        System.out.println("ID: " + pagoId);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(mpService.procesarWebhook(
+                Long.valueOf(pagoId)));
     }
 
 

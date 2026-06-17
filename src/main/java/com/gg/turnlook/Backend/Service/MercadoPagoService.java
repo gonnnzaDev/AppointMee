@@ -2,6 +2,7 @@ package com.gg.turnlook.Backend.Service;
 
 
 
+import com.gg.turnlook.Backend.Enum.EstadoTurno;
 import com.gg.turnlook.Backend.Model.Servicio;
 import com.gg.turnlook.Backend.Model.Turno;
 import com.mercadopago.MercadoPagoConfig;
@@ -13,7 +14,8 @@ import com.mercadopago.exceptions.MPException;
 import com.mercadopago.resources.preference.Preference;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
+import com.mercadopago.client.payment.PaymentClient;
+import com.mercadopago.resources.payment.Payment;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +27,7 @@ public class MercadoPagoService {
 
 
     private final TurnoService turnoService;
+
 
     // mp test
     @Value("${mercadopago.access-token}")
@@ -70,4 +73,28 @@ public class MercadoPagoService {
 
         return preference.getInitPoint();
     }
+
+
+    public String procesarWebhook(Long pagoId) throws MPException, MPApiException {
+
+        MercadoPagoConfig.setAccessToken(tokenMp);
+
+        PaymentClient client = new PaymentClient();
+
+        Payment payment = client.get(pagoId);
+
+        Integer turnoId = Integer.valueOf(payment.getExternalReference());
+
+        if (!"approved".equals(payment.getStatus())) {
+
+            turnoService.setearPagoRechazado(turnoId);
+            return "Error al realizar el pago";
+        }
+
+        return "Pago exitoso\nTurno confirmado";
+    }
+
+
 }
+
+

@@ -246,7 +246,7 @@ public class TurnoService {
         }
 
         return new TurnoResponseDTO(
-                t.getId(), t.getFechaReserva(), t.getFechaHora(),
+                t.getId(), t.getFechaReserva(), t.getFechaHora(), t.getEstado(),
                 cliente, empleado, servicio, resenia);
     }
 
@@ -293,7 +293,7 @@ public class TurnoService {
                     r.getPuntuacion(), r.getComentario(), r.getFechaResenia());
         }
 
-        return new TurnoClienteResponseDTO(t.getFechaReserva(), t.getFechaHora(),
+        return new TurnoClienteResponseDTO(t.getFechaReserva(), t.getFechaHora(), t.getEstado(),
                 emp, serv, cl, resenia);
     }
 
@@ -324,6 +324,13 @@ public class TurnoService {
         reseniaService.guardarResenia(reseniaDto, turno);
     }
 
+
+    public void setearPagoRechazado(Integer turnoId){
+
+        Turno turno =  listarTurnoPorId(turnoId);
+        turno.setEstado(EstadoTurno.PAGO_RECHAZADO);
+        turnoRepo.save(turno);
+    }
 
 }
 

@@ -14,7 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class SucursalResponseDTO {
 
-     private Integer id;  // ver si dsp lo saco
+     private Integer id;
      private String nombre;
      private String direccion;
      private String telefono;

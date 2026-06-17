@@ -11,4 +11,5 @@ public enum ECategoria {
     TATUAJE,
     MANICURA,
     BARBERIA
+
 }

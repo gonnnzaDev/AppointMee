@@ -243,6 +243,9 @@ public class SucursalService {
     private SucursalResponseDTO mapearSucursal(Sucursal suc) {
 
         SucursalResponseDTO dto = new SucursalResponseDTO();
+
+        dto.setId(suc.getId());
+
         dto.setNombre(suc.getNombre());
 
         dto.setDireccion(suc.getDireccion());
