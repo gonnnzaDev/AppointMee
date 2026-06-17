@@ -14,7 +14,7 @@ export async function sesionActiva() {
     try {
 
         const response = await fetch(
-            "http://localhost:8080/usuarios/me",
+            "/usuarios/me",
             {
                 headers: authHeaders()
             }

@@ -55,7 +55,7 @@ async function userExists(mail, pass) {
 
     try {
 
-        const response = await fetch(`http://localhost:8080/usuarios/inicio-sesion`,
+        const response = await fetch(`/usuarios/inicio-sesion`,
             {
                 method: "POST",
                 headers: {

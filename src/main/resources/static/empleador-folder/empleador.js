@@ -1,5 +1,4 @@
 import { authHeaders } from "../recursos/modulos.js";
-const API = "http://localhost:8080";
 
 
 let miId = null;
@@ -25,7 +24,7 @@ window.eliminarEmpleado = eliminarEmpleado;
 
 async function cargarMe() {
     try {
-        const res = await fetch(API + "/usuarios/me", { headers: authHeaders() });
+        const res = await fetch("/usuarios/me", { headers: authHeaders() });
         if (!res.ok) throw new Error(`Error ${res.status}`);
         const data = await res.json();
         miId = data.id;
@@ -38,7 +37,7 @@ async function cargarMe() {
 
 async function cargarSucursales() {
     try {
-        const res = await fetch(API + "/sucursales/listar", { headers: authHeaders() });
+        const res = await fetch("/sucursales/listar", { headers: authHeaders() });
         if (!res.ok) throw new Error(`Error ${res.status}`);
         const todas = await res.json();
 
@@ -97,7 +96,7 @@ function poblarSelectsSucursal(sucursales) {
 async function eliminarSucursal(sucursalId) {
     if (!confirm("¿Borrar esta sucursal?")) return;
     try {
-        const res = await fetch(`${API}/sucursales/borrar-sucursal-propia/${sucursalId}`, {
+        const res = await fetch(`/sucursales/borrar-sucursal-propia/${sucursalId}`, {
             method: "DELETE",
             headers: authHeaders()
         });
@@ -118,7 +117,7 @@ async function cargarServicios(sucursalId) {
     if (!sucursalId) return;
 
     try {
-        const res = await fetch(`${API}/servicios/listar/sucursal/${sucursalId}`, { headers: authHeaders() });
+        const res = await fetch(`/servicios/listar/sucursal/${sucursalId}`, { headers: authHeaders() });
         if (!res.ok) throw new Error(`Error ${res.status}`);
         const servicios = await res.json();
 
@@ -152,7 +151,7 @@ async function cargarServicios(sucursalId) {
 async function eliminarServicio(servicioId, sucursalId) {
     if (!confirm("¿Borrar este servicio?")) return;
     try {
-        const res = await fetch(`${API}/servicios/eliminar/${servicioId}`, {
+        const res = await fetch(`/servicios/eliminar/${servicioId}`, {
             method: "DELETE",
             headers: authHeaders()
         });
@@ -173,7 +172,7 @@ async function cargarTurnos(sucursalId) {
     if (!sucursalId) return;
 
     try {
-        const res = await fetch(`${API}/turnos/de-sucursal/${sucursalId}`, { headers: authHeaders() });
+        const res = await fetch(`/turnos/de-sucursal/${sucursalId}`, { headers: authHeaders() });
         if (!res.ok) throw new Error(`Error ${res.status}`);
         const turnos = await res.json();
 
@@ -213,7 +212,7 @@ async function cargarTurnos(sucursalId) {
 async function finalizarTurno(turnoId, sucursalId) {
     if (!confirm("¿Finalizar este turno?")) return;
     try {
-        const res = await fetch(`${API}/turnos/finalizar/${turnoId}`, {
+        const res = await fetch(`/turnos/finalizar/${turnoId}`, {
             method: "PATCH",
             headers: authHeaders()
         });
@@ -228,7 +227,7 @@ async function finalizarTurno(turnoId, sucursalId) {
 async function cancelarTurno(turnoId, sucursalId) {
     if (!confirm("¿Cancelar este turno?")) return;
     try {
-        const res = await fetch(`${API}/turnos/cancelar/${turnoId}`, {
+        const res = await fetch(`/turnos/cancelar/${turnoId}`, {
             method: "DELETE",
             headers: authHeaders()
         });
@@ -249,7 +248,7 @@ async function cargarEmpleados(sucursalId) {
     if (!sucursalId) return;
 
     try {
-        const res = await fetch(`${API}/sucursales/${sucursalId}/empleados`, { headers: authHeaders() });
+        const res = await fetch(`/sucursales/${sucursalId}/empleados`, { headers: authHeaders() });
         if (!res.ok) throw new Error(`Error ${res.status}`);
         const empleados = await res.json();
 
@@ -282,7 +281,7 @@ async function agregarEmpleado(sucursalId) {
     if (!email) { alert("Ingresá el email del empleado"); return; }
 
     try {
-        const res = await fetch(`${API}/sucursales/${sucursalId}/empleados/agregar`, {
+        const res = await fetch(`/sucursales/${sucursalId}/empleados/agregar`, {
             method: "POST",
             headers: authHeaders(),
             body: JSON.stringify({ email })
@@ -301,7 +300,7 @@ async function agregarEmpleado(sucursalId) {
 async function eliminarEmpleado(sucursalId, empleadoId) {
     if (!confirm("¿Quitar este empleado?")) return;
     try {
-        const res = await fetch(`${API}/sucursales/${sucursalId}/empleados/eliminar/${empleadoId}`, {
+        const res = await fetch(`/sucursales/${sucursalId}/empleados/eliminar/${empleadoId}`, {
             method: "DELETE",
             headers: authHeaders()
         });
@@ -367,7 +366,7 @@ async function abrirModalModificarSucursal(sucursalId) {
             fotoUrl: document.getElementById("mod-suc-fotoUrl").value || undefined,
         };
         try {
-            const res = await fetch(`${API}/sucursales/modificar/${sucursalId}`, {
+            const res = await fetch(`/sucursales/modificar/${sucursalId}`, {
                 method: "PATCH",
                 headers: authHeaders(),
                 body: JSON.stringify(body)
@@ -386,7 +385,7 @@ async function abrirModalModificarSucursal(sucursalId) {
 
 async function abrirModalModificarServicio(servicioId) {
     try {
-        const res = await fetch(`${API}/servicios/${servicioId}`, { headers: authHeaders() });
+        const res = await fetch(`/servicios/${servicioId}`, { headers: authHeaders() });
         if (!res.ok) throw new Error(`Error ${res.status}`);
         const s = await res.json();
 
@@ -433,7 +432,7 @@ async function abrirModalModificarServicio(servicioId) {
                 fotoUrl: document.getElementById("mod-serv-fotoUrl").value || undefined,
             };
             try {
-                const res = await fetch(`${API}/servicios/modificar/${servicioId}`, {
+                const res = await fetch(`/servicios/modificar/${servicioId}`, {
                     method: "PATCH",
                     headers: authHeaders(),
                     body: JSON.stringify(body)
@@ -536,7 +535,7 @@ function abrirModalAgregarSucursal() {
 
 async function cargarCategoriasSucursal() {
     try {
-        const response = await fetch(`${API}/sucursales/categorias`, {
+        const response = await fetch(`/sucursales/categorias`, {
             headers: authHeaders()
         });
 
@@ -570,7 +569,7 @@ async function postSucursal(nombre, direccion, telefono, descripcion, categoriaI
     };
 
     try {
-        const response = await fetch(`${API}/sucursales/crear`, {
+        const response = await fetch(`/sucursales/crear`, {
             method: "POST",
             headers: authHeaders(),
             body: JSON.stringify(datos)
@@ -657,7 +656,7 @@ async function postServicio(nombre, descripcion, duracion, precio, sucursalId, f
     };
 
     try {
-        const response = await fetch(`${API}/servicios/crear`, {
+        const response = await fetch(`/servicios/crear`, {
             method: "POST",
             headers: authHeaders(),
             body: JSON.stringify(datos)

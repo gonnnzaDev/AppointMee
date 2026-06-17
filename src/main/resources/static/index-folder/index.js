@@ -54,7 +54,7 @@ function renderListaSucursales(sucursales) {
 
 async function buscarSucursales() {
     try {
-        const response = await fetch(`http://localhost:8080/sucursales/listar`, {
+        const response = await fetch(`/sucursales/listar`, {
             headers: authHeaders()
         });
         console.log(authHeaders());
@@ -69,7 +69,7 @@ async function buscarSucursales() {
 async function filtrarPorCategoria(categoria) {
     try {
         const response = await fetch(
-            `http://localhost:8080/sucursales/listar/filtrar?categoria=${categoria}`,
+            `/sucursales/listar/filtrar?categoria=${categoria}`,
             { headers: authHeaders() }
         );
         if (!response.ok) throw new Error(`Error ${response.status}`);
@@ -86,7 +86,7 @@ async function filtrarPorNombre(texto) {
         if (texto) parametros.append("nombre", texto);
 
         const response = await fetch(
-            `http://localhost:8080/sucursales/listar/filtrar?${parametros.toString()}`,
+            `/sucursales/listar/filtrar?${parametros.toString()}`,
             { headers: authHeaders() }
         );
         if (!response.ok) throw new Error(`Error ${response.status}`);
@@ -136,7 +136,7 @@ function iniciarBuscador(valorInicial, input) {
 
 async function buscarCategorias() {
     try {
-        const response = await fetch(`http://localhost:8080/sucursales/categorias`, {
+        const response = await fetch(`/sucursales/categorias`, {
             headers: authHeaders()
         });
         if (!response.ok) throw new Error(`Error ${response.status}`);

@@ -1,6 +1,6 @@
 import { authHeaders } from "../recursos/modulos.js";
 
-const apiBaseURL = "http://localhost:8080/sucursales";
+
 
 render();
 
@@ -49,7 +49,7 @@ function getSucursalIdFromUrl() {
 
 async function fetchSucursal(id) {
     try {
-        const response = await fetch(`${apiBaseURL}/${id}`, {
+        const response = await fetch(`/sucursales/${id}`, {
             headers: authHeaders()
         });
         if (!response.ok) {
@@ -65,7 +65,7 @@ async function fetchSucursal(id) {
 
 async function fetchValoracionXSucursal(id) {
     try {
-        const response = await fetch(`${apiBaseURL}/${id}`, {
+        const response = await fetch(`/sucursales/${id}`, {
             headers: authHeaders()
         });3
         if (!response.ok) {

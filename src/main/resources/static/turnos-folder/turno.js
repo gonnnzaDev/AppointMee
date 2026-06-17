@@ -2,7 +2,7 @@ import { authHeaders } from "../recursos/modulos.js";
 
 
 
-const API = "http://localhost:8080";
+
 const IMG_FALLBACK = "https://xentra.glomastore.mx/img/sin_imagen.png";
 const sucursalId = new URLSearchParams(window.location.search).get("sucursalId");
 
@@ -56,7 +56,7 @@ function renderPaso2() {
 
 async function cargarEmpleados() {
     try {
-        const res = await fetch(`${API}/sucursales/${sucursalId}/elegir-empleado`, {
+        const res = await fetch(`/sucursales/${sucursalId}/elegir-empleado`, {
             headers: authHeaders()
         });
         if (!res.ok) throw new Error(`Error ${res.status}`);
@@ -130,7 +130,7 @@ function renderPaso1() {
 
 async function cargarServicios() {
     try {
-        const res = await fetch(`${API}/servicios/listar/sucursal/${sucursalId}`, {
+        const res = await fetch(`/servicios/listar/sucursal/${sucursalId}`, {
             headers: authHeaders()
         });
         if (!res.ok) throw new Error(`Error ${res.status}`);
@@ -248,7 +248,7 @@ function renderPaso3() {
 async function cargarDisponibilidad() {
     try {
         const res = await fetch(
-            `${API}/turnos/disponibilidad/empleado/${empleadoSeleccionado.id}/servicio/${servicioSeleccionado.id}`,
+            `/turnos/disponibilidad/empleado/${empleadoSeleccionado.id}/servicio/${servicioSeleccionado.id}`,
             { headers: authHeaders() }
         );
         if (!res.ok) throw new Error(`Error ${res.status}`);

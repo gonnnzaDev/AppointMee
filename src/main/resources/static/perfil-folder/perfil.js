@@ -258,7 +258,7 @@ async function modificarUsuario(id) {
         if (fotoUrl) body.fotoUrl = fotoUrl;
 
         const response = await fetch(
-            `http://localhost:8080/usuarios/modificar/${id}`,
+            `/usuarios/modificar/${id}`,
             {
                 method: "PATCH",
                 body: JSON.stringify(body),
@@ -283,7 +283,7 @@ async function eliminarCuenta() {
 
     try {
 
-        const response = await fetch(`http://localhost:8080/usuarios/borrar-cuenta`, {
+        const response = await fetch(`/usuarios/borrar-cuenta`, {
             headers: authHeaders(),
             method: "DELETE"
         });
@@ -308,7 +308,7 @@ async function cargarUsuario(id) {
     try {
 
 
-        const response = await fetch(`http://localhost:8080/usuarios/${id}`,
+        const response = await fetch(`/usuarios/${id}`,
             {
                 headers: authHeaders()
             }

@@ -43,7 +43,7 @@ async function postMensaje(mensaje) {
 
     try {
         const response = await fetch(
-            `http://localhost:8080/solicitudes-empleador/solicitar`,
+            `/solicitudes-empleador/solicitar`,
              {
             method: 'POST',
             headers: authHeaders(),

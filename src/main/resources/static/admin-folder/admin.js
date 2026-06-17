@@ -58,7 +58,7 @@ async function render() {
 
 async function buscarUsuarios() {
     try {
-        const response = await fetch("http://localhost:8080/usuarios/listar", { headers: authHeaders() });
+        const response = await fetch("/usuarios/listar", { headers: authHeaders() });
         if (!response.ok) throw new Error(`Error ${response.status}`);
         return await response.json();
     } catch (error) {
@@ -69,7 +69,7 @@ async function buscarUsuarios() {
 
 async function buscarSucursales() {
     try {
-        const response = await fetch("http://localhost:8080/sucursales/listar", { headers: authHeaders() });
+        const response = await fetch("/sucursales/listar", { headers: authHeaders() });
         if (!response.ok) throw new Error(`Error ${response.status}`);
         return await response.json();
     } catch (error) {
@@ -80,7 +80,7 @@ async function buscarSucursales() {
 
 async function buscarServicios() {
     try {
-        const response = await fetch("http://localhost:8080/servicios/listar", { headers: authHeaders() });
+        const response = await fetch("/servicios/listar", { headers: authHeaders() });
         if (!response.ok) throw new Error(`Error ${response.status}`);
         return await response.json();
     } catch (error) {

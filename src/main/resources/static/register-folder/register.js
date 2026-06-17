@@ -45,7 +45,7 @@ if (cancelButton) {
 function postUser(name, surname, mail, pass) {
 
 
-    fetch("http://localhost:8080/usuarios/crear", {
+    fetch("/usuarios/crear", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

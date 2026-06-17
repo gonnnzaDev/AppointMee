@@ -53,7 +53,7 @@ async function buscarMisTurnos() {
     try {
 
         const response = await fetch(
-            `http://localhost:8080/turnos/propios`,
+            `/turnos/propios`,
             {
                 headers: authHeaders()
             }

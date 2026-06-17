@@ -40,7 +40,7 @@ function postFormulario(email, descripcion, pass) {
 
 
     //poner bien el post
-    fetch("http://localhost:8080/usuarios/recuperar-cuenta", {
+    fetch("/usuarios/recuperar-cuenta", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

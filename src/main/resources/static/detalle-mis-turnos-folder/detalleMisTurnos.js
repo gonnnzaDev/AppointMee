@@ -14,7 +14,7 @@ obtenerDetalleTurno();
 
 async function obtenerDetalleTurno() {
     try {
-        const response = await fetch(`http://localhost:8080/turnos/propios/detalles/${turnoId}`, {
+        const response = await fetch(`/turnos/propios/detalles/${turnoId}`, {
             headers: authHeaders()
         });
 
@@ -88,7 +88,7 @@ document.getElementById("resenia-form").addEventListener("submit", async (e) => 
     };
 
     try {
-        const response = await fetch(`http://localhost:8080/turnos/detalles/${turnoId}/resenia`, {
+        const response = await fetch(`/turnos/detalles/${turnoId}/resenia`, {
             method: 'POST',
             headers: {
                 ...authHeaders(),
