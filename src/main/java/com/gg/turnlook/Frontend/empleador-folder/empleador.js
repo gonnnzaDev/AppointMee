@@ -1,9 +1,6 @@
+import { authHeaders } from "../recursos/modulos.js";
 const API = "http://localhost:8080";
-const token = () => localStorage.getItem("token");
-const authHeaders = () => ({
-    "Content-Type": "application/json",
-    "Authorization": "Bearer " + token()
-});
+
 
 let miId = null;
 let misSucursales = [];
@@ -14,6 +11,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     await cargarSucursales();
     bindEventos();
 });
+
+window.abrirModalModificarSucursal = abrirModalModificarSucursal;
+window.eliminarSucursal = eliminarSucursal;
+window.abrirModalModificarServicio = abrirModalModificarServicio;
+window.eliminarServicio = eliminarServicio;
+window.finalizarTurno = finalizarTurno;
+window.cancelarTurno = cancelarTurno;
+window.eliminarEmpleado = eliminarEmpleado;
+
 
 
 
@@ -105,6 +111,7 @@ async function eliminarSucursal(sucursalId) {
 
 
 
+
 async function cargarServicios(sucursalId) {
     const body = document.getElementById("serviciosBody");
     body.innerHTML = "";
@@ -156,6 +163,7 @@ async function eliminarServicio(servicioId, sucursalId) {
         alert("Error: " + e.message);
     }
 }
+
 
 
 
@@ -234,6 +242,7 @@ async function cancelarTurno(turnoId, sucursalId) {
 
 
 
+
 async function cargarEmpleados(sucursalId) {
     const body = document.getElementById("empleadosBody");
     body.innerHTML = "";
@@ -306,6 +315,7 @@ async function eliminarEmpleado(sucursalId, empleadoId) {
 
 
 
+
 async function abrirModalModificarSucursal(sucursalId) {
     const suc = misSucursales.find(s => s.id === sucursalId);
     if (!suc) return;
@@ -348,13 +358,13 @@ async function abrirModalModificarSucursal(sucursalId) {
 
     document.getElementById("btn-guardar-suc").addEventListener("click", async () => {
         const body = {
-            nombre:       document.getElementById("mod-suc-nombre").value || undefined,
-            direccion:    document.getElementById("mod-suc-direccion").value || undefined,
-            telefono:     document.getElementById("mod-suc-telefono").value || undefined,
-            descripcion:  document.getElementById("mod-suc-descripcion").value || undefined,
+            nombre: document.getElementById("mod-suc-nombre").value || undefined,
+            direccion: document.getElementById("mod-suc-direccion").value || undefined,
+            telefono: document.getElementById("mod-suc-telefono").value || undefined,
+            descripcion: document.getElementById("mod-suc-descripcion").value || undefined,
             horaApertura: document.getElementById("mod-suc-horaApertura").value || undefined,
-            horaCierre:   document.getElementById("mod-suc-horaCierre").value || undefined,
-            fotoUrl:      document.getElementById("mod-suc-fotoUrl").value || undefined,
+            horaCierre: document.getElementById("mod-suc-horaCierre").value || undefined,
+            fotoUrl: document.getElementById("mod-suc-fotoUrl").value || undefined,
         };
         try {
             const res = await fetch(`${API}/sucursales/modificar/${sucursalId}`, {
@@ -370,6 +380,9 @@ async function abrirModalModificarSucursal(sucursalId) {
         }
     });
 }
+
+
+
 
 async function abrirModalModificarServicio(servicioId) {
     try {
@@ -413,11 +426,11 @@ async function abrirModalModificarServicio(servicioId) {
 
         document.getElementById("btn-guardar-serv").addEventListener("click", async () => {
             const body = {
-                nombre:      document.getElementById("mod-serv-nombre").value || undefined,
+                nombre: document.getElementById("mod-serv-nombre").value || undefined,
                 descripcion: document.getElementById("mod-serv-descripcion").value || undefined,
-                duracion:    parseInt(document.getElementById("mod-serv-duracion").value) || undefined,
-                precio:      parseFloat(document.getElementById("mod-serv-precio").value) || undefined,
-                fotoUrl:     document.getElementById("mod-serv-fotoUrl").value || undefined,
+                duracion: parseInt(document.getElementById("mod-serv-duracion").value) || undefined,
+                precio: parseFloat(document.getElementById("mod-serv-precio").value) || undefined,
+                fotoUrl: document.getElementById("mod-serv-fotoUrl").value || undefined,
             };
             try {
                 const res = await fetch(`${API}/servicios/modificar/${servicioId}`, {
@@ -444,16 +457,238 @@ async function abrirModalModificarServicio(servicioId) {
 
 
 
+
+function abrirModalAgregarSucursal() {
+    const div = document.createElement("div");
+    div.id = "modal-agregar-suc";
+    div.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center;";
+    div.innerHTML = `
+        <div class="form-simple" style="max-width:480px;width:90%;max-height:85vh;overflow-y:auto;">
+            <h1>Agregar Sucursal</h1>
+ 
+            <p>Nombre de la sucursal</p>
+            <div class="input-group mb-1">
+                <input type="text" class="form-control" placeholder="Nombre" id="add-suc-nombre" minlength="4" maxlength="120" required>
+            </div>
+ 
+            <p>Dirección</p>
+            <div class="input-group mb-1">
+                <input type="text" class="form-control" placeholder="Dirección" id="add-suc-direccion" minlength="10" maxlength="60" required>
+            </div>
+ 
+            <p>Teléfono</p>
+            <div class="input-group mb-1">
+                <input type="tel" class="form-control" placeholder="Teléfono" id="add-suc-telefono" minlength="8" maxlength="20">
+            </div>
+ 
+            <p>Descripción</p>
+            <div class="input-group mb-1">
+                <textarea class="form-control" placeholder="Descripción" id="add-suc-descripcion" minlength="10" maxlength="1500" rows="4" required></textarea>
+            </div>
+ 
+            <p>Categoría</p>
+            <div class="input-group mb-1">
+                <select class="form-control" id="add-suc-categoria" required>
+                    <option value="">Seleccioná una categoría</option>
+                </select>
+            </div>
+ 
+            <p>Hora de apertura</p>
+            <div class="input-group mb-1">
+                <input type="time" class="form-control" id="add-suc-horaApertura" required>
+            </div>
+ 
+            <p>Hora de cierre</p>
+            <div class="input-group mb-1">
+                <input type="time" class="form-control" id="add-suc-horaCierre" required>
+            </div>
+ 
+            <p>URL foto de perfil</p>
+            <div class="input-group mb-1">
+                <input type="url" class="form-control" placeholder="https://..." id="add-suc-fotoUrl" required>
+            </div>
+ 
+            <div class="form-actions">
+                <button class="btn-submit" id="btn-crear-suc">Enviar</button>
+                <button class="btn-cancel" onclick="document.getElementById('modal-agregar-suc').remove()">Cancelar</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(div);
+
+    cargarCategoriasSucursal();
+
+    document.getElementById("btn-crear-suc").addEventListener("click", async (e) => {
+        e.preventDefault();
+
+        const nombre = document.getElementById("add-suc-nombre").value;
+        const direccion = document.getElementById("add-suc-direccion").value;
+        const telefono = document.getElementById("add-suc-telefono").value;
+        const descripcion = document.getElementById("add-suc-descripcion").value;
+        const categoriaId = document.getElementById("add-suc-categoria").value;
+        const horaApertura = document.getElementById("add-suc-horaApertura").value;
+        const horaCierre = document.getElementById("add-suc-horaCierre").value;
+        const fotoUrl = document.getElementById("add-suc-fotoUrl").value;
+
+        await postSucursal(nombre, direccion, telefono, descripcion, categoriaId, horaApertura, horaCierre, fotoUrl, div);
+    });
+}
+
+async function cargarCategoriasSucursal() {
+    try {
+        const response = await fetch(`${API}/sucursales/categorias`, {
+            headers: authHeaders()
+        });
+
+        if (!response.ok) throw new Error(`Error ${response.status}`);
+
+        const categorias = await response.json();
+        const select = document.getElementById("add-suc-categoria");
+
+        categorias.forEach((cat) => {
+            const option = document.createElement("option");
+            option.value = cat;
+            option.textContent = cat;
+            select.appendChild(option);
+        });
+
+    } catch (error) {
+        alert("Error al cargar categorías: " + error.message);
+    }
+}
+
+async function postSucursal(nombre, direccion, telefono, descripcion, categoriaId, horaApertura, horaCierre, fotoUrl, modalDiv) {
+    const datos = {
+        nombre,
+        direccion,
+        telefono,
+        descripcion,
+        categoriaId,
+        horaApertura,
+        horaCierre,
+        fotoUrl
+    };
+
+    try {
+        const response = await fetch(`${API}/sucursales/crear`, {
+            method: "POST",
+            headers: authHeaders(),
+            body: JSON.stringify(datos)
+        });
+
+        const data = await response.text();
+        alert(data);
+
+        if (response.ok) {
+            modalDiv.remove();
+            await cargarSucursales();
+        }
+
+    } catch (error) {
+        alert("Error al guardar: " + error.message);
+    }
+}
+
+
+
+
+function abrirModalAgregarServicio(sucursalId) {
+    const div = document.createElement("div");
+    div.id = "modal-agregar-serv";
+    div.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center;";
+    div.innerHTML = `
+        <div class="form-simple" style="max-width:440px;width:90%;max-height:85vh;overflow-y:auto;">
+            <h1>Agregar Servicio</h1>
+ 
+            <p>Nombre del servicio</p>
+            <div class="input-group mb-1">
+                <input type="text" class="form-control" placeholder="Nombre" id="add-serv-nombre" minlength="4" maxlength="60" required>
+            </div>
+ 
+            <p>Descripción</p>
+            <div class="input-group mb-1">
+                <textarea class="form-control" placeholder="Descripción" id="add-serv-descripcion" minlength="10" maxlength="500" rows="4" required></textarea>
+            </div>
+ 
+            <p>Duración (minutos)</p>
+            <div class="input-group mb-1">
+                <input type="number" class="form-control" placeholder="Ej: 30" id="add-serv-duracion" min="30" max="360" required>
+            </div>
+ 
+            <p>Precio</p>
+            <div class="input-group mb-1">
+                <input type="number" class="form-control" placeholder="Ej: 1500.00" id="add-serv-precio" min="0.01" max="999999.99" step="0.01" required>
+            </div>
+ 
+            <p>URL foto de perfil</p>
+            <div class="input-group mb-1">
+                <input type="url" class="form-control" placeholder="https://..." id="add-serv-fotoUrl" required>
+            </div>
+ 
+            <div class="form-actions">
+                <button class="btn-submit" id="btn-crear-serv">Enviar</button>
+                <button class="btn-cancel" onclick="document.getElementById('modal-agregar-serv').remove()">Cancelar</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(div);
+
+    document.getElementById("btn-crear-serv").addEventListener("click", async (e) => {
+        e.preventDefault();
+
+        const nombre = document.getElementById("add-serv-nombre").value;
+        const descripcion = document.getElementById("add-serv-descripcion").value;
+        const duracion = parseInt(document.getElementById("add-serv-duracion").value);
+        const precio = parseFloat(document.getElementById("add-serv-precio").value);
+        const fotoUrl = document.getElementById("add-serv-fotoUrl").value;
+
+        await postServicio(nombre, descripcion, duracion, precio, sucursalId, fotoUrl, div);
+    });
+}
+
+async function postServicio(nombre, descripcion, duracion, precio, sucursalId, fotoUrl, modalDiv) {
+    const datos = {
+        nombre,
+        descripcion,
+        duracion,
+        precio,
+        sucursalId,
+        fotoUrl
+    };
+
+    try {
+        const response = await fetch(`${API}/servicios/crear`, {
+            method: "POST",
+            headers: authHeaders(),
+            body: JSON.stringify(datos)
+        });
+
+        const data = await response.text();
+        alert(data);
+
+        if (response.ok) {
+            modalDiv.remove();
+            await cargarServicios(sucursalId);
+        }
+
+    } catch (error) {
+        alert("Error al guardar: " + error.message);
+    }
+}
+
+
+
+
 function bindEventos() {
 
     document.getElementById("btn-agregar-sucursal").addEventListener("click", () => {
-        window.location.href = "../formagregarsucursal-folder/FormAgregarSucursal.html";
+        abrirModalAgregarSucursal();
     });
 
     document.getElementById("btn-agregar-servicio").addEventListener("click", () => {
         const sucursalId = document.getElementById("filtro-sucursal-servicios").value;
         if (!sucursalId) { alert("Seleccioná una sucursal primero"); return; }
-        window.location.href = `../formagregarservicio-folder/FormAgregarServicio.html?sucursalId=${sucursalId}`;
+        abrirModalAgregarServicio(sucursalId);
     });
 
     document.getElementById("filtro-sucursal-servicios").addEventListener("change", (e) => {
@@ -474,3 +709,5 @@ function bindEventos() {
         agregarEmpleado(sucursalId);
     });
 }
+
+//
