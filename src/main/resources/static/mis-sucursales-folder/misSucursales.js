@@ -1,4 +1,4 @@
-import { API_URL, authHeaders, sesionActiva } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva, checkRes } from "../recursos/modulos.js";
 
 const user = await sesionActiva();
 if (!user) {
@@ -47,7 +47,7 @@ function renderSucursales(lista) {
 async function fetchPropias() {
     try {
         const res = await fetch(API_URL + "/sucursales/listar/propias", { headers: authHeaders() });
-        if (!res.ok) throw new Error();
+        await checkRes(res);
         return await res.json();
     } catch {
         return [];
@@ -57,7 +57,7 @@ async function fetchPropias() {
 async function fetchAsociadas() {
     try {
         const res = await fetch(API_URL + `/usuarios/${user.id}`, { headers: authHeaders() });
-        if (!res.ok) throw new Error();
+        await checkRes(res);
         const perfil = await res.json();
         return perfil.sucursalesEmpleado || [];
     } catch {

@@ -1,4 +1,4 @@
-import { API_URL, authHeaders, sesionActiva } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva, checkRes } from "../recursos/modulos.js";
 
 const user = await sesionActiva();
 
@@ -74,7 +74,7 @@ async function buscarMisTurnos() {
             API_URL + `/turnos/propios`,
             { headers: authHeaders() }
         );
-        if (!response.ok) throw new Error(`Error ${response.status}`);
+        await checkRes(response);
         return await response.json();
     } catch (error) {
         console.error("Error al buscar turnos:", error);

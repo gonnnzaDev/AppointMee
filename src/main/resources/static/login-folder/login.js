@@ -1,4 +1,4 @@
-import { API_URL, authHeaders } from "../recursos/modulos.js";
+import { API_URL, authHeaders, checkRes } from "../recursos/modulos.js";
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 renderLogin();
 
@@ -45,9 +45,7 @@ async function userExists(mail, pass) {
             }
         );
 
-        if (!response.ok) {
-              return null;
-        }
+        await checkRes(response);
 
         const data = await response.json();
         localStorage.setItem("token", data.token);

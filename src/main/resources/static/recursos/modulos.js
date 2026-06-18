@@ -39,3 +39,18 @@ export function cerrarSesion() {
     localStorage.removeItem("token");
     window.location.href = "../login-folder/Login.html";
 }
+//Esta mierda es una checkea el status
+export async function checkRes(response) {
+    if (!response.ok) {
+        const text = await response.text();
+        const msg = text || "Error desconocido";
+        window.location.href = `../error-folder/Error.html?msg=${encodeURIComponent(msg)}`;
+        throw new Error(msg);
+    }
+    return response;
+}
+
+export async function apiFetch(url, options = {}) {
+    const res = await fetch(url, options);
+    return checkRes(res);
+}

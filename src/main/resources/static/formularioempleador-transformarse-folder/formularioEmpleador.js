@@ -1,4 +1,4 @@
-import { API_URL, authHeaders, sesionActiva } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva, checkRes } from "../recursos/modulos.js";
 const user = await sesionActiva();
 
 if (!user) {
@@ -53,7 +53,7 @@ async function postMensaje(mensaje) {
             headers: authHeaders(),
             body: JSON.stringify({ motivo: mensaje })
         });
-
+        await checkRes(response);
         const data = await response.text();
 
         if (response.ok) alert("enviado con exito");

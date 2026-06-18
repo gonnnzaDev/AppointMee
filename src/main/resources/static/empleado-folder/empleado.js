@@ -1,7 +1,8 @@
 import {
     API_URL,
     sesionActiva,
-    authHeaders
+    authHeaders,
+    checkRes
 } from "../recursos/modulos.js";
 
 
@@ -13,6 +14,7 @@ if (!user) {
 
 let solicitudes = [];
 let turnos = [];
+let misSucursales = [];
 
 document
     .getElementById("buscar-solicitud")
@@ -27,8 +29,42 @@ await init();
 async function init() {
 
     await cargarSolicitudes();
-    await cargarTurnos();
+    await cargarSucursales();
 
+    document.getElementById("filtro-sucursal-turnos").addEventListener("change", (e) => {
+        const id = e.target.value;
+        if (id) {
+            cargarTurnos(parseInt(id));
+        } else {
+            turnos = [];
+            renderTurnos();
+        }
+    });
+
+}
+
+async function cargarSucursales() {
+    try {
+        const res = await fetch(API_URL + `/usuarios/${user.id}`, { headers: authHeaders() });
+        await checkRes(res);
+        const perfil = await res.json();
+        misSucursales = perfil.sucursalesEmpleado || [];
+        const sel = document.getElementById("filtro-sucursal-turnos");
+        sel.innerHTML = '<option value="">Seleccioná una sucursal</option>';
+        misSucursales.forEach(s => {
+            const opt = document.createElement("option");
+            opt.value = s.id;
+            opt.textContent = s.nombre;
+            sel.appendChild(opt);
+        });
+        if (misSucursales.length === 1) {
+            sel.value = misSucursales[0].id;
+            const event = new Event("change");
+            sel.dispatchEvent(event);
+        }
+    } catch (e) {
+        console.error("Error al cargar sucursales:", e);
+    }
 }
 
 async function cargarSolicitudes() {
@@ -41,10 +77,7 @@ async function cargarSolicitudes() {
                 headers: authHeaders()
             }
         );
-
-        if (!response.ok) {
-            throw new Error("Error cargando solicitudes");
-        }
+        await checkRes(response);
 
         solicitudes = await response.json();
 
@@ -139,10 +172,7 @@ async function aprobarSolicitud(id) {
                 headers: authHeaders()
             }
         );
-
-        if (!response.ok) {
-            throw new Error();
-        }
+        await checkRes(response);
 
         await cargarSolicitudes();
 
@@ -167,10 +197,7 @@ async function rechazarSolicitud(id) {
                 headers: authHeaders()
             }
         );
-
-        if (!response.ok) {
-            throw new Error();
-        }
+        await checkRes(response);
 
         await cargarSolicitudes();
 
@@ -184,10 +211,18 @@ async function rechazarSolicitud(id) {
 
 }
 
-async function cargarTurnos() {
+async function cargarTurnos(sucursalId) {
 
-    turnos = [];
-
+    try {
+        const res = await fetch(
+            API_URL + `/turnos/de-sucursal/${sucursalId}/propios?estadoTurno=PENDIENTE`,
+            { headers: authHeaders() }
+        );
+        await checkRes(res);
+        turnos = await res.json();
+    } catch (e) {
+        turnos = [];
+    }
     renderTurnos();
 
 }
@@ -214,34 +249,33 @@ function renderTurnos() {
     if (filtrados.length === 0) {
 
         container.innerHTML =
-            "<p>No hay turnos para mostrar.</p>";
+            "<p style='color:var(--t3);font-family:var(--mono);font-size:12px;'>No hay turnos para mostrar.</p>";
 
         return;
     }
 
     filtrados.forEach(turno => {
 
+        const fecha = new Date(turno.fechaTurno).toLocaleString("es-AR");
+        const estadoBadge = {
+            PENDIENTE: 'badge--amber',
+            REALIZADO: 'badge--green',
+            CANCELADO: 'badge--red',
+            PAGO_RECHAZADO: 'badge--red'
+        }[turno.estadoTurno] || 'badge--blue';
+
         const card = document.createElement("div");
 
         card.className = "card";
 
         card.innerHTML = `
-            <h3>${turno.servicio}</h3>
-
-            <p>
-                Cliente:
-                ${turno.cliente}
-            </p>
-
-            <p>
-                Fecha:
-                ${turno.fecha}
-            </p>
-
-            <p>
-                Estado:
-                ${turno.estado}
-            </p>
+            <div style="display:flex;align-items:center;gap:12px;">
+                <div style="flex:1;min-width:0;">
+                    <h3 style="font-size:13px;font-weight:500;color:var(--t);margin:0 0 4px;">${turno.nombreServicio}</h3>
+                    <p style="font-size:11px;color:var(--t3);font-family:var(--mono);margin:0;">${fecha}</p>
+                </div>
+                <span class="badge ${estadoBadge}">${turno.estadoTurno}</span>
+            </div>
         `;
 
         container.appendChild(card);

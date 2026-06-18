@@ -1,4 +1,4 @@
-import { API_URL, authHeaders, sesionActiva } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva, checkRes } from "../recursos/modulos.js";
 
 const user = await sesionActiva();
 
@@ -54,12 +54,8 @@ async function pagarConMercadoPago() {
             method: 'POST',
             headers: authHeaders()
         });
-
+        await checkRes(response);
         const data = await response.text();
-
-        if (!response.ok) {
-            throw new Error(data || `No se pudo iniciar el pago (código ${response.status})`);
-        }
 
         window.location.href = data;
 

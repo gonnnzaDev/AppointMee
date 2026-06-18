@@ -1,4 +1,4 @@
-import { API_URL, authHeaders, sesionActiva } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva, checkRes } from "../recursos/modulos.js";
 
 const user = await sesionActiva();
 
@@ -21,10 +21,7 @@ async function obtenerDetalleTurno() {
         const response = await fetch(API_URL + `/turnos/propios/detalles/${turnoId}`, {
             headers: authHeaders()
         });
-
-        if (!response.ok) {
-            throw new Error(`Error al recuperar detalles: ${response.status}`);
-        }
+        await checkRes(response);
 
         const turno = await response.json();
 
@@ -232,12 +229,7 @@ document
                     })
                 }
             );
-
-            if (!response.ok) {
-                throw new Error(
-                    `No se pudo guardar la calificación. Código: ${response.status}`
-                );
-            }
+            await checkRes(response);
 
             alert(
                 "¡Muchas gracias! Tu calificación se guardó correctamente."
