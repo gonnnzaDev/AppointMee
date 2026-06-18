@@ -59,6 +59,7 @@ public class SecurityConfig {
                                 "/creditos-folder/**",
                                 "/detalle-mis-turnos-folder/**",
                                 "/empleador-folder/**",
+                                "/empleado-folder/**",
                                 "/error-folder/**",
                                 "/formularioempleador-transformarse-folder/**",
                                 "/index-folder/**",
