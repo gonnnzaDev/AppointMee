@@ -19,8 +19,12 @@ window.eliminarSucursal = eliminarSucursal;
 window.eliminarServicio = eliminarServicio;
 window.finalizarTurno = finalizarTurno;
 window.cancelarTurno = cancelarTurno;
+window.verDetalleTurno = verDetalleTurno;
+window.verDetalleServicio = verDetalleServicio;
 window.eliminarEmpleado = eliminarEmpleado;
 window.convertirmeEnEmpleado = convertirmeEnEmpleado;
+window.abrirModalImagenes = abrirModalImagenes;
+window.eliminarImagenSucursal = eliminarImagenSucursal;
 
 function crearModal(id) {
     const old = document.getElementById(id);
@@ -78,6 +82,7 @@ function renderSucursales(sucursales) {
                 <div class="table-actions">
                     <button onclick="abrirModalModificarSucursal(${s.id})">Editar</button>
                     <button onclick="convertirmeEnEmpleado(${s.id})">Ser empleado</button>
+                    <button onclick="abrirModalImagenes(${s.id})">Imágenes</button>
                     <button onclick="eliminarSucursal(${s.id})" class="btn-danger">Borrar</button>
                 </div>
             </td>
@@ -138,6 +143,7 @@ async function cargarServicios(sucursalId) {
                 <td>${s.duracion} min</td>
                 <td>
                     <div class="table-actions">
+                        <button onclick="verDetalleServicio(${s.id})">Detalle</button>
                         <button onclick="abrirModalModificarServicio(${s.id})">Editar</button>
                         <button onclick="eliminarServicio(${s.id}, ${sucursalId})" style="color:var(--red);">Borrar</button>
                     </div>
@@ -167,6 +173,52 @@ async function eliminarServicio(servicioId, sucursalId) {
     }
 }
 
+async function verDetalleServicio(servicioId) {
+    const div = crearModal("modal-detalle-servicio");
+    div.innerHTML = `
+        <div class="form-simple">
+            <h1>Detalle del Servicio</h1>
+            <div id="detalle-servicio-body" style="color:var(--t3);font-size:12px;">Cargando...</div>
+            <div class="form-actions" style="margin-top:20px;">
+                <button class="btn-cancel" onclick="this.closest('.modal-overlay').remove()">Cerrar</button>
+            </div>
+        </div>
+    `;
+
+    try {
+        const res = await fetch(API_URL + `/servicios/${servicioId}`, { headers: authHeaders() });
+        await checkRes(res);
+        const s = await res.json();
+        const body = document.getElementById("detalle-servicio-body");
+        if (!body) return;
+
+        const fila = (label, valor) => `
+            <p style="margin:0 0 8px;"><strong>${label}:</strong> ${valor ?? "-"}</p>
+        `;
+
+        let html = "";
+        if (s.fotoPerfil) {
+            html += `<img src="${s.fotoPerfil}" alt="" style="width:100%;max-height:160px;object-fit:cover;border-radius:var(--r-sm);margin-bottom:12px;">`;
+        }
+        html += fila("Nombre", s.nombre);
+        html += fila("Descripción", s.descripcion);
+        html += fila("Duración", `${s.duracion} min`);
+        html += fila("Precio", `$${s.precio}`);
+        html += fila("Puntuación", s.cantidadPuntuaciones > 0 ? `${s.puntuacion} 🐝 (${s.cantidadPuntuaciones} reseñas)` : "Sin reseñas");
+
+        html += `<hr style="border-color:var(--b);margin:14px 0;">`;
+        html += `<p style="font-weight:600;color:var(--t);margin-bottom:8px;">Sucursal</p>`;
+        html += fila("Nombre", s.nombreSucursal);
+        html += fila("Dirección", s.direccionSucursal);
+        html += fila("Categoría", s.categoriaSucursal);
+
+        body.innerHTML = html;
+    } catch (e) {
+        const body = document.getElementById("detalle-servicio-body");
+        if (body) body.innerHTML = `<div style="color:var(--red);font-size:12px;">Error al cargar el detalle: ${e.message}</div>`;
+    }
+}
+
 async function convertirmeEnEmpleado(sucursalId) {
     if (!confirm("¿Querés convertirte en empleado de esta sucursal?")) return;
     try {
@@ -188,7 +240,6 @@ async function cargarTurnos(sucursalId) {
     if (!sucursalId) return;
 
     const estado = document.getElementById("filtro-estado-turnos").value;
-    console.log(estado);
     try {
         const res = await fetch(
             API_URL + `/turnos/de-sucursal/${sucursalId}?estadoTurno=${estado}`,
@@ -213,6 +264,7 @@ async function cargarTurnos(sucursalId) {
                 <td><span class="badge badge--blue">${estado}</span></td>
                 <td>
                     <div class="table-actions">
+                        <button onclick="verDetalleTurno(${t.id})">Detalle</button>
                         <button onclick="finalizarTurno(${t.id}, ${sucursalId})">Finalizar</button>
                         <button onclick="cancelarTurno(${t.id}, ${sucursalId})" style="color:var(--red);">Cancelar</button>
                     </div>
@@ -225,10 +277,12 @@ async function cargarTurnos(sucursalId) {
         alert("Error al cargar turnos: " + e.message);
     }
 }
+
 document.getElementById("filtro-estado-turnos").addEventListener("change", () => {
     const sucursalId = document.getElementById("filtro-sucursal-turnos").value;
     cargarTurnos(sucursalId);
 });
+
 async function finalizarTurno(turnoId, sucursalId) {
     if (!confirm("¿Finalizar este turno?")) return;
     try {
@@ -258,6 +312,67 @@ async function cancelarTurno(turnoId, sucursalId) {
         if (res.ok) await cargarTurnos(sucursalId);
     } catch (e) {
         alert("Error: " + e.message);
+    }
+}
+
+async function verDetalleTurno(turnoId) {
+    const div = crearModal("modal-detalle-turno");
+    div.innerHTML = `
+        <div class="form-simple">
+            <h1>Detalle del Turno</h1>
+            <div id="detalle-turno-body" style="color:var(--t3);font-size:12px;">Cargando...</div>
+            <div class="form-actions" style="margin-top:20px;">
+                <button class="btn-cancel" onclick="this.closest('.modal-overlay').remove()">Cerrar</button>
+            </div>
+        </div>
+    `;
+
+    try {
+        const res = await fetch(API_URL + `/turnos/de-sucursal/detalles/${turnoId}`, { headers: authHeaders() });
+        await checkRes(res);
+        const t = await res.json();
+        const body = document.getElementById("detalle-turno-body");
+        if (!body) return;
+
+        const fechaTurno = new Date(t.fechaTurno).toLocaleString("es-AR");
+        const fechaReserva = new Date(t.fechaReserva).toLocaleString("es-AR");
+
+        const fila = (label, valor) => `
+            <p style="margin:0 0 8px;"><strong>${label}:</strong> ${valor ?? "-"}</p>
+        `;
+
+        let html = "";
+        html += fila("Estado", `<span class="badge badge--blue">${t.estadoTurno}</span>`);
+        html += fila("Fecha del turno", fechaTurno);
+        html += fila("Fecha de reserva", fechaReserva);
+
+        html += `<hr style="border-color:var(--b);margin:14px 0;">`;
+        html += `<p style="font-weight:600;color:var(--t);margin-bottom:8px;">Servicio</p>`;
+        html += fila("Nombre", t.servicio?.nombre);
+        html += fila("Duración", t.servicio ? `${t.servicio.duracion} min` : "-");
+        html += fila("Precio", t.servicio ? `$${t.servicio.precio}` : "-");
+
+        html += `<hr style="border-color:var(--b);margin:14px 0;">`;
+        html += `<p style="font-weight:600;color:var(--t);margin-bottom:8px;">Cliente</p>`;
+        html += fila("Nombre", t.cliente ? `${t.cliente.nombre} ${t.cliente.apellido}` : "-");
+
+        html += `<hr style="border-color:var(--b);margin:14px 0;">`;
+        html += `<p style="font-weight:600;color:var(--t);margin-bottom:8px;">Empleado</p>`;
+        html += fila("Nombre", t.empleado ? `${t.empleado.nombre} ${t.empleado.apellido}` : "-");
+        html += fila("Email", t.empleado?.email);
+
+        if (t.resenia) {
+            html += `<hr style="border-color:var(--b);margin:14px 0;">`;
+            html += `<p style="font-weight:600;color:var(--t);margin-bottom:8px;">Reseña</p>`;
+            html += fila("Puntuación", `${t.resenia.puntuacion} 🐝`);
+            html += fila("Comentario", t.resenia.comentario);
+            html += fila("Fecha", t.resenia.fechaResenia);
+        }
+
+        body.innerHTML = html;
+    } catch (e) {
+        const body = document.getElementById("detalle-turno-body");
+        if (body) body.innerHTML = `<div style="color:var(--red);font-size:12px;">Error al cargar el detalle: ${e.message}</div>`;
     }
 }
 
@@ -486,13 +601,13 @@ async function abrirModalModificarServicio(servicioId) {
                 fotoUrl: document.getElementById("mod-serv-fotoUrl").value || undefined,
             };
             try {
-            const res = await fetch(API_URL + `/servicios/modificar/${servicioId}`, {
-                method: "PATCH",
-                headers: authHeaders(),
-                body: JSON.stringify(body)
-            });
-            await checkRes(res);
-            const msg = await res.text();
+                const res = await fetch(API_URL + `/servicios/modificar/${servicioId}`, {
+                    method: "PATCH",
+                    headers: authHeaders(),
+                    body: JSON.stringify(body)
+                });
+                await checkRes(res);
+                const msg = await res.text();
                 alert(msg);
                 if (res.ok) {
                     div.remove();
@@ -719,6 +834,145 @@ async function postServicio(nombre, descripcion, duracion, precio, sucursalId, f
         alert("Error al guardar: " + error.message);
     }
 }
+
+
+async function abrirModalImagenes(sucursalId) {
+    const div = crearModal("modal-imagenes");
+    div.innerHTML = `
+        <div class="form-simple" style="max-width:700px;">
+            <h1>Imágenes de la Sucursal</h1>
+            
+            <div id="imagenes-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:12px; margin:20px 0;">
+                <div style="color:var(--t3);font-size:12px;">Cargando imágenes...</div>
+            </div>
+            
+            <hr style="border-color:var(--b);margin:20px 0;">
+            
+            <h2 style="font-size:16px; margin-bottom:12px;">Agregar Imágenes</h2>
+            <p style="font-size:12px; color:var(--t3); margin-bottom:8px;">Ingresá las URLs de las imágenes</p>
+            
+            <div class="input-group">
+                <input type="url" class="form-control" id="input-imagen-url-1" placeholder="https://ejemplo.com/imagen1.jpg">
+            </div>
+            <div class="input-group">
+                <input type="url" class="form-control" id="input-imagen-url-2" placeholder="https://ejemplo.com/imagen2.jpg">
+            </div>
+            <div class="input-group">
+                <input type="url" class="form-control" id="input-imagen-url-3" placeholder="https://ejemplo.com/imagen3.jpg">
+            </div>
+            <div class="input-group">
+                <input type="url" class="form-control" id="input-imagen-url-4" placeholder="https://ejemplo.com/imagen4.jpg">
+            </div>
+            <div class="input-group">
+                <input type="url" class="form-control" id="input-imagen-url-5" placeholder="https://ejemplo.com/imagen5.jpg">
+            </div>
+            
+            <div class="form-actions" style="margin-top:20px;">
+                <button class="btn-submit" id="btn-agregar-imagenes">Agregar Imágenes</button>
+                <button class="btn-cancel" onclick="this.closest('.modal-overlay').remove()">Cerrar</button>
+            </div>
+        </div>
+    `;
+
+    await cargarImagenesEnModal(sucursalId);
+
+    document.getElementById("btn-agregar-imagenes").addEventListener("click", async () => {
+        const urls = [];
+
+        for (let i = 1; i <= 5; i++) {
+            const url = document.getElementById(`input-imagen-url-${i}`).value.trim();
+            if (url) urls.push(url);
+        }
+
+        if (urls.length === 0) {
+            alert("Ingresá al menos una URL de imagen");
+            return;
+        }
+
+        await agregarImagenes(sucursalId, urls, div);
+    });
+}
+
+async function cargarImagenesEnModal(sucursalId) {
+    const grid = document.getElementById("imagenes-grid");
+    if (!grid) return;
+
+    try {
+        const res = await fetch(API_URL + `/sucursales/${sucursalId}/imagenes`, {
+            headers: authHeaders()
+        });
+        await checkRes(res);
+        const imagenes = await res.json();
+
+        if (!imagenes || !imagenes.length) {
+            grid.innerHTML = `<div style="color:var(--t3);font-family:var(--mono);font-size:12px;grid-column:1/-1;">Sin imágenes</div>`;
+            return;
+        }
+
+        grid.innerHTML = imagenes.map(img => `
+            <div style="position:relative; border-radius:var(--r-sm); overflow:hidden; aspect-ratio:1; background:var(--s2);">
+                <img src="${img.url}" alt="Imagen de sucursal" 
+                    style="width:100%; height:100%; object-fit:cover;"
+                    onerror="this.parentElement.innerHTML='<div style=\\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:10px;\\'>Error al cargar</div>'">
+                <button onclick="eliminarImagenSucursal(${sucursalId}, ${img.id})" 
+                    style="position:absolute; top:4px; right:4px; background:var(--red); color:white; border:none; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; line-height:1; opacity:0.9; transition:opacity 0.2s;"
+                    onmouseover="this.style.opacity='1'"
+                    onmouseout="this.style.opacity='0.9'"
+                    title="Eliminar imagen">
+                    ×
+                </button>
+            </div>
+        `).join("");
+
+    } catch (e) {
+        grid.innerHTML = `<div style="color:var(--red);font-size:12px;grid-column:1/-1;">Error al cargar imágenes: ${e.message}</div>`;
+    }
+}
+
+async function agregarImagenes(sucursalId, urls, modalDiv) {
+    try {
+        const res = await fetch(API_URL + `/sucursales/${sucursalId}/agregar/imagenes`, {
+            method: "POST",
+            headers: authHeaders(),
+            body: JSON.stringify({ urls: urls })
+        });
+
+        await checkRes(res);
+        const msg = await res.text();
+        alert(msg);
+
+        if (res.ok) {
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`input-imagen-url-${i}`).value = "";
+            }
+            await cargarImagenesEnModal(sucursalId);
+        }
+    } catch (e) {
+        alert("Error al agregar imágenes: " + e.message);
+    }
+}
+
+async function eliminarImagenSucursal(sucursalId, imagenId) {
+    if (!confirm("¿Eliminar esta imagen?")) return;
+
+    try {
+        const res = await fetch(API_URL + `/sucursales/${sucursalId}/eliminar/imagen/${imagenId}`, {
+            method: "DELETE",
+            headers: authHeaders()
+        });
+
+        await checkRes(res);
+        const msg = await res.text();
+        alert(msg);
+
+        if (res.ok) {
+            await cargarImagenesEnModal(sucursalId);
+        }
+    } catch (e) {
+        alert("Error al eliminar la imagen: " + e.message);
+    }
+}
+
 
 function bindEventos() {
 

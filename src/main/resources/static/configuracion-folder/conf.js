@@ -34,7 +34,7 @@ function render() {
 
                 <h2>Ayuda</h2>
                 <p>¿Tuviste algun problema?
-                    <a href="mailto:gonnnzaDev@gmail.com">Contactate</a>
+                    <a href="mailto:appointmee3@gmail.com">Contactate</a>
                 </p>
 
 

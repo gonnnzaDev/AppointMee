@@ -94,3 +94,4 @@ if (registerButton) {
         window.location.href = "../register-folder/Register.html";
     });
 }
+

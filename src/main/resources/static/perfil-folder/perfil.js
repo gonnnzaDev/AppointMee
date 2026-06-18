@@ -14,11 +14,7 @@ if (!usuario) {
 } else {
     const params = new URLSearchParams(window.location.search);
     if (params.has("solicitudes")) {
-        if (usuario.roles.includes("ADMINISTRADOR")) {
-            renderPerfil(usuario);
-        } else {
-            renderSolicitudes(usuario);
-        }
+        renderSolicitudes(usuario);
     } else {
         renderPerfil(usuario);
     }
@@ -126,23 +122,11 @@ async function renderOpciones(usuario) {
         `;
     }
 
-    let tieneSolicitudesPendientes = false;
-    if (!usuario.roles.includes("ADMINISTRADOR")) {
-        try {
-            const res = await fetch(API_URL + `/solicitudes-empleado/recibidas`, { headers: authHeaders() });
-            await checkRes(res);
-            const solicitudes = await res.json();
-            tieneSolicitudesPendientes = solicitudes.length > 0;
-        } catch {}
-    }
-
-    if (!usuario.roles.includes("ADMINISTRADOR")) {
-        html += `
-            <button id="btn-solicitudes-perfil">
-                Solicitudes
-            </button>
-        `;
-    }
+    html += `
+        <button id="btn-solicitudes-perfil">
+            Solicitudes
+        </button>
+    `;
 
     containerrol.innerHTML = html;
 
@@ -353,8 +337,6 @@ async function renderSolicitudes(usuario) {
         <div class="funcionalidad-perfil-container">
             <div class="funcionalidad-perfil">
                 <h2 style="font-size:1rem;font-weight:600;color:var(--t);margin-bottom:16px;">Invitaciones a Sucursales</h2>
-                <input type="text" id="buscar-solicitud" placeholder="Buscar sucursal..."
-                    style="width:100%;padding:8px 12px;border:1px solid var(--b);border-radius:var(--r-sm);background:var(--s1);color:var(--t);font-size:12px;margin-bottom:12px;box-sizing:border-box;">
                 <div id="solicitudes-lista" style="color:var(--t3);font-size:13px;">Cargando...</div>
                 <div style="margin-top:16px;">
                     <button class="btn-cancel" id="volver-solicitudes">Volver</button>
@@ -369,33 +351,23 @@ async function renderSolicitudes(usuario) {
 
     try {
         const res = await fetch(API_URL + `/solicitudes-empleado/recibidas`, { headers: authHeaders() });
+
         await checkRes(res);
+
         solicitudesCache = await res.json();
         renderLista(solicitudesCache);
     } catch (e) {
         const container = document.getElementById("solicitudes-lista");
+        console.log(e);
         if (container) container.innerHTML = '<div style="color:var(--red);font-size:12px;">Error al cargar invitaciones</div>';
     }
 
-    document.getElementById("buscar-solicitud").addEventListener("input", () => {
-        renderLista(solicitudesCache);
-    });
 
     function renderLista(solicitudes) {
         const container = document.getElementById("solicitudes-lista");
-        const texto = document.getElementById("buscar-solicitud").value.toLowerCase();
 
         if (!solicitudes || !solicitudes.length) {
             container.innerHTML = '<div style="color:var(--t3);font-family:var(--mono);font-size:12px;">No tenés invitaciones pendientes</div>';
-            return;
-        }
-
-        const filtradas = solicitudes.filter(s =>
-            (s.sucursal.nombre || "").toLowerCase().includes(texto)
-        );
-
-        if (filtradas.length === 0) {
-            container.innerHTML = '<div style="color:var(--t3);font-family:var(--mono);font-size:12px;">No hay coincidencias</div>';
             return;
         }
 
@@ -405,28 +377,118 @@ async function renderSolicitudes(usuario) {
             RECHAZADA: 'badge--red'
         };
 
-        container.innerHTML = filtradas.map(s => {
+        container.innerHTML = solicitudes.map(s => {
             const fecha = new Date(s.fechaSolicitud).toLocaleDateString("es-AR");
             const esPendiente = s.estadoSolicitud === 'PENDIENTE';
             return `
                 <div class="card solicitud-card" data-id="${s.id}">
-                    <h3>${s.sucursal.nombre}</h3>
+                    <h3>${s.nombreSucursal}</h3>
                     <p>${fecha} — Te invitaron a trabajar en esta sucursal</p>
-                    ${esPendiente ? `
-                        <div style="display:flex;gap:8px;">
-                            <button class="aceptar-btn" data-id="${s.id}">Aceptar</button>
-                            <button class="rechazar-btn" data-id="${s.id}">Rechazar</button>
-                        </div>
-                    ` : `<span class="badge ${estadoBadge[s.estadoSolicitud] || 'badge--blue'}">${s.estadoSolicitud}</span>`}
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <button class="detalle-btn" data-id="${s.id}">Ver Detalle</button>
+                    </div>
                 </div>`;
         }).join("");
 
+        container.querySelectorAll(".detalle-btn").forEach(btn => {
+            btn.addEventListener("click", () => verDetalleSolicitud(parseInt(btn.dataset.id)));
+        });
         container.querySelectorAll(".aceptar-btn").forEach(btn => {
             btn.addEventListener("click", () => aprobarSolicitud(parseInt(btn.dataset.id)));
         });
         container.querySelectorAll(".rechazar-btn").forEach(btn => {
             btn.addEventListener("click", () => rechazarSolicitud(parseInt(btn.dataset.id)));
         });
+    }
+
+    async function verDetalleSolicitud(id) {
+        const old = document.getElementById("modal-detalle-solicitud");
+        if (old) old.remove();
+
+        const div = document.createElement("div");
+        div.className = "modal-overlay";
+        div.id = "modal-detalle-solicitud";
+        div.addEventListener("click", (e) => {
+            if (e.target === div) div.remove();
+        });
+        document.body.appendChild(div);
+
+        div.innerHTML = `
+            <div class="form-simple">
+                <h1>Detalle de la Solicitud</h1>
+                <div id="detalle-solicitud-body" style="color:var(--t3);font-size:12px;">Cargando...</div>
+                <div class="form-actions" style="margin-top:20px;">
+                    <button class="btn-cancel" onclick="this.closest('.modal-overlay').remove()">Cerrar</button>
+                </div>
+            </div>
+        `;
+
+        try {
+            const res = await fetch(API_URL + `/solicitudes-empleado/${id}/detalles`, { headers: authHeaders() });
+            await checkRes(res);
+            const s = await res.json();
+            const body = document.getElementById("detalle-solicitud-body");
+            if (!body) return;
+
+            const fila = (label, valor) => `
+                <p style="margin:0 0 8px;"><strong>${label}:</strong> ${valor ?? "-"}</p>
+            `;
+
+            const estadoBadgeDetalle = {
+                PENDIENTE: 'badge--amber',
+                APROBADA: 'badge--green',
+                RECHAZADA: 'badge--red'
+            };
+
+            let html = "";
+            html += fila("Estado", `<span class="badge ${estadoBadgeDetalle[s.estadoSolicitud] || 'badge--blue'}">${s.estadoSolicitud}</span>`);
+            html += fila("Fecha de solicitud", new Date(s.fechaSolicitud).toLocaleDateString("es-AR"));
+
+            html += `<hr style="border-color:var(--b);margin:14px 0;">`;
+            html += `<p style="font-weight:600;color:var(--t);margin-bottom:8px;">Empleado</p>`;
+            html += fila("Nombre", s.empleado ? `${s.empleado.nombre} ${s.empleado.apellido}` : "-");
+            html += fila("Email", s.empleado?.email);
+
+            html += `<hr style="border-color:var(--b);margin:14px 0;">`;
+            html += `<p style="font-weight:600;color:var(--t);margin-bottom:8px;">Sucursal</p>`;
+            html += fila("Nombre", s.sucursal?.nombre);
+            html += fila("Categoría", s.sucursal?.categoria);
+            html += fila("Puntuación", s.sucursal?.cantidadPuntuaciones > 0
+                ? `${s.sucursal.puntuacion} 🐝 (${s.sucursal.cantidadPuntuaciones} reseñas)`
+                : "Sin reseñas");
+
+            if (s.estadoSolicitud === 'PENDIENTE') {
+                html += `
+                    <div class="form-actions" style="margin-top:16px;">
+                        <button class="btn-submit" id="btn-aceptar-detalle-solicitud">Aceptar</button>
+                        <button class="btn-cancel" id="btn-rechazar-detalle-solicitud" style="color:var(--red);">Rechazar</button>
+                    </div>
+                `;
+            }
+
+            body.innerHTML = html;
+
+            const btnAceptar = document.getElementById("btn-aceptar-detalle-solicitud");
+            const btnRechazar = document.getElementById("btn-rechazar-detalle-solicitud");
+
+            if (btnAceptar) {
+                btnAceptar.addEventListener("click", async () => {
+                    div.remove();
+                    await aprobarSolicitud(id);
+                });
+            }
+
+            if (btnRechazar) {
+                btnRechazar.addEventListener("click", async () => {
+                    div.remove();
+                    await rechazarSolicitud(id);
+                });
+            }
+
+        } catch (e) {
+            const body = document.getElementById("detalle-solicitud-body");
+            if (body) body.innerHTML = `<div style="color:var(--red);font-size:12px;">Error al cargar el detalle: ${e.message}</div>`;
+        }
     }
 
     async function aprobarSolicitud(id) {
