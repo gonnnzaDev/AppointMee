@@ -50,10 +50,7 @@ public class Sucursal {
 
     @Column(nullable = false)
     private boolean activo = true;
-
-    @Column(nullable = true)
-    private String mpToken;
-
+    
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "imagen_id")
@@ -81,6 +78,7 @@ public class Sucursal {
 
 
 
+
     @PrePersist
     public void prePersist() {
         this.fechaCreacion = LocalDate.now();
@@ -89,6 +87,8 @@ public class Sucursal {
 
 
     /// CONSTRUCTORES
+
+
     public Sucursal(String nombre, String direccion, String telefono, String descripcion, LocalTime horaApertura, LocalTime horaCierre, Categoria categoria, Usuario empleador) {
         this.nombre = nombre;
         this.direccion = direccion;
@@ -99,4 +99,9 @@ public class Sucursal {
         this.categoria = categoria;
         this.empleador = empleador;
     }
+
+
 }
+
+
+
