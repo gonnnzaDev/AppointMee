@@ -34,6 +34,30 @@ Gestor de turnos para Trabajo Practico Final de la Materia Programacion III en l
 * Render
 * Docker
 
+## Cuentas de Prueba
+
+### Administrador
+
+**Email:** [admin123@gmail.com](mailto:admin123@gmail.com)
+**Contraseña:** Hola12_!
+
+### Empleador
+
+**Email:** [gonzalo@gmail.com](mailto:gonzalo@gmail.com)
+**Contraseña:** Hola12_!
+
+### Empleado
+
+**Email:** [claudio@gmail.com](mailto:claudio@gmail.com)
+**Contraseña:** Hola12_!
+
+### Cliente
+
+No se incluyen cuentas de prueba para clientes. (Tanto el empleado y empleador ya mencionados son clientes)
+
+Para probar las funcionalidades de cliente, registrar un nuevo usuario desde la aplicación.
+
+
 
 
 ### Instrucciones
