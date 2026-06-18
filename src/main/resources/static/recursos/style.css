@@ -3257,8 +3257,15 @@ button:active {
 
 .servicios-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 14px;
+    margin-bottom: 16px;
+}
+
+@media (min-width: 600px) {
+    .servicios-container {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
 
 .empleado-article {
@@ -3288,9 +3295,6 @@ button:active {
 @media (max-width: 768px) {
     .empleados-pagina {
         grid-template-columns: repeat(2, 1fr);
-    }
-    .servicios-container {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     }
 }
 
@@ -4069,7 +4073,7 @@ button:active {
     }
 
     .servicios-container {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
         gap: 8px;
     }
     .empleados-pagina {
