@@ -19,9 +19,8 @@ function render() {
                 <textarea class="form-control" placeholder="Mensaje" id="mensaje"></textarea>
             </div>
             <div class="formulario-transformar-empleador-botones">
-
-            <button id="volver">Volver</button>
-                <button id="enviar">Enviar</button>
+                <button class="btn-cancel" id="volver">Volver</button>
+                <button class="btn-submit" id="enviar">Enviar</button>
             </div>`;
     const enviar = document.getElementById("enviar");
     const volver = document.getElementById("volver");

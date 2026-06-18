@@ -37,7 +37,7 @@ function renderSucursales(lista) {
             <div style="flex:1;">
                 <h3 style="margin:0 0 4px;">${s.nombre}</h3>
                 <p style="margin:0 0 2px;color:var(--t3);font-size:14px;">${s.categoria || ""} ${s.tipo ? "· " + s.tipo : ""}</p>
-                <p style="margin:0;color:var(--t3);font-size:14px;">🐝 ${s.puntuacion ?? "Sin calificar"} (${s.cantidadPuntuaciones ?? 0})</p>
+                <p style="margin:0;color:var(--t3);font-size:14px;">${s.puntuacion ? "🐝".repeat(Math.round(s.puntuacion)) : "Sin calificar"}</p>
             </div>
             <a href="../sucursal-folder/Sucursal.html?id=${s.id}" style="background:#444;border:none;color:#fff;padding:8px 18px;border-radius:6px;text-decoration:none;font-size:14px;">Ver</a>
         </div>

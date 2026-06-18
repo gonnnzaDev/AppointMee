@@ -112,6 +112,11 @@ async function renderOpciones(usuario) {
                 Panel Administrador
             </button>
         `;
+        html += `
+            <button id="btn-solicitudes-transformacion">
+                Solicitudes de transformación
+            </button>
+        `;
     }
 
     if (usuario.roles.includes("CLIENTE") && !usuario.roles.includes("ADMINISTRADOR") && !usuario.roles.includes("EMPLEADOR")) {
@@ -134,6 +139,7 @@ async function renderOpciones(usuario) {
     const editar = document.getElementById("btn-editar-perfil");
     const modoAdmin = document.getElementById("btn-modo-admin");
     const btnSolicitudes = document.getElementById("btn-solicitudes-perfil");
+    const btnSolicitudesTransformacion = document.getElementById("btn-solicitudes-transformacion");
 
     volver.addEventListener("click", () => {
         renderPerfil(usuario);
@@ -142,6 +148,12 @@ async function renderOpciones(usuario) {
     if (modoAdmin) {
         modoAdmin.addEventListener("click", () => {
             window.location.href = "../admin-folder/admin.html";
+        });
+    }
+
+    if (btnSolicitudesTransformacion) {
+        btnSolicitudesTransformacion.addEventListener("click", () => {
+            renderSolicitudesEmpleador(usuario);
         });
     }
 
@@ -328,6 +340,169 @@ async function eliminarCuenta() {
 
 
 
+async function renderSolicitudesEmpleador(usuario) {
+    const infoAccountDiv = document.getElementById("info-account");
+
+    infoAccountDiv.innerHTML = `
+        <div class="funcionalidad-perfil-container">
+            <div class="funcionalidad-perfil">
+                <h2 style="font-size:1rem;font-weight:600;color:var(--t);margin-bottom:16px;">Solicitudes para ser Empleador</h2>
+                <div id="solicitudes-lista" style="color:var(--t3);font-size:13px;">Cargando...</div>
+                <div style="margin-top:16px;">
+                    <button class="btn-cancel" id="volver-solicitudes">Volver</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.getElementById("volver-solicitudes").addEventListener("click", () => {
+        renderPerfil(usuario);
+    });
+
+    try {
+        const res = await fetch(API_URL + `/solicitudes-empleador/listar`, { headers: authHeaders() });
+        await checkRes(res);
+        const solicitudes = await res.json();
+        const container = document.getElementById("solicitudes-lista");
+
+        if (!solicitudes.length) {
+            container.innerHTML = '<div style="color:var(--t3);font-family:var(--mono);font-size:12px;">No hay solicitudes pendientes</div>';
+            return;
+        }
+
+        container.innerHTML = solicitudes.map(s => {
+            const fecha = new Date(s.fechaSolicitud).toLocaleDateString("es-AR");
+            return `
+                <div class="card solicitud-card" style="cursor:pointer;" data-id="${s.id}">
+                    <h3>${s.nombreUsuario} ${s.apellidoUsuario}</h3>
+                    <p>${fecha}</p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <button class="detalle-btn" data-id="${s.id}">Ver Detalle</button>
+                    </div>
+                </div>`;
+        }).join("");
+
+        container.querySelectorAll(".detalle-btn").forEach(btn => {
+            btn.addEventListener("click", () => verDetalleSolicitudEmpleador(parseInt(btn.dataset.id)));
+        });
+    } catch (e) {
+        const container = document.getElementById("solicitudes-lista");
+        if (container) container.innerHTML = '<div style="color:var(--red);font-size:12px;">Error al cargar solicitudes</div>';
+    }
+
+    async function verDetalleSolicitudEmpleador(id) {
+        const old = document.getElementById("modal-detalle-solicitud");
+        if (old) old.remove();
+
+        const div = document.createElement("div");
+        div.className = "modal-overlay";
+        div.id = "modal-detalle-solicitud";
+        div.addEventListener("click", (e) => {
+            if (e.target === div) div.remove();
+        });
+        document.body.appendChild(div);
+
+        div.innerHTML = `
+            <div class="form-simple">
+                <h1>Detalle de Solicitud</h1>
+                <div id="detalle-solicitud-body" style="color:var(--t3);font-size:12px;">Cargando...</div>
+                <div class="form-actions" style="margin-top:20px;">
+                    <button class="btn-cancel" onclick="this.closest('.modal-overlay').remove()">Cerrar</button>
+                </div>
+            </div>
+        `;
+
+        try {
+            const res = await fetch(API_URL + `/solicitudes-empleador/${id}/detalles`, { headers: authHeaders() });
+            await checkRes(res);
+            const s = await res.json();
+            const body = document.getElementById("detalle-solicitud-body");
+            if (!body) return;
+
+            const fila = (label, valor) => `
+                <p style="margin:0 0 8px;"><strong>${label}:</strong> ${valor ?? "-"}</p>
+            `;
+
+            const estadoBadge = {
+                PENDIENTE: 'badge--amber',
+                APROBADA: 'badge--green',
+                RECHAZADA: 'badge--red'
+            };
+
+            let html = "";
+            html += fila("Estado", `<span class="badge ${estadoBadge[s.estado] || 'badge--blue'}">${s.estado}</span>`);
+            html += fila("Fecha", new Date(s.fechaSolicitud).toLocaleDateString("es-AR"));
+            html += `<hr style="border-color:var(--b);margin:14px 0;">`;
+            html += `<p style="font-weight:600;color:var(--t);margin-bottom:8px;">Usuario</p>`;
+            html += fila("Nombre", `${s.usuario?.nombre ?? ""} ${s.usuario?.apellido ?? ""}`);
+            html += fila("Email", s.usuario?.email);
+            html += `<hr style="border-color:var(--b);margin:14px 0;">`;
+            html += `<p style="font-weight:600;color:var(--t);margin-bottom:8px;">Motivo</p>`;
+            html += `<p style="color:var(--t2);font-size:13px;background:rgba(255,255,255,.03);border:1px solid var(--b);border-radius:var(--r-sm);padding:12px;">${s.motivo ?? "Sin motivo"}</p>`;
+
+            if (s.estado === 'PENDIENTE') {
+                html += `
+                    <div class="form-actions" style="margin-top:16px;">
+                        <button class="btn-submit" id="btn-aceptar-detalle-solicitud">Aprobar</button>
+                        <button class="btn-cancel" id="btn-rechazar-detalle-solicitud" style="color:var(--red);">Rechazar</button>
+                    </div>
+                `;
+            }
+
+            body.innerHTML = html;
+
+            const btnAceptar = document.getElementById("btn-aceptar-detalle-solicitud");
+            const btnRechazar = document.getElementById("btn-rechazar-detalle-solicitud");
+
+            if (btnAceptar) {
+                btnAceptar.addEventListener("click", async () => {
+                    div.remove();
+                    await aprobarSolicitudEmpleador(id);
+                });
+            }
+
+            if (btnRechazar) {
+                btnRechazar.addEventListener("click", async () => {
+                    div.remove();
+                    await rechazarSolicitudEmpleador(id);
+                });
+            }
+
+        } catch (e) {
+            const body = document.getElementById("detalle-solicitud-body");
+            if (body) body.innerHTML = `<div style="color:var(--red);font-size:12px;">Error al cargar el detalle</div>`;
+        }
+    }
+
+    async function aprobarSolicitudEmpleador(id) {
+        try {
+            const res = await fetch(API_URL + `/solicitudes-empleador/${id}/aprobar`, {
+                method: "PATCH",
+                headers: authHeaders()
+            });
+            await checkRes(res);
+            alert("Solicitud aprobada");
+            renderSolicitudesEmpleador(usuario);
+        } catch {
+            alert("No se pudo aprobar la solicitud");
+        }
+    }
+
+    async function rechazarSolicitudEmpleador(id) {
+        try {
+            const res = await fetch(API_URL + `/solicitudes-empleador/${id}/rechazar`, {
+                method: "PATCH",
+                headers: authHeaders()
+            });
+            await checkRes(res);
+            alert("Solicitud rechazada");
+            renderSolicitudesEmpleador(usuario);
+        } catch {
+            alert("No se pudo rechazar la solicitud");
+        }
+    }
+}
+
 async function renderSolicitudes(usuario) {
     const infoAccountDiv = document.getElementById("info-account");
 
@@ -453,8 +628,8 @@ async function renderSolicitudes(usuario) {
             html += `<p style="font-weight:600;color:var(--t);margin-bottom:8px;">Sucursal</p>`;
             html += fila("Nombre", s.sucursal?.nombre);
             html += fila("Categoría", s.sucursal?.categoria);
-            html += fila("Puntuación", s.sucursal?.cantidadPuntuaciones > 0
-                ? `${s.sucursal.puntuacion} 🐝 (${s.sucursal.cantidadPuntuaciones} reseñas)`
+            html += fila("Puntuación", s.sucursal?.puntuacion
+                ? "🐝".repeat(Math.round(s.sucursal.puntuacion))
                 : "Sin reseñas");
 
             if (s.estadoSolicitud === 'PENDIENTE') {

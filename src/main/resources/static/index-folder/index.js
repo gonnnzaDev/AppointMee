@@ -53,7 +53,6 @@ function renderListaSucursales(sucursales) {
     ${sucursal.puntuacion
                 ? "🐝".repeat(Math.round(sucursal.puntuacion))
                 : "—"}
-    (${sucursal.puntuacion ?? 0} · ${sucursal.cantidadPuntuaciones ?? 0})
 </span>
                     </div>
                 </article>

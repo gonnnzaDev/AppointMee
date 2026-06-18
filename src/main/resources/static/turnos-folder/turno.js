@@ -33,14 +33,23 @@ function renderPaso2() {
     const c = document.getElementById("agendarTurno-container");
     c.innerHTML = `
         <div class="agendarTurno-info">
+            <div class="paso-indicador">
+                <span class="paso-punto paso-punto--completado"></span>
+                <span class="paso-linea paso-linea--completado"></span>
+                <span class="paso-punto paso-punto--activo"></span>
+                <span class="paso-linea"></span>
+                <span class="paso-punto"></span>
+            </div>
+            <p class="paso-label">Paso 2 de 3 — Profesional</p>
             <h2 class="turno-paso-titulo">Elegí un profesional</h2>
             <div class="empleados-container" id="empleados-container">
                 <p class="turno-sin-dia">Cargando profesionales…</p>
             </div>
             <div class="info-seleccionada" id="info-seleccionada"></div>
-            <button class="btn-proceso" id="volver">Volver</button>
-            <button class="btn-proceso" id="siguiente" disabled>Siguiente</button>
-
+            <div class="btn-group">
+                <button class="btn-proceso btn-proceso--secundario" id="volver">Volver</button>
+                <button class="btn-proceso" id="siguiente" disabled>Siguiente</button>
+            </div>
         </div>`;
 
     cargarEmpleados();
@@ -50,9 +59,7 @@ function renderPaso2() {
     });
 
     document.getElementById("siguiente").addEventListener("click", () => {
-
         renderPaso3();
-
     });
 
 }
@@ -80,7 +87,7 @@ async function cargarEmpleados() {
                      onerror="this.src='${IMG_FALLBACK}'">
                 <p class="empleado-nombre">${e.nombre} ${e.apellido}</p>
                 <p class="empleado-valoracion">
-                    C:${e.puntuacion ? "🐝".repeat(Math.round(e.puntuacion)) : ""} 
+                    ${e.puntuacion ? "🐝".repeat(Math.round(e.puntuacion)) : "Sin calificar"} 
                 </p>
             </article>`).join("");
 
@@ -116,12 +123,22 @@ function renderPaso1() {
     const c = document.getElementById("agendarTurno-container");
     c.innerHTML = `
         <div class="agendarTurno-info">
+            <div class="paso-indicador">
+                <span class="paso-punto paso-punto--activo"></span>
+                <span class="paso-linea"></span>
+                <span class="paso-punto"></span>
+                <span class="paso-linea"></span>
+                <span class="paso-punto"></span>
+            </div>
+            <p class="paso-label">Paso 1 de 3 — Servicio</p>
             <h2 class="turno-paso-titulo">Elegí un servicio</h2>
             <div class="servicios-container" id="servicios-container">
                 <p class="turno-sin-dia">Cargando servicios…</p>
             </div>
-            <button class="btn-proceso btn-proceso--secundario" id="volver">Volver</button>
-            <button class="btn-proceso" id="siguiente" disabled>Siguiente</button>
+            <div class="btn-group">
+                <button class="btn-proceso btn-proceso--secundario" id="volver">Volver</button>
+                <button class="btn-proceso" id="siguiente" disabled>Siguiente</button>
+            </div>
         </div>`;
 
     cargarServicios();
@@ -190,6 +207,14 @@ function renderPaso3() {
     const c = document.getElementById("agendarTurno-container");
     c.innerHTML = `
         <div class="agendarTurno-info">
+            <div class="paso-indicador">
+                <span class="paso-punto paso-punto--completado"></span>
+                <span class="paso-linea paso-linea--completado"></span>
+                <span class="paso-punto paso-punto--completado"></span>
+                <span class="paso-linea paso-linea--completado"></span>
+                <span class="paso-punto paso-punto--activo"></span>
+            </div>
+            <p class="paso-label">Paso 3 de 3 — Fecha y hora</p>
             <div class="turno-container">
                 <div class="turno-header">
                     <h1>¿Cuándo querés venir?</h1>

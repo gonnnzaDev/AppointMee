@@ -6,6 +6,7 @@ import com.gg.turnlook.Backend.DTO.Sucursal.SucursalCrearDTO;
 import com.gg.turnlook.Backend.DTO.Sucursal.SucursalModificarDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioEmailDTO;
 import com.gg.turnlook.Backend.Enum.ECategoria;
+import com.gg.turnlook.Backend.Service.ReseniaService;
 import com.gg.turnlook.Backend.Service.SucursalService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -21,10 +22,12 @@ public class SucursalController {
 
 
     private final SucursalService sucursalService;
+    private final ReseniaService reseniaService;
 
 
-    public SucursalController(SucursalService sucursalService) {
+    public SucursalController(SucursalService sucursalService, ReseniaService reseniaService) {
         this.sucursalService = sucursalService;
+        this.reseniaService = reseniaService;
     }
 
 
@@ -195,6 +198,14 @@ public class SucursalController {
     public ResponseEntity<?> listarCategorias() {
 
         return ResponseEntity.ok().body(ECategoria.values());
+    }
+
+
+    @PreAuthorize("hasAnyRole('CLIENTE','EMPLEADO','EMPLEADOR','ADMINISTRADOR')")
+    @GetMapping("/{sucursalId}/resenias")
+    public ResponseEntity<?> verResenias(@PathVariable("sucursalId") Integer sucursalId) {
+
+        return ResponseEntity.ok().body(reseniaService.getReseniasPorSucursal(sucursalId));
     }
 
 

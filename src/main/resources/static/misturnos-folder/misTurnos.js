@@ -1,4 +1,4 @@
-import { API_URL, authHeaders, sesionActiva, checkRes } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva, checkRes, formatearFechaLocal } from "../recursos/modulos.js";
 
 const user = await sesionActiva();
 
@@ -43,17 +43,14 @@ async function renderTurnos() {
     filtrados.forEach(turno => {
         const idActual = turno.id;
 
-        const fecha = new Date(turno.fechaTurno);
-        const fechaFormateada = isNaN(fecha.getTime())
-            ? turno.fechaTurno
-            : fecha.toLocaleString("es-AR");
+        const fechaFormateada = formatearFechaLocal(turno.fechaTurno) || turno.fechaTurno;
 
         container.innerHTML += `
             <div class="turno-misTurnos">
                 <p><strong>${turno.nombreServicio}</strong></p>
                 <p>${fechaFormateada}</p>
                 <p><span class="badge ${obtenerClaseBadge(turno.estadoTurno)}">${turno.estadoTurno}</span></p>
-                <p>🐝 ${turno.puntuacion != null ? turno.puntuacion : 'Sin calificar'}</p>
+                <p>${turno.puntuacion != null ? "🐝".repeat(Math.round(turno.puntuacion)) : 'Sin calificar'}</p>
                 <button class="btn-submit btn-ver-detalle" data-id="${idActual}">Ver Detalle</button>
             </div>
         `;

@@ -1,10 +1,4 @@
-import { API_URL, sesionActiva, checkRes } from "../recursos/modulos.js";
-const user = await sesionActiva();
-
-
-if (!user) {
-    window.location.href = "../login-folder/Login.html";
-}
+import { API_URL, checkRes } from "../recursos/modulos.js";
 const cancelar = document.getElementById("cancelar");
 const enviar = document.getElementById("enviar");
 

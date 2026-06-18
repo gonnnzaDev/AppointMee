@@ -1,4 +1,4 @@
-import { API_URL, authHeaders, sesionActiva, checkRes } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva, checkRes, formatearFechaLocal } from "../recursos/modulos.js";
 
 const user = await sesionActiva();
 
@@ -80,8 +80,8 @@ function renderDetalle(turno) {
 
     const infoContainer = document.getElementById("detalle-turno-info");
 
-   const fechaHora = new Date(turno.fechaTurno).toLocaleString("es-AR");
-    const fechaReserva = new Date(turno.fechaReserva).toLocaleDateString();
+   const fechaHora = formatearFechaLocal(turno.fechaTurno);
+    const fechaReserva = formatearFechaLocal(turno.fechaReserva);
 
     const nombreEmpleado = turno.empleado
         ? `${turno.empleado.nombre} ${turno.empleado.apellido}`

@@ -45,8 +45,7 @@ async function render() {
             <tr>
                 <td>${s.nombre}</td>
                 <td>${s.categoria}</td>
-                <td>${s.puntuacion}</td>
-                <td>${s.cantidadPuntuaciones}</td>
+                <td>${s.puntuacion ? "🐝".repeat(Math.round(s.puntuacion)) : "-"}</td>
                 <td>
                     <div class="table-actions">
                         <button class="btn-detalle-sucursal" data-id="${s.id}">Detalle</button>
@@ -127,7 +126,7 @@ async function abrirModalUsuario(userId) {
                     <span class="suc-item-cat">${s.categoria || ""}</span>
                 </div>
                 <div class="suc-item-actions">
-                    <span class="badge badge--amber">⭐ ${s.puntuacion ?? "-"} (${s.cantidadPuntuaciones ?? 0})</span>
+                    <span class="badge badge--amber">${s.puntuacion ? "🐝".repeat(Math.round(s.puntuacion)) : "-"}</span>
                     <a href="../sucursal-folder/Sucursal.html?id=${s.id}"
                        target="_blank" class="suc-item-link">Ver</a>
                 </div>
@@ -222,7 +221,7 @@ async function abrirModalSucursal(sucursalId) {
                 <div><small class="detail-label">Teléfono</small><div class="detail-value">${s.telefono ?? "-"}</div></div>
                 <div><small class="detail-label">Fecha de creación</small><div class="detail-value">${s.fechaCreacion ?? "-"}</div></div>
                 <div><small class="detail-label">Horario</small><div class="detail-value">${s.horaApertura ?? "-"} — ${s.horaCierre ?? "-"}</div></div>
-                <div><small class="detail-label">Puntuación</small><div class="detail-value">⭐ ${s.puntuacion ?? "-"} (${s.cantidadPuntuaciones ?? 0})</div></div>
+                <div><small class="detail-label">Puntuación</small><div class="detail-value">${s.puntuacion ? "🐝".repeat(Math.round(s.puntuacion)) : "-"}</div></div>
                 <div><small class="detail-label">Empleador</small><div class="detail-value">${s.empleador ? s.empleador.nombre + " " + s.empleador.apellido : "-"}</div></div>
             </div>
             <div class="detail-section">

@@ -1,4 +1,4 @@
-import { API_URL, authHeaders, sesionActiva, checkRes } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva, checkRes, formatearFechaLocal } from "../recursos/modulos.js";
 const user = await sesionActiva();
 if (!user) {
     window.location.href = "../login-folder/Login.html";
@@ -72,6 +72,11 @@ async function render() {
             <button class="btn-secondary" id="btn-volver">Volver</button>
             <button class="btn-primary" id="btn-reservar">Reservar turno</button>
         </div>
+
+        <div class="resenias-seccion" id="resenias-seccion">
+            <h3>Reseñas</h3>
+            <div id="resenias-lista"></div>
+        </div>
     `;
 
     document.getElementById("btn-volver")
@@ -80,6 +85,34 @@ async function render() {
         .addEventListener("click", () => {
             window.location.href = `../turnos-folder/Turnos.html?sucursalId=${sucursalId}`;
         });
+
+    cargarResenias(sucursalId);
+}
+
+async function cargarResenias(sucursalId) {
+    try {
+        const response = await fetch(API_URL + `/sucursales/${sucursalId}/resenias`, {
+            headers: authHeaders()
+        });
+        await checkRes(response);
+        const resenias = await response.json();
+        const lista = document.getElementById("resenias-lista");
+        if (!resenias || resenias.length === 0) {
+            lista.innerHTML = "<p class='sin-datos'>Todavía no hay reseñas</p>";
+            return;
+        }
+        lista.innerHTML = resenias.map(r => `
+            <div class="resenia-card">
+                <div class="resenia-header">
+                    <span class="resenia-abejas">${"🐝".repeat(Math.round(r.puntuacion))}</span>
+                    <span class="resenia-fecha">${formatearFechaLocal(r.fecha) || new Date(r.fecha).toLocaleDateString()}</span>
+                </div>
+                <p class="resenia-comentario">${r.comentario || "Sin comentario"}</p>
+            </div>
+        `).join("");
+    } catch (error) {
+        console.error("Error al cargar reseñas:", error);
+    }
 }
 
 function getSucursalIdFromUrl() {

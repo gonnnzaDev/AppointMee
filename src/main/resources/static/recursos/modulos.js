@@ -58,3 +58,15 @@ export async function apiFetch(url, options = {}) {
     const res = await fetch(url, options);
     return checkRes(res);
 }
+
+export function formatearFechaLocal(isoStr) {
+    if (!isoStr) return "";
+    const partes = isoStr.split("T");
+    const [y, m, d] = partes[0].split("-");
+    if (!partes[1]) {
+        return new Date(+y, +m - 1, +d).toLocaleDateString("es-AR");
+    }
+    const [h, min, s] = partes[1].split(":");
+    const date = new Date(+y, +m - 1, +d, +h, +min, +(s || 0));
+    return date.toLocaleString("es-AR");
+}

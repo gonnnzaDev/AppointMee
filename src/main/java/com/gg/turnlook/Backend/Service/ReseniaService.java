@@ -2,10 +2,13 @@ package com.gg.turnlook.Backend.Service;
 
 
 import com.gg.turnlook.Backend.DTO.Resenia.ReseniaCrearDTO;
+import com.gg.turnlook.Backend.DTO.Resenia.ReseniaResponseDTO;
 import com.gg.turnlook.Backend.Model.Resenia;
 import com.gg.turnlook.Backend.Model.Turno;
 import com.gg.turnlook.Backend.Repository.ReseniaRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 @Service
@@ -71,6 +74,17 @@ public class ReseniaService {
     public Long getPuntuacionesTotalesServicio(Integer servicioId) {
 
         return reseniaRepo.puntuacionesTotalesServicio(servicioId);
+    }
+
+
+    public List<ReseniaResponseDTO> getReseniasPorSucursal(Integer sucursalId) {
+
+        return reseniaRepo.findBySucursalId(sucursalId).stream()
+                .map(r -> new ReseniaResponseDTO(
+                        r.getPuntuacion(),
+                        r.getComentario(),
+                        r.getFechaResenia()))
+                .toList();
     }
 
 

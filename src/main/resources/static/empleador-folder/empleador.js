@@ -1,4 +1,4 @@
-import { API_URL, authHeaders, sesionActiva, checkRes } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva, checkRes, formatearFechaLocal } from "../recursos/modulos.js";
 
 const user = await sesionActiva();
 
@@ -77,7 +77,7 @@ function renderSucursales(sucursales) {
         tr.innerHTML = `
             <td>${s.nombre}</td>
             <td>${s.categoria}</td>
-            <td>🐝 ${s.puntuacion ?? 'Sin calificar'} (${s.cantidadPuntuaciones ?? 0})</td>
+            <td>${s.puntuacion ? "🐝".repeat(Math.round(s.puntuacion)) : 'Sin calificar'}</td>
             <td>
                 <div class="table-actions">
                     <button onclick="abrirModalModificarSucursal(${s.id})">Editar</button>
@@ -204,7 +204,7 @@ async function verDetalleServicio(servicioId) {
         html += fila("Descripción", s.descripcion);
         html += fila("Duración", `${s.duracion} min`);
         html += fila("Precio", `$${s.precio}`);
-        html += fila("Puntuación", s.cantidadPuntuaciones > 0 ? `${s.puntuacion} 🐝 (${s.cantidadPuntuaciones} reseñas)` : "Sin reseñas");
+        html += fila("Puntuación", s.puntuacion ? "🐝".repeat(Math.round(s.puntuacion)) : "Sin reseñas");
 
         html += `<hr style="border-color:var(--b);margin:14px 0;">`;
         html += `<p style="font-weight:600;color:var(--t);margin-bottom:8px;">Sucursal</p>`;
@@ -254,7 +254,7 @@ async function cargarTurnos(sucursalId) {
         }
 
         turnos.forEach(t => {
-            const fecha = new Date(t.fechaTurno).toLocaleString("es-AR");
+            const fecha = formatearFechaLocal(t.fechaTurno);
             const estado = t.estadoTurno ?? "-";
 
             const tr = document.createElement("tr");
@@ -334,8 +334,8 @@ async function verDetalleTurno(turnoId) {
         const body = document.getElementById("detalle-turno-body");
         if (!body) return;
 
-        const fechaTurno = new Date(t.fechaTurno).toLocaleString("es-AR");
-        const fechaReserva = new Date(t.fechaReserva).toLocaleString("es-AR");
+        const fechaTurno = formatearFechaLocal(t.fechaTurno);
+        const fechaReserva = formatearFechaLocal(t.fechaReserva);
 
         const fila = (label, valor) => `
             <p style="margin:0 0 8px;"><strong>${label}:</strong> ${valor ?? "-"}</p>
@@ -364,7 +364,7 @@ async function verDetalleTurno(turnoId) {
         if (t.resenia) {
             html += `<hr style="border-color:var(--b);margin:14px 0;">`;
             html += `<p style="font-weight:600;color:var(--t);margin-bottom:8px;">Reseña</p>`;
-            html += fila("Puntuación", `${t.resenia.puntuacion} 🐝`);
+            html += fila("Puntuación", "🐝".repeat(Math.round(t.resenia.puntuacion)));
             html += fila("Comentario", t.resenia.comentario);
             html += fila("Fecha", t.resenia.fechaResenia);
         }

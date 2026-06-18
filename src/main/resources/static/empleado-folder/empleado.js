@@ -2,7 +2,8 @@ import {
     API_URL,
     sesionActiva,
     authHeaders,
-    checkRes
+    checkRes,
+    formatearFechaLocal
 } from "../recursos/modulos.js";
 
 
@@ -106,7 +107,7 @@ function renderTurnos() {
 
     filtrados.forEach(turno => {
 
-        const fecha = new Date(turno.fechaTurno).toLocaleString("es-AR");
+        const fecha = formatearFechaLocal(turno.fechaTurno);
         const estadoBadge = {
             PENDIENTE: 'badge--amber',
             REALIZADO: 'badge--green',
@@ -124,9 +125,32 @@ function renderTurnos() {
                     <h3 style="font-size:13px;font-weight:500;color:var(--t);margin:0 0 4px;">${turno.nombreServicio}</h3>
                     <p style="font-size:11px;color:var(--t3);font-family:var(--mono);margin:0;">${fecha}</p>
                 </div>
-                <span class="badge ${estadoBadge}">${turno.estadoTurno}</span>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="badge ${estadoBadge}">${turno.estadoTurno}</span>
+                    <button class="btn-realizar" data-id="${turno.id}">Realizar</button>
+                </div>
             </div>
         `;
+
+        card.querySelector(".btn-realizar").addEventListener("click", async (e) => {
+            e.stopPropagation();
+            const btn = e.currentTarget;
+            btn.disabled = true;
+            btn.textContent = "⋯";
+            try {
+                const res = await fetch(API_URL + `/turnos/finalizar/${turno.id}`, {
+                    method: "PATCH",
+                    headers: authHeaders()
+                });
+                await checkRes(res);
+                turnos = turnos.filter(t => t.id !== turno.id);
+                renderTurnos();
+            } catch (err) {
+                alert("Error al finalizar el turno: " + err.message);
+                btn.disabled = false;
+                btn.textContent = "Realizar";
+            }
+        });
 
         container.appendChild(card);
 
