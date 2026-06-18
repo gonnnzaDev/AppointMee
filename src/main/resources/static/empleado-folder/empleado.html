@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Empleado</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <main class="container">
+
+        <h1>Panel de Empleado</h1>
+
+        <section class="panel">
+
+            <h2>Solicitudes Pendientes</h2>
+
+            <input
+                type="text"
+                id="buscar-solicitud"
+                placeholder="Buscar sucursal...">
+
+            <div id="solicitudes-container"></div>
+
+        </section>
+
+        <section class="panel">
+
+            <h2>Historial de Turnos</h2>
+
+            <input
+                type="text"
+                id="buscar-turno"
+                placeholder="Buscar turno...">
+
+            <div id="turnos-container"></div>
+
+        </section>
+
+    </main>
+
+    <script type="module" src="empleado.js"></script>
+
+</body>
+
+</html>
