@@ -1,4 +1,4 @@
-import { API_URL, authHeaders, sesionActiva } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva, checkRes } from "../recursos/modulos.js";
 
 const user = await sesionActiva();
 
@@ -17,7 +17,14 @@ async function renderTurnos() {
     if (!container) return;
 
     const estadoP = document.getElementById("estados").value;
-    const turnosLista = await buscarMisTurnos();
+    const resultado = await buscarMisTurnos();
+
+    if (resultado.error) {
+        container.innerHTML = `<p style="color:var(--t3);font-family:var(--mono);text-align:center;padding:32px 0;">No se pudieron cargar los turnos (${resultado.error}). Probá recargar la página.</p>`;
+        return;
+    }
+
+    const turnosLista = resultado.data;
 
     container.innerHTML = ``;
 
@@ -74,10 +81,10 @@ async function buscarMisTurnos() {
             API_URL + `/turnos/propios`,
             { headers: authHeaders() }
         );
-        if (!response.ok) throw new Error(`Error ${response.status}`);
-        return await response.json();
+        await checkRes(response);
+        return { data: await response.json() };
     } catch (error) {
         console.error("Error al buscar turnos:", error);
-        return [];
+        return { data: [], error: error.message || "error de conexión" };
     }
 }

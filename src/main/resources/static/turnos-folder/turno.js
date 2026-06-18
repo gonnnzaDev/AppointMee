@@ -1,4 +1,4 @@
-import { API_URL, authHeaders, sesionActiva } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva, checkRes } from "../recursos/modulos.js";
 
 const user = await sesionActiva();
 if (!user) {
@@ -62,7 +62,7 @@ async function cargarEmpleados() {
         const res = await fetch(API_URL + `/sucursales/${sucursalId}/elegir-empleado`, {
             headers: authHeaders()
         });
-        if (!res.ok) throw new Error(`Error ${res.status}`);
+        await checkRes(res);
         const empleados = await res.json();
 
         const contenedor = document.getElementById("empleados-container");
@@ -136,7 +136,7 @@ async function cargarServicios() {
         const res = await fetch(API_URL + `/servicios/listar/sucursal/${sucursalId}`, {
             headers: authHeaders()
         });
-        if (!res.ok) throw new Error(`Error ${res.status}`);
+        await checkRes(res);
         const servicios = await res.json();
 
         const contenedor = document.getElementById("servicios-container");
@@ -254,7 +254,7 @@ async function cargarDisponibilidad() {
             API_URL + `/turnos/disponibilidad/empleado/${empleadoSeleccionado.id}/servicio/${servicioSeleccionado.id}`,
             { headers: authHeaders() }
         );
-        if (!res.ok) throw new Error(`Error ${res.status}`);
+        await checkRes(res);
         cacheDisponibilidad = await res.json();
     } catch (err) {
         cacheDisponibilidad = [];
@@ -384,14 +384,7 @@ async function confirmarTurno() {
                 servicioId: servicioSeleccionado.id
             })
         });
-
-        const msg = await resCrear.text();
-
-        if (!resCrear.ok) {
-            alert(msg || `No se pudo reservar el turno (código ${resCrear.status})`);
-            if (btnSiguiente) btnSiguiente.disabled = false;
-            return;
-        }
+        await checkRes(resCrear);
 
         const turnoId = await buscarTurnoRecienCreado();
 
@@ -412,7 +405,7 @@ async function confirmarTurno() {
 async function buscarTurnoRecienCreado() {
     try {
         const res = await fetch(API_URL + `/turnos/propios`, { headers: authHeaders() });
-        if (!res.ok) return null;
+        await checkRes(res);
 
         const turnos = await res.json();
 

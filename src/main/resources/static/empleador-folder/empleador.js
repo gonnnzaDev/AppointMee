@@ -1,4 +1,4 @@
-import { API_URL, authHeaders, sesionActiva } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva, checkRes } from "../recursos/modulos.js";
 
 const user = await sesionActiva();
 
@@ -20,6 +20,7 @@ window.eliminarServicio = eliminarServicio;
 window.finalizarTurno = finalizarTurno;
 window.cancelarTurno = cancelarTurno;
 window.eliminarEmpleado = eliminarEmpleado;
+window.convertirmeEnEmpleado = convertirmeEnEmpleado;
 
 function crearModal(id) {
     const old = document.getElementById(id);
@@ -37,7 +38,7 @@ function crearModal(id) {
 async function cargarMe() {
     try {
         const res = await fetch(API_URL + "/usuarios/me", { headers: authHeaders() });
-        if (!res.ok) throw new Error(`Error ${res.status}`);
+        await checkRes(res);
         const data = await res.json();
         miId = data.id;
     } catch (e) {
@@ -48,7 +49,7 @@ async function cargarMe() {
 async function cargarSucursales() {
     try {
         const res = await fetch(API_URL + "/sucursales/listar/propias", { headers: authHeaders() });
-        if (!res.ok) throw new Error(`Error ${res.status}`);
+        await checkRes(res);
         const todas = await res.json();
         misSucursales = todas;
         renderSucursales(misSucursales);
@@ -76,7 +77,8 @@ function renderSucursales(sucursales) {
             <td>
                 <div class="table-actions">
                     <button onclick="abrirModalModificarSucursal(${s.id})">Editar</button>
-                    <button onclick="eliminarSucursal(${s.id})" style="color:var(--red);">Borrar</button>
+                    <button onclick="convertirmeEnEmpleado(${s.id})">Ser empleado</button>
+                    <button onclick="eliminarSucursal(${s.id})" class="btn-danger">Borrar</button>
                 </div>
             </td>
         `;
@@ -105,6 +107,7 @@ async function eliminarSucursal(sucursalId) {
             method: "DELETE",
             headers: authHeaders()
         });
+        await checkRes(res);
         const msg = await res.text();
         alert(msg);
         if (res.ok) await cargarSucursales();
@@ -120,7 +123,7 @@ async function cargarServicios(sucursalId) {
 
     try {
         const res = await fetch(API_URL + `/servicios/listar/sucursal/${sucursalId}`, { headers: authHeaders() });
-        if (!res.ok) throw new Error(`Error ${res.status}`);
+        await checkRes(res);
         const servicios = await res.json();
 
         if (!servicios.length) {
@@ -155,9 +158,25 @@ async function eliminarServicio(servicioId, sucursalId) {
             method: "DELETE",
             headers: authHeaders()
         });
+        await checkRes(res);
         const msg = await res.text();
         alert(msg);
         if (res.ok) await cargarServicios(sucursalId);
+    } catch (e) {
+        alert("Error: " + e.message);
+    }
+}
+
+async function convertirmeEnEmpleado(sucursalId) {
+    if (!confirm("¿Querés convertirte en empleado de esta sucursal?")) return;
+    try {
+        const res = await fetch(API_URL + `/sucursales/${sucursalId}/convertirme-empleado`, {
+            method: "PATCH",
+            headers: authHeaders()
+        });
+        await checkRes(res);
+        const msg = await res.text();
+        alert(msg);
     } catch (e) {
         alert("Error: " + e.message);
     }
@@ -169,13 +188,13 @@ async function cargarTurnos(sucursalId) {
     if (!sucursalId) return;
 
     const estado = document.getElementById("filtro-estado-turnos").value;
-
+    console.log(estado);
     try {
         const res = await fetch(
             API_URL + `/turnos/de-sucursal/${sucursalId}?estadoTurno=${estado}`,
             { headers: authHeaders() }
         );
-        if (!res.ok) throw new Error(`Error ${res.status}`);
+        await checkRes(res);
         const turnos = await res.json();
 
         if (!turnos.length) {
@@ -208,7 +227,6 @@ async function cargarTurnos(sucursalId) {
 }
 document.getElementById("filtro-estado-turnos").addEventListener("change", () => {
     const sucursalId = document.getElementById("filtro-sucursal-turnos").value;
-    console.log()
     cargarTurnos(sucursalId);
 });
 async function finalizarTurno(turnoId, sucursalId) {
@@ -218,6 +236,7 @@ async function finalizarTurno(turnoId, sucursalId) {
             method: "PATCH",
             headers: authHeaders()
         });
+        await checkRes(res);
         const msg = await res.text();
         alert(msg);
         if (res.ok) await cargarTurnos(sucursalId);
@@ -233,6 +252,7 @@ async function cancelarTurno(turnoId, sucursalId) {
             method: "DELETE",
             headers: authHeaders()
         });
+        await checkRes(res);
         const msg = await res.text();
         alert(msg);
         if (res.ok) await cargarTurnos(sucursalId);
@@ -248,7 +268,7 @@ async function cargarEmpleados(sucursalId) {
 
     try {
         const res = await fetch(API_URL + `/sucursales/${sucursalId}/empleados`, { headers: authHeaders() });
-        if (!res.ok) throw new Error(`Error ${res.status}`);
+        await checkRes(res);
         const empleados = await res.json();
 
         if (!empleados.length) {
@@ -285,6 +305,7 @@ async function agregarEmpleado(sucursalId) {
             headers: authHeaders(),
             body: JSON.stringify({ email })
         });
+        await checkRes(res);
         const msg = await res.text();
         alert(msg);
         if (res.ok) {
@@ -303,6 +324,7 @@ async function eliminarEmpleado(sucursalId, empleadoId) {
             method: "DELETE",
             headers: authHeaders()
         });
+        await checkRes(res);
         const msg = await res.text();
         alert(msg);
         if (res.ok) await cargarEmpleados(sucursalId);
@@ -315,7 +337,7 @@ async function abrirModalModificarSucursal(sucursalId) {
     let suc;
     try {
         const res = await fetch(API_URL + `/sucursales/${sucursalId}`, { headers: authHeaders() });
-        if (!res.ok) throw new Error(`Error ${res.status}`);
+        await checkRes(res);
         suc = await res.json();
     } catch (e) {
         alert("Error al cargar la sucursal: " + e.message);
@@ -324,7 +346,7 @@ async function abrirModalModificarSucursal(sucursalId) {
 
     const div = crearModal("modal-suc");
     div.innerHTML = `
-        <div class="form-simple">
+        <div class="form-simple" style="max-width:600px;">
             <h1>Editar Sucursal</h1>
             <p>Nombre</p>
             <div class="input-group">
@@ -354,12 +376,43 @@ async function abrirModalModificarSucursal(sucursalId) {
             <div class="input-group">
                 <input type="url" class="form-control" id="mod-suc-fotoUrl" value="${suc.fotoPerfil ?? ""}">
             </div>
-            <div class="form-actions">
+            <hr style="border-color:var(--b);margin:20px 0;">
+            <p style="font-size:13px;font-weight:600;color:var(--t);margin-bottom:10px;">Empleados</p>
+            <div id="empleados-lista-modal" style="color:var(--t3);font-size:12px;">Cargando...</div>
+            <div class="form-actions" style="margin-top:20px;">
                 <button class="btn-submit" id="btn-guardar-suc">Guardar</button>
                 <button class="btn-cancel" onclick="this.closest('.modal-overlay').remove()">Cancelar</button>
             </div>
         </div>
     `;
+
+    try {
+        const res = await fetch(API_URL + `/sucursales/${sucursalId}/empleados`, { headers: authHeaders() });
+        await checkRes(res);
+        const empleados = await res.json();
+        const container = document.getElementById("empleados-lista-modal");
+
+        if (!empleados || !empleados.length) {
+            container.innerHTML = '<div style="color:var(--t3);font-family:var(--mono);font-size:11px;">Sin empleados</div>';
+        } else {
+            container.innerHTML = empleados.map(e => {
+                const avatar = e.urlFotoPerfil
+                    ? `<img src="${e.urlFotoPerfil}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
+                    : `<div style="width:28px;height:28px;border-radius:50%;background:var(--s2);color:var(--t2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;">${(e.nombre || "?")[0].toUpperCase()}</div>`;
+                return `
+                    <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--b);">
+                        ${avatar}
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:12px;font-weight:500;color:var(--t);">${e.nombre} ${e.apellido}</div>
+                            <div style="font-size:10.5px;color:var(--t3);font-family:var(--mono);">${e.email}</div>
+                        </div>
+                    </div>`;
+            }).join("");
+        }
+    } catch (e) {
+        const container = document.getElementById("empleados-lista-modal");
+        if (container) container.innerHTML = '<div style="color:var(--red);font-size:12px;">Error al cargar empleados</div>';
+    }
 
     document.getElementById("btn-guardar-suc").addEventListener("click", async () => {
         const body = {
@@ -377,6 +430,7 @@ async function abrirModalModificarSucursal(sucursalId) {
                 headers: authHeaders(),
                 body: JSON.stringify(body)
             });
+            await checkRes(res);
             const msg = await res.text();
             alert(msg);
             if (res.ok) { div.remove(); await cargarSucursales(); }
@@ -389,7 +443,7 @@ async function abrirModalModificarSucursal(sucursalId) {
 async function abrirModalModificarServicio(servicioId) {
     try {
         const res = await fetch(API_URL + `/servicios/${servicioId}`, { headers: authHeaders() });
-        if (!res.ok) throw new Error(`Error ${res.status}`);
+        await checkRes(res);
         const s = await res.json();
 
         const div = crearModal("modal-serv");
@@ -432,12 +486,13 @@ async function abrirModalModificarServicio(servicioId) {
                 fotoUrl: document.getElementById("mod-serv-fotoUrl").value || undefined,
             };
             try {
-                const res = await fetch(API_URL + `/servicios/modificar/${servicioId}`, {
-                    method: "PATCH",
-                    headers: authHeaders(),
-                    body: JSON.stringify(body)
-                });
-                const msg = await res.text();
+            const res = await fetch(API_URL + `/servicios/modificar/${servicioId}`, {
+                method: "PATCH",
+                headers: authHeaders(),
+                body: JSON.stringify(body)
+            });
+            await checkRes(res);
+            const msg = await res.text();
                 alert(msg);
                 if (res.ok) {
                     div.remove();
@@ -533,7 +588,7 @@ async function cargarCategoriasSucursal() {
             headers: authHeaders()
         });
 
-        if (!response.ok) throw new Error(`Error ${response.status}`);
+        await checkRes(response);
 
         const categorias = await response.json();
         const select = document.getElementById("add-suc-categoria");
@@ -569,6 +624,7 @@ async function postSucursal(nombre, direccion, telefono, descripcion, categoriaI
             body: JSON.stringify(datos)
         });
 
+        await checkRes(response);
         const data = await response.text();
         alert(data);
 
@@ -650,6 +706,7 @@ async function postServicio(nombre, descripcion, duracion, precio, sucursalId, f
             body: JSON.stringify(datos)
         });
 
+        await checkRes(response);
         const data = await response.text();
         alert(data);
 

@@ -1,4 +1,4 @@
-import { API_URL, authHeaders, sesionActiva } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva, checkRes } from "../recursos/modulos.js";
 
 let buscadorConectado = false;
 
@@ -62,7 +62,7 @@ async function buscarSucursales() {
             headers: authHeaders()
         });
         console.log(authHeaders());
-        if (!response.ok) throw new Error(`Error ${response.status}`);
+        await checkRes(response);
         return await response.json();
     } catch (error) {
         alert(error.message);
@@ -76,7 +76,7 @@ async function filtrarPorCategoria(categoria) {
             `/sucursales/listar/filtrar?categoria=${categoria}`,
             { headers: authHeaders() }
         );
-        if (!response.ok) throw new Error(`Error ${response.status}`);
+        await checkRes(response);
         const sucursales = await response.json();
         renderListaSucursales(sucursales);
     } catch (error) {
@@ -93,7 +93,7 @@ async function filtrarPorNombre(texto) {
             `/sucursales/listar/filtrar?${parametros.toString()}`,
             { headers: authHeaders() }
         );
-        if (!response.ok) throw new Error(`Error ${response.status}`);
+        await checkRes(response);
         const sucursales = await response.json();
         renderListaSucursales(sucursales);
     } catch (error) {
@@ -143,7 +143,7 @@ async function buscarCategorias() {
         const response = await fetch(API_URL + `/sucursales/categorias`, {
             headers: authHeaders()
         });
-        if (!response.ok) throw new Error(`Error ${response.status}`);
+        await checkRes(response);
         return await response.json();
     } catch (error) {
         alert(error.message);

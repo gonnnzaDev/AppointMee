@@ -1,4 +1,4 @@
-import { API_URL, sesionActiva } from "../recursos/modulos.js";
+import { API_URL, sesionActiva, checkRes } from "../recursos/modulos.js";
 const user = await sesionActiva();
 
 
@@ -43,26 +43,24 @@ cancelar.addEventListener('click', e => {
 
 });
 
-function postFormulario(email, descripcion, pass) {
-
-
-    fetch(API_URL + "/usuarios/recuperar-cuenta", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            email: email,
-            password: pass,
-            descripcion: descripcion,
-        })
-    }).then(data => {
-        alert("Realizado con exito!");
-
-    })
-        .catch(error => {
-            alert(error);
+async function postFormulario(email, descripcion, pass) {
+    try {
+        const response = await fetch(API_URL + "/usuarios/recuperar-cuenta", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: email,
+                password: pass,
+                descripcion: descripcion,
+            })
         });
+        await checkRes(response);
+        alert("Realizado con exito!");
+    } catch (error) {
+        alert(error);
+    }
 }
 
 

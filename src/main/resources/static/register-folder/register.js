@@ -1,4 +1,4 @@
-import { API_URL } from "../recursos/modulos.js";
+import { API_URL, checkRes } from "../recursos/modulos.js";
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 
@@ -55,11 +55,12 @@ function postUser(name, surname, mail, pass) {
             password: pass,
             email: mail
         })
-    }).then(data => {
-        alert("Registrado con exito!");
-        window.location.href = "../login-folder/Login.html";
+    }).then(async response => { await checkRes(response); return response; })
+        .then(data => {
+            alert("Registrado con exito!");
+            window.location.href = "../login-folder/Login.html";
 
-    })
+        })
         .catch(error => {
             alert(error);
         });

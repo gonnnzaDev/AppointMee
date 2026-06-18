@@ -16,14 +16,14 @@
 
         <h1>Panel Empleador</h1>
 
-        <div id="sucursales">
+        <div class="panel-section" id="sucursales">
+            <div class="panel-section__header">
+                <h2 class="panel-section__title">Sucursales</h2>
+                <div class="panel-section__action">
+                    <button class="btn-add" id="btn-agregar-sucursal">+ Agregar Sucursal</button>
+                </div>
+            </div>
             <div class="table-container">
-                <h1>Sucursales</h1>
-                <p style="font-size:11px; font-family:var(--mono); color:var(--t3); margin:-8px 0 12px;">
-                    Mostrando todas las sucursales activas de la plataforma (el backend aún no filtra por empleador).
-                </p>
-                <button class="btn-add" id="btn-agregar-sucursal">+ Agregar Sucursal</button>
-
                 <table class="table" id="tablasSucursales">
                     <thead>
                         <tr>
@@ -38,19 +38,18 @@
             </div>
         </div>
 
-        <div id="servicios">
+        <div class="panel-section" id="servicios">
+            <div class="panel-section__header">
+                <h2 class="panel-section__title">Servicios</h2>
+            </div>
+            <div class="filtrar">
+                <label for="filtro-sucursal-servicios">Sucursal</label>
+                <button class="btn-add" id="btn-agregar-servicio" style="margin-bottom:0">+ Agregar Servicio</button>
+                <select id="filtro-sucursal-servicios">
+                    <option value="">Seleccioná una sucursal</option>
+                </select>
+            </div>
             <div class="table-container">
-                <h1>Servicios</h1>
-
-                <div class="filtrar">
-                    <label for="filtro-sucursal-servicios">Sucursal</label>
-                    <select id="filtro-sucursal-servicios">
-                        <option value="">Seleccioná una sucursal</option>
-                    </select>
-                    <button class="btn-add" id="btn-agregar-servicio" style="margin-bottom:0">+ Agregar
-                        Servicio</button>
-                </div>
-
                 <table class="table" id="tablasServicios">
                     <thead>
                         <tr>
@@ -64,26 +63,24 @@
             </div>
         </div>
 
-        <div id="turnos">
+        <div class="panel-section" id="turnos">
+            <div class="panel-section__header">
+                <h2 class="panel-section__title">Turnos</h2>
+            </div>
+            <div class="filtrar">
+                <label for="filtro-sucursal-turnos">Sucursal</label>
+                <select id="filtro-sucursal-turnos">
+                    <option value="">Seleccioná una sucursal</option>
+                </select>
+                <label for="filtro-estado-turnos">Estado</label>
+                <select id="filtro-estado-turnos">
+                    <option value="PENDIENTE">Pendiente</option>
+                    <option value="PAGO_RECHAZADO">Pago Rechazado</option>
+                    <option value="REALIZADO">Realizado</option>
+                    <option value="CANCELADO">Cancelado</option>
+                </select>
+            </div>
             <div class="table-container">
-                <h1>Turnos</h1>
-
-              
-                <div class="filtrar">
-                    <label for="filtro-sucursal-turnos">Sucursal</label>
-                    <select id="filtro-sucursal-turnos">
-                        <option value="">Seleccioná una sucursal</option>
-                    </select>
-
-                    <label for="filtro-estado-turnos">Estado</label>
-                    <select id="filtro-estado-turnos">
-                        <option value="PENDIENTE">Pendiente</option>
-                        <option value="CONFIRMADO">Confirmado</option>
-                        <option value="FINALIZADO">Finalizado</option>
-                        <option value="CANCELADO">Cancelado</option>
-                    </select>
-                </div>
-
                 <table class="table" id="tablasTurnos">
                     <thead>
                         <tr>
@@ -98,17 +95,17 @@
             </div>
         </div>
 
-        <div id="empleados">
+        <div class="panel-section" id="empleados">
+            <div class="panel-section__header">
+                <h2 class="panel-section__title">Empleados</h2>
+            </div>
+            <div class="filtrar">
+                <label for="filtro-sucursal-empleados">Sucursal</label>
+                <select id="filtro-sucursal-empleados">
+                    <option value="">Seleccioná una sucursal</option>
+                </select>
+            </div>
             <div class="table-container">
-                <h1>Empleados</h1>
-
-                <div class="filtrar">
-                    <label for="filtro-sucursal-empleados">Sucursal</label>
-                    <select id="filtro-sucursal-empleados">
-                        <option value="">Seleccioná una sucursal</option>
-                    </select>
-                </div>
-
                 <table class="table" id="tablasEmpleados">
                     <thead>
                         <tr>
@@ -119,14 +116,12 @@
                     </thead>
                     <tbody id="empleadosBody"></tbody>
                 </table>
-
-                <div class="filtrar" style="margin-top: 16px;">
-                    <p style="font-size:11px; font-family:var(--mono); color:var(--t3); margin:0 8px 0 0;">
-                        Agregar empleado por email</p>
-                    <input type="email" id="input-email-empleado" placeholder="email@ejemplo.com"
-                        style="background:var(--s2);border:1px solid var(--b);border-radius:var(--r-sm);padding:8px 12px;color:var(--t);font-family:var(--ui);font-size:13px;outline:none;flex:1;min-width:0;">
-                    <button id="btn-agregar-empleado">Agregar</button>
-                </div>
+            </div>
+            <div class="filtrar">
+                <p style="font-size:11px;font-family:var(--mono);color:var(--t3);margin:0 8px 0 0;">Agregar empleado por email</p>
+                <input type="email" id="input-email-empleado" placeholder="email@ejemplo.com"
+                    style="background:var(--s2);border:1px solid var(--b);border-radius:var(--r-sm);padding:8px 12px;color:var(--t);font-family:var(--ui);font-size:13px;outline:none;flex:1;min-width:0;">
+                <button id="btn-agregar-empleado">Agregar</button>
             </div>
         </div>
 

@@ -1,4 +1,4 @@
-import { API_URL, sesionActiva, authHeaders, cerrarSesion } from "../recursos/modulos.js";
+import { API_URL, sesionActiva, authHeaders, cerrarSesion, checkRes } from "../recursos/modulos.js";
 
 
 const user = await sesionActiva();
@@ -12,7 +12,16 @@ const usuario = await cargarUsuario(user.id);
 if (!usuario) {
     window.location.href = "../login-folder/Login.html";
 } else {
-    renderPerfil(usuario);
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("solicitudes")) {
+        if (usuario.roles.includes("ADMINISTRADOR")) {
+            renderPerfil(usuario);
+        } else {
+            renderSolicitudes(usuario);
+        }
+    } else {
+        renderPerfil(usuario);
+    }
 }
 
 async function renderPerfil(usuario) {
@@ -25,15 +34,23 @@ async function renderPerfil(usuario) {
             ? usuario.roles.map(r => `<span class="badge badge--blue">${r}</span>`).join(" ")
             : "";
 
-     const fotoHtml = usuario.fotoPerfil
-        ? `<img src="${usuario.fotoPerfil}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">`
-        : '';
+        const fotoHtml = usuario.fotoPerfil
+            ? `<img src="${usuario.fotoPerfil}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">`
+            : '';
 
-     const inicialHtml = usuario.fotoPerfil
-        ? `<div class="profile-inicial" style="display:none;">${(usuario.nombre || '?')[0].toUpperCase()}</div>`
-        : `<div class="profile-inicial">${(usuario.nombre || '?')[0].toUpperCase()}</div>`;
+        const inicialHtml = usuario.fotoPerfil
+            ? `<div class="profile-inicial" style="display:none;">${(usuario.nombre || '?')[0].toUpperCase()}</div>`
+            : `<div class="profile-inicial">${(usuario.nombre || '?')[0].toUpperCase()}</div>`;
 
-     infoAccountDiv.innerHTML = `
+        let accionesHtml = `<button type="button" id="btn-opciones-perfil">Opciones</button>`;
+        if (usuario.roles.includes("EMPLEADOR")) {
+            accionesHtml += `<button type="button" id="btn-panel-empleador">Panel Empleador</button>`;
+        }
+        if (usuario.roles.includes("EMPLEADO")) {
+            accionesHtml += `<button type="button" id="btn-panel-empleado">Panel Empleado</button>`;
+        }
+
+        infoAccountDiv.innerHTML = `
 <div class="profile-card">
     ${fotoHtml}${inicialHtml}
     <div class="profile-info">
@@ -45,23 +62,34 @@ async function renderPerfil(usuario) {
         <div class="profile-roles">${roles}</div>
     </div>
     <div class="profile-actions">
-        <button type="button" id="btn-opciones-perfil">Opciones</button>
+        ${accionesHtml}
     </div>
 </div>
 `;
 
         const opciones = document.getElementById("btn-opciones-perfil");
+        const btnEmpleador = document.getElementById("btn-panel-empleador");
+        const btnEmpleado = document.getElementById("btn-panel-empleado");
 
-        opciones.addEventListener("click", () => {
-
-            renderOpciones(usuario);
-
-
+        opciones.addEventListener("click", async () => {
+            await renderOpciones(usuario);
         });
+
+        if (btnEmpleador) {
+            btnEmpleador.addEventListener("click", () => {
+                window.location.href = "../empleador-folder/empleador.html";
+            });
+        }
+
+        if (btnEmpleado) {
+            btnEmpleado.addEventListener("click", () => {
+                window.location.href = "../empleado-folder/empleado.html";
+            });
+        }
 
     }
 }
-function renderOpciones(usuario) {
+async function renderOpciones(usuario) {
 
     const infoAccountDiv = document.getElementById("info-account");
 
@@ -76,7 +104,7 @@ function renderOpciones(usuario) {
         </div>
     `;
 
-console.log(usuario);
+    console.log(usuario);
 
     const containerrol = document.getElementById("dependiendo-rol");
 
@@ -90,30 +118,28 @@ console.log(usuario);
         `;
     }
 
-    if (usuario.roles.includes("CLIENTE") && !usuario.roles.includes("ADMINISTRADOR") && !usuario.roles.includes("EMPLEADOR") ) {
+    if (usuario.roles.includes("CLIENTE") && !usuario.roles.includes("ADMINISTRADOR") && !usuario.roles.includes("EMPLEADOR")) {
         html += `
-            <button id="btn-eliminar-perfil">
-                Eliminar Cuenta
-            </button>
-
             <button id="btn-editar-perfil">
                 Editar
             </button>
         `;
     }
 
-    if (usuario.roles.includes("EMPLEADOR")) {
-        html += `
-            <button id="btn-modo-empleador">
-                Panel Empleador
-            </button>
-        `;
+    let tieneSolicitudesPendientes = false;
+    if (!usuario.roles.includes("ADMINISTRADOR")) {
+        try {
+            const res = await fetch(API_URL + `/solicitudes-empleado/recibidas`, { headers: authHeaders() });
+            await checkRes(res);
+            const solicitudes = await res.json();
+            tieneSolicitudesPendientes = solicitudes.length > 0;
+        } catch {}
     }
 
-        if (usuario.roles.includes("EMPLEADO")) {
+    if (!usuario.roles.includes("ADMINISTRADOR")) {
         html += `
-            <button id="btn-modo-empleado">
-                Panel Empleado
+            <button id="btn-solicitudes-perfil">
+                Solicitudes
             </button>
         `;
     }
@@ -121,27 +147,13 @@ console.log(usuario);
     containerrol.innerHTML = html;
 
     const volver = document.getElementById("btn-volver-perfil");
-    const eliminar = document.getElementById("btn-eliminar-perfil");
     const editar = document.getElementById("btn-editar-perfil");
-    const modoEmpleador = document.getElementById("btn-modo-empleador");
     const modoAdmin = document.getElementById("btn-modo-admin");
-    const modoEmpleado = document.getElementById("btn-modo-empleado");
+    const btnSolicitudes = document.getElementById("btn-solicitudes-perfil");
 
     volver.addEventListener("click", () => {
         renderPerfil(usuario);
     });
-
-    if (modoEmpleador) {
-        modoEmpleador.addEventListener("click", () => {
-            window.location.href = "../empleador-folder/empleador.html";
-        });
-    }
-
-        if (modoEmpleado) {
-        modoEmpleado.addEventListener("click", () => {
-            window.location.href = "../empleado-folder/empleado.html";
-        });
-    }
 
     if (modoAdmin) {
         modoAdmin.addEventListener("click", () => {
@@ -155,22 +167,9 @@ console.log(usuario);
         });
     }
 
-    if (eliminar) {
-        eliminar.addEventListener("click", async () => {
-
-            const confirmar = confirm(
-                "¿Estás seguro de que querés eliminar tu cuenta?"
-            );
-
-            if (!confirmar) return;
-
-            const rta = await eliminarCuenta();
-
-            if (rta) {
-                alert("Eliminación realizada con éxito");
-            } else {
-                alert("No se pudo eliminar la cuenta");
-            }
+    if (btnSolicitudes) {
+        btnSolicitudes.addEventListener("click", () => {
+            renderSolicitudes(usuario);
         });
     }
 }
@@ -232,16 +231,18 @@ function renderModificar(usuario) {
     <button class="btn-cancel" id="cancelar">Volver</button>
     <button class="btn-submit" id="modificar">Modificar</button>
 </div>
+<button id="btn-eliminar-perfil" style="margin-top:16px;width:100%;padding:10px;border-radius:var(--r-sm);border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:var(--red);font-size:13px;font-weight:500;cursor:pointer;">Eliminar Cuenta</button>
             `;
 
 
     const cancelar = document.getElementById("cancelar");
     const modificar = document.getElementById("modificar");
+    const eliminar = document.getElementById("btn-eliminar-perfil");
 
 
-    cancelar.addEventListener('click', () => {
+    cancelar.addEventListener('click', async () => {
 
-        renderOpciones(usuario);
+        await renderOpciones(usuario);
 
     });
 
@@ -251,6 +252,18 @@ function renderModificar(usuario) {
         modificarUsuario(usuario.id);
 
     });
+
+    if (eliminar) {
+        eliminar.addEventListener("click", async () => {
+            if (!confirm("¿Estás seguro de que querés eliminar tu cuenta?")) return;
+            const rta = await eliminarCuenta();
+            if (rta) {
+                alert("Eliminación realizada con éxito");
+            } else {
+                alert("No se pudo eliminar la cuenta");
+            }
+        });
+    }
 
 
 }
@@ -299,11 +312,7 @@ async function modificarUsuario(id) {
                 headers: authHeaders(),
             }
         );
-
-        if (!response.ok) {
-            const error = await response.text();
-            throw new Error(error || `Error ${response.status}`);
-        }
+        await checkRes(response);
 
         alert("Usuario modificado con éxito");
 
@@ -321,10 +330,7 @@ async function eliminarCuenta() {
             headers: authHeaders(),
             method: "DELETE"
         });
-
-        if (!response.ok) {
-            return false;
-        }
+        await checkRes(response);
 
         cerrarSesion();
         return true;
@@ -338,6 +344,127 @@ async function eliminarCuenta() {
 
 
 
+async function renderSolicitudes(usuario) {
+    const infoAccountDiv = document.getElementById("info-account");
+
+    let solicitudesCache = [];
+
+    infoAccountDiv.innerHTML = `
+        <div class="funcionalidad-perfil-container">
+            <div class="funcionalidad-perfil">
+                <h2 style="font-size:1rem;font-weight:600;color:var(--t);margin-bottom:16px;">Invitaciones a Sucursales</h2>
+                <input type="text" id="buscar-solicitud" placeholder="Buscar sucursal..."
+                    style="width:100%;padding:8px 12px;border:1px solid var(--b);border-radius:var(--r-sm);background:var(--s1);color:var(--t);font-size:12px;margin-bottom:12px;box-sizing:border-box;">
+                <div id="solicitudes-lista" style="color:var(--t3);font-size:13px;">Cargando...</div>
+                <div style="margin-top:16px;">
+                    <button class="btn-cancel" id="volver-solicitudes">Volver</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.getElementById("volver-solicitudes").addEventListener("click", () => {
+        renderPerfil(usuario);
+    });
+
+    try {
+        const res = await fetch(API_URL + `/solicitudes-empleado/recibidas`, { headers: authHeaders() });
+        await checkRes(res);
+        solicitudesCache = await res.json();
+        renderLista(solicitudesCache);
+    } catch (e) {
+        const container = document.getElementById("solicitudes-lista");
+        if (container) container.innerHTML = '<div style="color:var(--red);font-size:12px;">Error al cargar invitaciones</div>';
+    }
+
+    document.getElementById("buscar-solicitud").addEventListener("input", () => {
+        renderLista(solicitudesCache);
+    });
+
+    function renderLista(solicitudes) {
+        const container = document.getElementById("solicitudes-lista");
+        const texto = document.getElementById("buscar-solicitud").value.toLowerCase();
+
+        if (!solicitudes || !solicitudes.length) {
+            container.innerHTML = '<div style="color:var(--t3);font-family:var(--mono);font-size:12px;">No tenés invitaciones pendientes</div>';
+            return;
+        }
+
+        const filtradas = solicitudes.filter(s =>
+            (s.sucursal.nombre || "").toLowerCase().includes(texto)
+        );
+
+        if (filtradas.length === 0) {
+            container.innerHTML = '<div style="color:var(--t3);font-family:var(--mono);font-size:12px;">No hay coincidencias</div>';
+            return;
+        }
+
+        const estadoBadge = {
+            PENDIENTE: 'badge--amber',
+            APROBADA: 'badge--green',
+            RECHAZADA: 'badge--red'
+        };
+
+        container.innerHTML = filtradas.map(s => {
+            const fecha = new Date(s.fechaSolicitud).toLocaleDateString("es-AR");
+            const esPendiente = s.estadoSolicitud === 'PENDIENTE';
+            return `
+                <div class="card solicitud-card" data-id="${s.id}">
+                    <h3>${s.sucursal.nombre}</h3>
+                    <p>${fecha} — Te invitaron a trabajar en esta sucursal</p>
+                    ${esPendiente ? `
+                        <div style="display:flex;gap:8px;">
+                            <button class="aceptar-btn" data-id="${s.id}">Aceptar</button>
+                            <button class="rechazar-btn" data-id="${s.id}">Rechazar</button>
+                        </div>
+                    ` : `<span class="badge ${estadoBadge[s.estadoSolicitud] || 'badge--blue'}">${s.estadoSolicitud}</span>`}
+                </div>`;
+        }).join("");
+
+        container.querySelectorAll(".aceptar-btn").forEach(btn => {
+            btn.addEventListener("click", () => aprobarSolicitud(parseInt(btn.dataset.id)));
+        });
+        container.querySelectorAll(".rechazar-btn").forEach(btn => {
+            btn.addEventListener("click", () => rechazarSolicitud(parseInt(btn.dataset.id)));
+        });
+    }
+
+    async function aprobarSolicitud(id) {
+        try {
+            const res = await fetch(API_URL + `/solicitudes-empleado/${id}/aprobar`, {
+                method: "PATCH",
+                headers: authHeaders()
+            });
+            await checkRes(res);
+            alert("Solicitud aceptada");
+            const res2 = await fetch(API_URL + `/solicitudes-empleado/recibidas`, { headers: authHeaders() });
+            await checkRes(res2);
+            solicitudesCache = await res2.json();
+            renderLista(solicitudesCache);
+        } catch {
+            alert("No se pudo aceptar la solicitud");
+        }
+    }
+
+    async function rechazarSolicitud(id) {
+        try {
+            const res = await fetch(API_URL + `/solicitudes-empleado/${id}/rechazar`, {
+                method: "PATCH",
+                headers: authHeaders()
+            });
+            await checkRes(res);
+            alert("Solicitud rechazada");
+            const res2 = await fetch(API_URL + `/solicitudes-empleado/recibidas`, { headers: authHeaders() });
+            await checkRes(res2);
+            solicitudesCache = await res2.json();
+            renderLista(solicitudesCache);
+        } catch {
+            alert("No se pudo rechazar la solicitud");
+        }
+    }
+}
+
+
 async function cargarUsuario(id) {
     try {
 
@@ -347,10 +474,7 @@ async function cargarUsuario(id) {
                 headers: authHeaders()
             }
         );
-
-        if (!response.ok) {
-            throw new Error(`Error ${response.status}`);
-        }
+        await checkRes(response);
 
         return await response.json();
     } catch (error) {

@@ -1,4 +1,4 @@
-import { API_URL, authHeaders, sesionActiva } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva, checkRes } from "../recursos/modulos.js";
 
 const usuariosBody = document.getElementById("usuariosBody");
 const sucursalesBody = document.getElementById("sucursalesBody");
@@ -204,9 +204,7 @@ async function abrirModalSucursal(sucursalId) {
                ${(s.nombre || "?")[0].toUpperCase()}
            </div>`;
 
-    const empleados = s.empleados && s.empleados.length
-        ? Array.from(s.empleados).map(e => `${e.nombre} ${e.apellido}`).join(", ")
-        : "Sin empleados";
+    let empleadosHTML = '<div class="detail-body" style="color:var(--t3)">Cargando...</div>';
 
     const backdrop = document.createElement("div");
     backdrop.className = "modal-overlay";
@@ -231,9 +229,9 @@ async function abrirModalSucursal(sucursalId) {
                 <small class="detail-label">Descripción</small>
                 <div class="detail-body">${s.descripcion ?? "-"}</div>
             </div>
-            <div class="detail-section">
+            <div class="detail-section" id="seccion-empleados">
                 <small class="detail-label">Empleados</small>
-                <div class="detail-body">${empleados}</div>
+                <div id="lista-empleados">${empleadosHTML}</div>
             </div>
             <div class="modal-foot--flex">
                 <a href="../sucursal-folder/Sucursal.html?id=${s.id}"
@@ -248,12 +246,40 @@ async function abrirModalSucursal(sucursalId) {
     backdrop.querySelector("#btn-cerrar-modal").onclick = cerrar;
     backdrop.querySelector("#btn-cerrar-modal-bottom").onclick = cerrar;
     backdrop.addEventListener("click", (e) => { if (e.target === backdrop) cerrar(); });
+
+    try {
+        const res = await fetch(API_URL + `/sucursales/${sucursalId}/empleados`, { headers: authHeaders() });
+        await checkRes(res);
+        const empleados = await res.json();
+        const lista = document.getElementById("lista-empleados");
+
+        if (!empleados || !empleados.length) {
+            lista.innerHTML = '<div class="detail-body" style="color:var(--t3)">Sin empleados</div>';
+        } else {
+            lista.innerHTML = empleados.map(e => {
+                const avatar = e.urlFotoPerfil
+                    ? `<img src="${e.urlFotoPerfil}" alt="" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
+                    : `<div style="width:32px;height:32px;border-radius:50%;background:var(--s2);color:var(--t2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;">${(e.nombre || "?")[0].toUpperCase()}</div>`;
+                return `
+                    <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--b);">
+                        ${avatar}
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:13px;font-weight:500;color:var(--t);">${e.nombre} ${e.apellido}</div>
+                            <div style="font-size:11px;color:var(--t3);font-family:var(--mono);">${e.email}</div>
+                        </div>
+                    </div>`;
+            }).join("");
+        }
+    } catch (e) {
+        const lista = document.getElementById("lista-empleados");
+        if (lista) lista.innerHTML = '<div class="detail-body" style="color:var(--red)">Error al cargar empleados</div>';
+    }
 }
 
 async function buscarSucursalPorId(id) {
     try {
         const res = await fetch(API_URL + `/sucursales/${id}`, { headers: authHeaders() });
-        if (!res.ok) throw new Error(`Error ${res.status}`);
+        await checkRes(res);
         return await res.json();
     } catch (e) {
         console.error("Error al cargar sucursal:", e);
@@ -264,7 +290,7 @@ async function buscarSucursalPorId(id) {
 async function buscarPerfilUsuario(userId) {
     try {
         const response = await fetch(API_URL + `/usuarios/${userId}`, { headers: authHeaders() });
-        if (!response.ok) throw new Error(`Error ${response.status}`);
+        await checkRes(response);
         return await response.json();
     } catch (error) {
         console.error("Error al cargar perfil de usuario:", error);
@@ -275,7 +301,7 @@ async function buscarPerfilUsuario(userId) {
 async function buscarUsuarios() {
     try {
         const response = await fetch(API_URL + "/usuarios/listar", { headers: authHeaders() });
-        if (!response.ok) throw new Error(`Error ${response.status}`);
+        await checkRes(response);
         return await response.json();
     } catch (error) {
         alert(error.message);
@@ -286,7 +312,7 @@ async function buscarUsuarios() {
 async function buscarSucursales() {
     try {
         const response = await fetch(API_URL + "/sucursales/listar", { headers: authHeaders() });
-        if (!response.ok) throw new Error(`Error ${response.status}`);
+        await checkRes(response);
         return await response.json();
     } catch (error) {
         alert(error.message);
@@ -301,13 +327,9 @@ async function eliminarUsuario(userId) {
             method: "DELETE",
             headers: authHeaders()
         });
-        if (response.ok) {
-            alert("Usuario eliminado correctamente.");
-            render();
-        } else {
-            const msg = await response.text();
-            alert(msg || `Error ${response.status}`);
-        }
+        await checkRes(response);
+        alert("Usuario eliminado correctamente.");
+        render();
     } catch (error) {
         alert("Error al eliminar usuario: " + error.message);
     }
@@ -320,7 +342,7 @@ async function eliminarSucursal(sucursalId) {
             method: "DELETE",
             headers: authHeaders()
         });
-        if (!response.ok) throw new Error(`Error ${response.status}`);
+        await checkRes(response);
         alert("Sucursal eliminada correctamente.");
         render();
     } catch (error) {
