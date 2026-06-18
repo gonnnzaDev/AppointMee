@@ -1,9 +1,7 @@
 
 # AppointMee
 Gestor de turnos para Trabajo Practico Final de la Materia Programacion III en la Universidad Tecnologica Nacional
-<div align="center">
-<img src="https://mdp.utn.edu.ar/UTNMDQdata/thumbnail.jpg" height="300" >
-</div>
+
 
 ## Backend
 
@@ -30,7 +28,12 @@ Gestor de turnos para Trabajo Practico Final de la Materia Programacion III en l
 * JavaScript
 * Tailwind
 * Bootstrap
-  
+
+## Deploy
+
+* Render
+* Docker
+
 
 
 ### Instrucciones
@@ -57,7 +60,7 @@ Gestor de turnos para Trabajo Practico Final de la Materia Programacion III en l
    ./mvnw spring-boot:run
    ```
 
-4. Acceder a la aplicación en `http://localhost:8080/login`
+4. Acceder a la aplicación en `https://appointmee-vcs2.onrender.com`
 
 # Equipo
 * Backend : **Giovanni Morro Bai**.
