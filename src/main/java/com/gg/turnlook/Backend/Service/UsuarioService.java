@@ -239,7 +239,8 @@ public class UsuarioService {
 
         Usuario usuario = listarUsuarioPorEmail(userEmail);
 
-        return new UsuarioMeDTO(usuario.getId(), setRolesComoString(usuario));
+        return new UsuarioMeDTO(usuario.getId(), setRolesComoString(usuario),
+                usuario.getFotoPerfil().getFotoValida());
     }
 
 
