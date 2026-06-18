@@ -99,7 +99,11 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("http://127.0.0.1:3000",
+        config.setAllowedOrigins(List.of(
+                "http://127.0.0.1:3000",
+                "http://localhost:3000",
+                "http://127.0.0.1:8080",
+                "http://localhost:8080",
                 "https://appointmee-vcs2.onrender.com"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
