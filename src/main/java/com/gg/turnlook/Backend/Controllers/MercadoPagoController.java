@@ -48,14 +48,14 @@ public class MercadoPagoController {
     @PostMapping("/webhook")
     public ResponseEntity<?> webhook(
             @RequestParam(required = false) String topic,
-            @RequestParam(required = false) String pagoId) throws MPException, MPApiException {
+            @RequestParam(required = false) String id) throws MPException, MPApiException {
 
         System.out.println("Webhook recibido");
         System.out.println("Topic: " + topic);
-        System.out.println("ID: " + pagoId);
+        System.out.println("ID: " + id);
 
         return ResponseEntity.ok().body(mpService.procesarWebhook(
-                Long.valueOf(pagoId)));
+                Long.valueOf(id)));
     }
 
 
