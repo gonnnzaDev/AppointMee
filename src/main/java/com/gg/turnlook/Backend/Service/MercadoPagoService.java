@@ -99,11 +99,10 @@ public class MercadoPagoService {
 
         if (!"approved".equals(payment.getStatus())) {
 
-            turnoService.setearPagoRechazado(turnoId, EstadoTurno.PAGO_RECHAZADO);
+            turnoService.setearPagoRechazado(turnoId);
             return "Error al realizar el pago";
         }
 
-        turnoService.setearPagoRechazado(turnoId, EstadoTurno.PRUEBA);
         return "Pago exitoso\nTurno confirmado";
     }
 

@@ -50,9 +50,13 @@ public class MercadoPagoController {
             @RequestParam(required = false) String topic,
             @RequestParam(required = false) String id) throws MPException, MPApiException {
 
-        System.out.println("Webhook recibido");
-        System.out.println("Topic: " + topic);
-        System.out.println("ID: " + id);
+        if(id == null){
+            return ResponseEntity.ok().build();
+        }
+
+        if(!"payment".equals(topic)){
+            return ResponseEntity.ok().build();
+        }
 
         return ResponseEntity.ok().body(mpService.procesarWebhook(
                 Long.valueOf(id)));

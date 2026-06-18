@@ -6,8 +6,8 @@ public enum EstadoTurno {
     PENDIENTE,
     REALIZADO,
     CANCELADO,
-    PAGO_RECHAZADO,
-    PRUEBA
+    PAGO_RECHAZADO
+
 }
 
 
