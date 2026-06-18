@@ -72,6 +72,7 @@ public class SecurityConfig {
                                 "/register-folder/**",
                                 "/sucursal-folder/**",
                                 "/turnos-folder/**",
+                                "/mis-sucursales-folder/**",
 
                                 "/usuarios/inicio-sesion",
                                 "/usuarios/recuperar-cuenta",
