@@ -1,4 +1,4 @@
-import { API_URL, authHeaders, sesionActiva, checkRes, formatearFechaLocal } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva, checkRes } from "../recursos/modulos.js";
 
 const user = await sesionActiva();
 
@@ -56,7 +56,7 @@ function renderComentarios(turno) {
                 </label>
 
                 <textarea
-                    id="mensaje"
+                    id="mensaje" class="form-control"
                     placeholder="Contanos qué te pareció el servicio..."
                 ></textarea>
             </div>
@@ -76,12 +76,22 @@ function renderComentarios(turno) {
     }
 }
 
+function formatearFecha(isoStr) {
+    if (!isoStr) return "";
+    const partes = isoStr.split("T");
+    const [y, m, d] = partes[0].split("-");
+    const fecha = `${d}/${m}/${y}`;
+    if (!partes[1]) return fecha;
+    const [h, min] = partes[1].split(":");
+    return `${fecha} a las ${h}:${min} hs`;
+}
+
 function renderDetalle(turno) {
 
     const infoContainer = document.getElementById("detalle-turno-info");
 
-   const fechaHora = formatearFechaLocal(turno.fechaTurno);
-    const fechaReserva = formatearFechaLocal(turno.fechaReserva);
+    const fechaTurno = formatearFecha(turno.fechaTurno);
+    const fechaReserva = formatearFecha(turno.fechaReserva);
 
     const nombreEmpleado = turno.empleado
         ? `${turno.empleado.nombre} ${turno.empleado.apellido}`
@@ -119,7 +129,7 @@ function renderDetalle(turno) {
 
         <div class="form-group">
             <label>Fecha y Hora del Turno</label>
-            <p style="font-family:var(--mono);">${fechaHora}</p>
+            <p style="font-family:var(--mono);color:var(--t);">${fechaTurno}</p>
         </div>
 
         <div class="form-group">
