@@ -119,13 +119,11 @@ async function renderOpciones(usuario) {
         `;
     }
 
-    if (usuario.roles.includes("CLIENTE") && !usuario.roles.includes("ADMINISTRADOR") && !usuario.roles.includes("EMPLEADOR")) {
-        html += `
-            <button id="btn-editar-perfil">
-                Editar
-            </button>
-        `;
-    }
+    html += `
+        <button id="btn-editar-perfil">
+            Editar
+        </button>
+    `;
 
     html += `
         <button id="btn-solicitudes-perfil">
