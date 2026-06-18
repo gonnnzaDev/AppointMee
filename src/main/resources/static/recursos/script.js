@@ -46,7 +46,7 @@ function initNavbar() {
           </button>
           <div class="am-nav__dropdown" id="navDropdown">
             <a class="am-nav__dropdown-link" href="../perfil-folder/Perfil.html">Mi Perfil</a>
-            <a class="am-nav__dropdown-link" href="../perfil-folder/Perfil.html?solicitudes=1">Solicitudes</a>
+            <a class="am-nav__dropdown-link" href="../solicitudes-folder/Solicitudes.html" id="nav-solicitudes-link" style="display:none;">Solicitudes</a>
             <a class="am-nav__dropdown-link" href="../configuracion-folder/configuracion.html">Ajustes</a>
             <button class="am-nav__dropdown-link am-nav__dropdown-link--danger" id="navCerrarSesion">Cerrar Sesión</button>
           </div>
@@ -168,6 +168,8 @@ async function mostrarLinkSucursales() {
 
     const link = document.getElementById("nav-mis-sucursales");
     if (link) link.style.display = tiene ? "" : "none";
+
+    const solicitudesLink = document.getElementById("nav-solicitudes-link");
 
     const avatar = document.getElementById("navProfileAvatar");
     if (avatar) {

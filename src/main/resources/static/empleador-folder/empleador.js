@@ -20,6 +20,7 @@ window.eliminarServicio = eliminarServicio;
 window.finalizarTurno = finalizarTurno;
 window.cancelarTurno = cancelarTurno;
 window.eliminarEmpleado = eliminarEmpleado;
+window.convertirmeEnEmpleado = convertirmeEnEmpleado;
 
 function crearModal(id) {
     const old = document.getElementById(id);
@@ -76,7 +77,8 @@ function renderSucursales(sucursales) {
             <td>
                 <div class="table-actions">
                     <button onclick="abrirModalModificarSucursal(${s.id})">Editar</button>
-                    <button onclick="eliminarSucursal(${s.id})" style="color:var(--red);">Borrar</button>
+                    <button onclick="convertirmeEnEmpleado(${s.id})">Ser empleado</button>
+                    <button onclick="eliminarSucursal(${s.id})" class="btn-danger">Borrar</button>
                 </div>
             </td>
         `;
@@ -160,6 +162,21 @@ async function eliminarServicio(servicioId, sucursalId) {
         const msg = await res.text();
         alert(msg);
         if (res.ok) await cargarServicios(sucursalId);
+    } catch (e) {
+        alert("Error: " + e.message);
+    }
+}
+
+async function convertirmeEnEmpleado(sucursalId) {
+    if (!confirm("¿Querés convertirte en empleado de esta sucursal?")) return;
+    try {
+        const res = await fetch(API_URL + `/sucursales/${sucursalId}/convertirme-empleado`, {
+            method: "PATCH",
+            headers: authHeaders()
+        });
+        await checkRes(res);
+        const msg = await res.text();
+        alert(msg);
     } catch (e) {
         alert("Error: " + e.message);
     }

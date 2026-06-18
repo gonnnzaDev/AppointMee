@@ -1,4 +1,10 @@
-export const API_URL = "http://localhost:8080";
+const ORIGENES_BACKEND_PROPIO = [8080];
+const puertoActual = Number(window.location.port);
+const esLocalhost = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+
+export const API_URL = (!esLocalhost || ORIGENES_BACKEND_PROPIO.includes(puertoActual))
+    ? window.location.origin
+    : "http://localhost:8080";
 
 function getToken() {
     return localStorage.getItem("token");
