@@ -2,6 +2,7 @@ import { authHeaders, sesionActiva } from "../recursos/modulos.js";
 
 const usuariosBody = document.getElementById("usuariosBody");
 const sucursalesBody = document.getElementById("sucursalesBody");
+const serviciosBody = document.getElementById("serviciosBody");
 
 const user = await sesionActiva();
 
@@ -9,303 +10,275 @@ if (!user) {
     window.location.href = "../login.html";
 }
 
-await render();
+render();
+
 
 async function render() {
+    if (!usuariosBody || !sucursalesBody || !serviciosBody) return;
 
-    const [usuarios, sucursales] = await Promise.all([
+    const [usuariosList, sucursalesList, serviciosList] = await Promise.all([
         buscarUsuarios(),
-        buscarSucursales()
+        buscarSucursales(),
+        buscarServicios()
     ]);
 
-    renderUsuarios(usuarios);
-    renderSucursales(sucursales);
-}
-
-function renderUsuarios(lista) {
-
-    usuariosBody.innerHTML = "";
-
-    lista.forEach(u => {
-
-        usuariosBody.innerHTML += `
+    let usuariosHTML = "";
+    usuariosList.forEach(u => {
+        usuariosHTML += `
             <tr>
                 <td>${u.id}</td>
                 <td>${u.nombre}</td>
                 <td>${u.apellido}</td>
-                <td>${u.email ?? "-"}</td>
-                <td>${u.roles}</td>
-                <td>${u.estado ?? "-"}</td>
-
+                <td>${u.email}</td>
+                <td>${u.rol}</td>
+                <td>${u.estado}</td>
                 <td>
-
-                    <button
-                        class="btn btn-primary detalle-usuario"
-                        data-id="${u.id}">
+                    <button class="btn btn-sm btn-info btn-detalle-usuario" data-id="${u.id}">
                         Detalle
                     </button>
-
-                    <button
-                        class="btn btn-danger eliminar-usuario"
-                        data-id="${u.id}">
-                        Eliminar
-                    </button>
-
                 </td>
-
-            </tr>
-        `;
+            </tr>`;
     });
-}
+    usuariosBody.innerHTML = usuariosHTML;
 
-function renderSucursales(lista) {
-
-    sucursalesBody.innerHTML = "";
-
-    lista.forEach(s => {
-
-        sucursalesBody.innerHTML += `
+    let sucursalesHTML = "";
+    sucursalesList.forEach(s => {
+        sucursalesHTML += `
             <tr>
-
                 <td>${s.nombre}</td>
                 <td>${s.categoria}</td>
                 <td>${s.puntuacion}</td>
                 <td>${s.cantidadPuntuaciones}</td>
-
                 <td>
-
-                    <button
-                        class="btn btn-info detalle-sucursal"
-                        data-id="${s.id}">
+                    <button class="btn btn-sm btn-primary btn-detalle-sucursal" data-id="${s.id}">
                         Detalle
                     </button>
-
-                    <button
-                        class="btn btn-danger eliminar-sucursal"
-                        data-id="${s.id}">
+                    <button class="btn btn-sm btn-danger btn-eliminar-sucursal ms-1" data-id="${s.id}">
                         Eliminar
                     </button>
-
                 </td>
+            </tr>`;
+    });
+    sucursalesBody.innerHTML = sucursalesHTML;
 
-            </tr>
-        `;
+    let serviciosHTML = "";
+    serviciosList.forEach(ser => {
+        serviciosHTML += `
+            <tr>
+                <td>${ser.nombre}</td>
+                <td>${ser.descripcion}</td>
+                <td>${ser.duracion}</td>
+                <td>${ser.precio}</td>
+            </tr>`;
+    });
+    serviciosBody.innerHTML = serviciosHTML;
+
+    registrarEventos();
+}
+
+
+function registrarEventos() {
+    usuariosBody.addEventListener("click", async (e) => {
+        const btn = e.target.closest(".btn-detalle-usuario");
+        if (!btn) return;
+        const userId = btn.dataset.id;
+        await abrirModalUsuario(userId);
+    });
+
+    sucursalesBody.addEventListener("click", (e) => {
+        const btnDetalle = e.target.closest(".btn-detalle-sucursal");
+        if (btnDetalle) {
+            const sucursalId = btnDetalle.dataset.id;
+            window.open(
+                `https://appointmee-vcs2.onrender.com/sucursal-folder/Sucursal.html?id=${sucursalId}`,
+                "_blank"
+            );
+            return;
+        }
+
+        const btnEliminar = e.target.closest(".btn-eliminar-sucursal");
+        if (btnEliminar) {
+            const sucursalId = btnEliminar.dataset.id;
+            eliminarSucursal(sucursalId);
+        }
     });
 }
 
-async function buscarUsuarios() {
 
+async function abrirModalUsuario(userId) {
+    const modalEl = document.getElementById("modalDetalleUsuario");
+    const modalBody = document.getElementById("modalDetalleUsuarioBody");
+    const modal = new bootstrap.Modal(modalEl);
+
+    modalBody.innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div>
+        </div>`;
+    modal.show();
+
+    const perfil = await buscarPerfilUsuario(userId);
+    if (!perfil) {
+        modalBody.innerHTML = `<div class="alert alert-danger">No se pudo cargar la información del usuario.</div>`;
+        return;
+    }
+
+    const roles = perfil.roles ? [...perfil.roles] : [];
+    const esEmpleador = roles.includes("EMPLEADOR");
+    const esCliente = roles.includes("CLIENTE");
+    const esEmpleado = roles.includes("EMPLEADO");
+    const esAdministrador = roles.includes("ADMINISTRADOR");
+
+    const fotoPerfil = perfil.fotoPerfil
+        ? `<img src="${perfil.fotoPerfil}" alt="Foto de perfil" class="rounded-circle mb-3" style="width:90px;height:90px;object-fit:cover;">`
+        : `<div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center mb-3 mx-auto" style="width:90px;height:90px;font-size:2rem;">
+               ${(perfil.nombre || "?")[0].toUpperCase()}
+           </div>`;
+
+    const coloresRol = {
+        ADMINISTRADOR: "danger",
+        EMPLEADOR: "primary",
+        EMPLEADO: "success",
+        CLIENTE: "warning"
+    };
+    const rolesHTML = roles.map(r =>
+        `<span class="badge bg-${coloresRol[r] || "secondary"} me-1">${r}</span>`
+    ).join("");
+
+    let sucursalesSection = "";
+    if (perfil.sucursalesEmpleado && perfil.sucursalesEmpleado.length > 0) {
+        const sucursalesItems = perfil.sucursalesEmpleado.map(s => `
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>${s.nombre}</strong>
+                    <span class="text-muted ms-2">${s.categoria || ""}</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-warning text-dark">⭐ ${s.puntuacion ?? "-"} (${s.cantidadPuntuaciones ?? 0})</span>
+                    <a href="https://appointmee-vcs2.onrender.com/sucursal-folder/Sucursal.html?id=${s.id}"
+                       target="_blank" class="btn btn-sm btn-outline-primary">Ver</a>
+                </div>
+            </li>`).join("");
+        sucursalesSection = `
+            <hr>
+            <h6 class="fw-bold">Sucursales asociadas</h6>
+            <ul class="list-group list-group-flush">${sucursalesItems}</ul>`;
+    }
+
+    let seccionExtra = "";
+    if (esEmpleador) {
+        seccionExtra = `
+            <div class="alert alert-primary mt-3 mb-0">
+                <strong>Empleador:</strong> Este usuario es dueño/gestor de sucursales.
+                Puede crear sucursales, administrar empleados y gestionar turnos.
+            </div>`;
+    }
+    if (esCliente) {
+        seccionExtra += `
+            <div class="alert alert-warning mt-3 mb-0">
+                <strong>Cliente:</strong> Este usuario puede reservar turnos en cualquier sucursal.
+            </div>`;
+    }
+    if (esEmpleado) {
+        seccionExtra += `
+            <div class="alert alert-success mt-3 mb-0">
+                <strong>Empleado:</strong> Este usuario trabaja en una o más sucursales.
+            </div>`;
+    }
+    if (esAdministrador) {
+        seccionExtra += `
+            <div class="alert alert-danger mt-3 mb-0">
+                <strong>Administrador:</strong> Tiene acceso completo al panel de administración.
+            </div>`;
+    }
+
+    modalBody.innerHTML = `
+        <div class="text-center">${fotoPerfil}</div>
+        <div class="row g-3">
+            <div class="col-12 text-center">${rolesHTML}</div>
+
+            <div class="col-md-6">
+                <label class="form-label text-muted small mb-0">ID</label>
+                <div class="fw-semibold">${perfil.id}</div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label text-muted small mb-0">Fecha de creación</label>
+                <div class="fw-semibold">${perfil.fechaCreacion ?? "-"}</div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label text-muted small mb-0">Nombre</label>
+                <div class="fw-semibold">${perfil.nombre ?? "-"}</div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label text-muted small mb-0">Apellido</label>
+                <div class="fw-semibold">${perfil.apellido ?? "-"}</div>
+            </div>
+            <div class="col-12">
+                <label class="form-label text-muted small mb-0">Email</label>
+                <div class="fw-semibold">${perfil.email ?? "-"}</div>
+            </div>
+        </div>
+
+        ${seccionExtra}
+        ${sucursalesSection}
+    `;
+}
+
+
+async function buscarPerfilUsuario(userId) {
     try {
-
-        const response = await fetch(
-            "/usuarios/listar",
-            {
-                headers: authHeaders()
-            }
-        );
-
-        if (!response.ok) return [];
-
+        const response = await fetch(`/usuarios/${userId}`, { headers: authHeaders() });
+        if (!response.ok) throw new Error(`Error ${response.status}`);
         return await response.json();
+    } catch (error) {
+        console.error("Error al cargar perfil de usuario:", error);
+        return null;
+    }
+}
 
-    } catch {
-
+async function buscarUsuarios() {
+    try {
+        const response = await fetch("/usuarios/listar", { headers: authHeaders() });
+        if (!response.ok) throw new Error(`Error ${response.status}`);
+        return await response.json();
+    } catch (error) {
+        alert(error.message);
         return [];
     }
 }
 
 async function buscarSucursales() {
-
     try {
-
-        const response = await fetch(
-            "/sucursales/listar",
-            {
-                headers: authHeaders()
-            }
-        );
-
-        if (!response.ok) return [];
-
+        const response = await fetch("/sucursales/listar", { headers: authHeaders() });
+        if (!response.ok) throw new Error(`Error ${response.status}`);
         return await response.json();
-
-    } catch {
-
+    } catch (error) {
+        alert(error.message);
         return [];
     }
 }
 
-async function mostrarDetalleUsuario(id) {
-
+async function buscarServicios() {
     try {
-
-        const response = await fetch(
-            `/usuarios/${id}`,
-            {
-                headers: authHeaders()
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error("No se pudo cargar el usuario");
-        }
-
-        const usuario = await response.json();
-
-        document.getElementById("usuarioModalBody").innerHTML = `
-            <div class="text-center">
-
-                ${usuario.fotoPerfil
-                ? `
-                            <img
-                                src="${usuario.fotoPerfil}"
-                                class="img-thumbnail mb-3"
-                                style="max-width:200px;">
-                        `
-                : ""
-            }
-
-                <h3>
-                    ${usuario.nombre}
-                    ${usuario.apellido}
-                </h3>
-
-            </div>
-
-            <hr>
-
-            <p><strong>ID:</strong> ${usuario.id}</p>
-
-            <p>
-                <strong>Email:</strong>
-                ${usuario.email}
-            </p>
-
-            <p>
-                <strong>Fecha Creación:</strong>
-                ${usuario.fechaCreacion}
-            </p>
-
-            <p>
-                <strong>Roles:</strong>
-                ${usuario.roles?.join(", ")
-            ?? "Sin roles"
-            }
-            </p>
-
-            <hr>
-
-            <h5>Sucursales</h5>
-
-            ${usuario.sucursalesEmpleado?.length
-                ? `
-                        <ul>
-                            ${usuario.sucursalesEmpleado.map(s => `
-                                <li>
-                                    ${s.nombre}
-                                </li>
-                            `).join("")}
-                        </ul>
-                    `
-                : "<p>No posee sucursales asociadas.</p>"
-            }
-        `;
-
-        const modal = new bootstrap.Modal(
-            document.getElementById("usuarioModal")
-        );
-
-        modal.show();
-
+        const response = await fetch("/servicios/listar", { headers: authHeaders() });
+        if (!response.ok) throw new Error(`Error ${response.status}`);
+        return await response.json();
     } catch (error) {
-
         alert(error.message);
+        return [];
     }
 }
 
-document.addEventListener("click", async e => {
-
-    const id = e.target.dataset.id;
-
-    if (!id) return;
-
-    if (e.target.classList.contains("detalle-usuario")) {
-
-        await mostrarDetalleUsuario(id);
-        return;
+async function eliminarSucursal(sucursalId) {
+    if (!confirm(`¿Seguro que querés eliminar la sucursal #${sucursalId}?`)) return;
+    try {
+        const response = await fetch(`/sucursales/eliminar/${sucursalId}`, {
+            method: "DELETE",
+            headers: authHeaders()
+        });
+        if (!response.ok) throw new Error(`Error ${response.status}`);
+        alert("Sucursal eliminada correctamente.");
+        render();
+    } catch (error) {
+        alert("Error al eliminar la sucursal: " + error.message);
     }
-
-    if (e.target.classList.contains("detalle-sucursal")) {
-
-        window.open(
-            `https://appointmee-vcs2.onrender.com/sucursal-folder/Sucursal.html?id=${id}`,
-            "_blank"
-        );
-
-        return;
-    }
-
-    if (e.target.classList.contains("eliminar-usuario")) {
-
-        if (!confirm("¿Eliminar usuario?")) return;
-
-        await fetch(
-            `/usuarios/eliminar/${id}`,
-            {
-                method: "DELETE",
-                headers: authHeaders()
-            }
-        );
-
-        await render();
-
-        return;
-    }
-
-    if (e.target.classList.contains("eliminar-sucursal")) {
-
-        if (!confirm("¿Eliminar sucursal?")) return;
-
-        await fetch(
-            `/sucursales/eliminar/${id}`,
-            {
-                method: "DELETE",
-                headers: authHeaders()
-            }
-        );
-
-        await render();
-    }
-});
-
-function activarBuscador(inputId, tbodyId) {
-
-    const input = document.getElementById(inputId);
-
-    input.addEventListener("input", () => {
-
-        const texto = input.value.toLowerCase();
-
-        document
-            .querySelectorAll(`#${tbodyId} tr`)
-            .forEach(tr => {
-
-                tr.style.display =
-                    tr.textContent
-                        .toLowerCase()
-                        .includes(texto)
-                        ? ""
-                        : "none";
-            });
-    });
 }
-
-activarBuscador(
-    "buscarUsuario",
-    "usuariosBody"
-);
-
-activarBuscador(
-    "buscarSucursal",
-    "sucursalesBody"
-);
