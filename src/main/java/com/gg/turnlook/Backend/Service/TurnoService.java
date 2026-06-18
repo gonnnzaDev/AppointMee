@@ -110,7 +110,7 @@ public class TurnoService {
             List<LocalTime> horariosDisponibles = new ArrayList<>();
             LocalTime apertura = sucursal.getHoraApertura();
 
-            while (!apertura.plusMinutes(servicio.getDuracion()).isAfter(sucursal.getHoraCierre())) {
+            while (!apertura.plusMinutes(servicio.getDuracion()).isAfter(LocalTime.of(23, 59))) {
 
                 LocalDateTime inicioNuevo = LocalDateTime.of(dia, apertura);
 

@@ -47,7 +47,7 @@ function renderPaso2() {
             </div>
             <div class="info-seleccionada" id="info-seleccionada"></div>
             <div class="btn-group">
-                <button class="btn-proceso btn-proceso--secundario" id="volver">Volver</button>
+                <button class="btn-proceso btn-proceso--secundario" id="volver" data-no-cooldown>Volver</button>
                 <button class="btn-proceso" id="siguiente" disabled>Siguiente</button>
             </div>
         </div>`;
@@ -64,37 +64,76 @@ function renderPaso2() {
 
 }
 
+const EMPLEADOS_POR_PAGINA = 4;
+let empleadosCache = [];
+let paginaEmpleados = 0;
+
 async function cargarEmpleados() {
     try {
         const res = await fetch(API_URL + `/sucursales/${sucursalId}/elegir-empleado`, {
             headers: authHeaders()
         });
         await checkRes(res);
-        const empleados = await res.json();
+        empleadosCache = await res.json();
 
         const contenedor = document.getElementById("empleados-container");
         if (!contenedor) return;
 
-        if (!empleados.length) {
+        if (!empleadosCache.length) {
             contenedor.innerHTML = `<p class="turno-sin-dia">Esta sucursal no tiene profesionales disponibles.</p>`;
             return;
         }
 
-        contenedor.innerHTML = empleados.map(e => `
-            <article class="empleado-article" data-id="${e.id}" onclick="seleccionarEmpleado(${e.id}, this)">
-                <img src="${e.urlFotoPerfil || IMG_FALLBACK}"
-                     alt="Foto de ${e.nombre}"
-                     onerror="this.src='${IMG_FALLBACK}'">
-                <p class="empleado-nombre">${e.nombre} ${e.apellido}</p>
-                <p class="empleado-valoracion">
-                    ${e.puntuacion ? "🐝".repeat(Math.round(e.puntuacion)) : "Sin calificar"} 
-                </p>
-            </article>`).join("");
+        paginaEmpleados = 0;
+        renderPaginaEmpleados();
 
     } catch (err) {
         const contenedor = document.getElementById("empleados-container");
         if (contenedor) contenedor.innerHTML = `<p class="turno-sin-dia">No se pudieron cargar los profesionales.</p>`;
     }
+}
+
+function renderPaginaEmpleados() {
+    const contenedor = document.getElementById("empleados-container");
+    if (!contenedor) return;
+
+    const totalPaginas = Math.ceil(empleadosCache.length / EMPLEADOS_POR_PAGINA);
+    const inicio = paginaEmpleados * EMPLEADOS_POR_PAGINA;
+    const fin = inicio + EMPLEADOS_POR_PAGINA;
+    const pagina = empleadosCache.slice(inicio, fin);
+
+    contenedor.innerHTML =
+        `<div class="empleados-pagina">` +
+            pagina.map(e => `
+                <article class="empleado-article" data-id="${e.id}" onclick="seleccionarEmpleado(${e.id}, this)">
+                    <img src="${e.urlFotoPerfil || IMG_FALLBACK}"
+                         alt="Foto de ${e.nombre}"
+                         onerror="this.src='${IMG_FALLBACK}'">
+                    <p class="empleado-nombre">${e.nombre} ${e.apellido}</p>
+                    <p class="empleado-valoracion">
+                        ${e.puntuacion ? "🐝".repeat(Math.round(e.puntuacion)) : "Sin calificar"} 
+                    </p>
+                </article>`).join("") +
+        `</div>` +
+        (totalPaginas > 1 ? `
+            <div class="empleados-paginacion">
+                <button class="btn-proceso btn-proceso--secundario empleados-pag-btn" id="btn-empleados-prev" data-no-cooldown ${paginaEmpleados === 0 ? "disabled" : ""}>‹ Anterior</button>
+                <span class="empleados-pag-info">${paginaEmpleados + 1} / ${totalPaginas}</span>
+                <button class="btn-proceso btn-proceso--secundario empleados-pag-btn" id="btn-empleados-next" data-no-cooldown ${paginaEmpleados >= totalPaginas - 1 ? "disabled" : ""}>Siguiente ›</button>
+            </div>` : "");
+
+    document.getElementById("btn-empleados-prev")?.addEventListener("click", () => {
+        if (paginaEmpleados > 0) {
+            paginaEmpleados--;
+            renderPaginaEmpleados();
+        }
+    });
+    document.getElementById("btn-empleados-next")?.addEventListener("click", () => {
+        if (paginaEmpleados < totalPaginas - 1) {
+            paginaEmpleados++;
+            renderPaginaEmpleados();
+        }
+    });
 }
 
 
@@ -136,7 +175,7 @@ function renderPaso1() {
                 <p class="turno-sin-dia">Cargando servicios…</p>
             </div>
             <div class="btn-group">
-                <button class="btn-proceso btn-proceso--secundario" id="volver">Volver</button>
+                <button class="btn-proceso btn-proceso--secundario" id="volver" data-no-cooldown>Volver</button>
                 <button class="btn-proceso" id="siguiente" disabled>Siguiente</button>
             </div>
         </div>`;
@@ -224,9 +263,9 @@ function renderPaso3() {
                 </div>
 
                 <div class="cal-nav">
-                    <button class="cal-nav-btn" id="btn-prev">&#8249;</button>
+                    <button class="cal-nav-btn" id="btn-prev" data-no-cooldown>&#8249;</button>
                     <span class="cal-mes-nombre" id="cal-mes-nombre"></span>
-                    <button class="cal-nav-btn" id="btn-next">&#8250;</button>
+                    <button class="cal-nav-btn" id="btn-next" data-no-cooldown>&#8250;</button>
                 </div>
 
                 <div class="cal-semana">
@@ -251,7 +290,7 @@ function renderPaso3() {
                 </div>
 
                 <div class="turno-footer">
-                    <button class="btn-proceso btn-proceso--secundario" id="volver">Volver</button>
+                    <button class="btn-proceso btn-proceso--secundario" id="volver" data-no-cooldown>Volver</button>
                     <button class="turno-btn-siguiente" id="siguiente" disabled>
                         Confirmar turno <span>→</span>
                     </button>

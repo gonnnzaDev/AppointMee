@@ -41,7 +41,7 @@ function initNavbar() {
         </ul>
 
         <div class="am-nav__profile" id="navProfile">
-          <button class="am-nav__profile-btn" id="navProfileBtn">
+          <button class="am-nav__profile-btn" id="navProfileBtn" data-no-cooldown>
             <span class="am-nav__profile-avatar" id="navProfileAvatar">?</span>
           </button>
           <div class="am-nav__dropdown" id="navDropdown">
@@ -52,7 +52,7 @@ function initNavbar() {
           </div>
         </div>
 
-        <button class="am-nav__toggle" id="amNavToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="amNavLinks">
+        <button class="am-nav__toggle" id="amNavToggle" data-no-cooldown aria-label="Abrir menú" aria-expanded="false" aria-controls="amNavLinks">
           <span class="am-nav__toggle-bar"></span>
           <span class="am-nav__toggle-bar"></span>
           <span class="am-nav__toggle-bar"></span>
@@ -150,7 +150,45 @@ function _bindProfileDropdown() {
 document.addEventListener("DOMContentLoaded", () => {
   initNavbar();
   mostrarLinkSucursales();
+  initBtnCooldown();
 });
+
+const COOLDOWN_MS = 1500;
+
+function initBtnCooldown() {
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if (btn && !btn.disabled && !btn.hasAttribute("data-no-cooldown")) {
+      const cd = parseInt(btn.getAttribute("data-cooldown"), 10);
+      const ms = cd > 0 ? cd : COOLDOWN_MS;
+      btn.disabled = true;
+      btn.style.pointerEvents = "none";
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.style.pointerEvents = "";
+      }, ms);
+    }
+
+    const link = e.target.closest("a");
+    if (link && !link.hasAttribute("data-no-cooldown")) {
+      const cd = parseInt(link.getAttribute("data-cooldown"), 10);
+      const ms = cd > 0 ? cd : COOLDOWN_MS;
+      if (link.dataset.cooldownUntil) {
+        const remaining = parseInt(link.dataset.cooldownUntil, 10) - Date.now();
+        if (remaining > 0) {
+          e.preventDefault();
+          return;
+        }
+      }
+      link.dataset.cooldownUntil = Date.now() + ms;
+      link.style.pointerEvents = "none";
+      setTimeout(() => {
+        delete link.dataset.cooldownUntil;
+        link.style.pointerEvents = "";
+      }, ms);
+    }
+  }, true);
+}
 
 async function mostrarLinkSucursales() {
   try {

@@ -239,7 +239,7 @@ body:has(#login) {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 40px 24px 80px;
+    padding: 40px 16px 80px;
 }
 
 .form {
@@ -3148,6 +3148,42 @@ button:active {
 
 .empleados-container,
 .servicios-container {
+    display: block;
+}
+
+.empleados-pagina {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+@media (min-width: 600px) {
+    .empleados-pagina {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.empleados-paginacion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 8px 0;
+}
+
+.empleados-pag-btn {
+    min-width: 110px;
+}
+
+.empleados-pag-info {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--t3);
+    white-space: nowrap;
+}
+
+.servicios-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 14px;
@@ -3178,7 +3214,9 @@ button:active {
 }
 
 @media (max-width: 768px) {
-    .empleados-container,
+    .empleados-pagina {
+        grid-template-columns: repeat(2, 1fr);
+    }
     .servicios-container {
         grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     }
@@ -3958,9 +3996,12 @@ button:active {
         border-right: none;
     }
 
-    .servicios-container,
-    .empleados-container {
+    .servicios-container {
         grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    .empleados-pagina {
+        grid-template-columns: 1fr;
         gap: 8px;
     }
 }
