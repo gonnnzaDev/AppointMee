@@ -1459,6 +1459,78 @@ button:active {
     font-family: var(--mono);
 }
 
+.sucursal-galeria {
+    margin-bottom: 24px;
+}
+.galeria-thumbs {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+.galeria-thumb {
+    flex-shrink: 0;
+    width: 72px;
+    height: 56px;
+    border-radius: var(--r-sm);
+    border: 2px solid transparent;
+    overflow: hidden;
+    cursor: pointer;
+    padding: 0;
+    background: none;
+    transition: border-color var(--ease), opacity var(--ease);
+    opacity: .6;
+}
+.galeria-thumb:hover {
+    opacity: .85;
+}
+.galeria-thumb--activo {
+    border-color: var(--blue);
+    opacity: 1;
+}
+.galeria-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.empleados-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    margin-top: 8px;
+}
+.empleado-foto-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px;
+    background: var(--s1);
+    border-radius: var(--r-sm);
+    border: 1px solid var(--b);
+}
+.empleado-foto-card img {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--b-md);
+}
+.empleado-foto-nombre {
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--t2);
+    text-align: center;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    white-space: nowrap;
+}
+
 .principal-imagen-sucursal {
     width: 100%;
     height: 42vh;

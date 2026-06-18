@@ -1,5 +1,6 @@
 package com.gg.turnlook.Backend.DTO.Sucursal;
 
+import com.gg.turnlook.Backend.DTO.Imagen.ImagenResponseDTO;
 import com.gg.turnlook.Backend.DTO.Usuario.UsuarioMiniDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -28,5 +30,6 @@ public class SucursalResponseDTO {
      private UsuarioMiniDTO empleador;
      private Set<UsuarioMiniDTO> empleados;
      private String fotoPerfil;
+     private List<ImagenResponseDTO> imagenes;
 
 }
