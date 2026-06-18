@@ -268,6 +268,10 @@ public class SucursalService {
 
         dto.setCantidadPuntuaciones(reseniaService.getPuntuacionesTotalesSucursal(suc.getId()));
 
+        List<ImagenResponseDTO> imagenes = listarImagenesPorSucursal(suc.getId(),
+                suc.getEmpleador().getEmail());
+        dto.setImagenes(imagenes);
+
         UsuarioMiniDTO empleador = new UsuarioMiniDTO(
                 suc.getEmpleador().getNombre(),
                 suc.getEmpleador().getApellido()
