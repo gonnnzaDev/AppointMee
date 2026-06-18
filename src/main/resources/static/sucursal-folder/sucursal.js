@@ -1,7 +1,7 @@
-import { authHeaders, sesionActiva } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva } from "../recursos/modulos.js";
 const user = await sesionActiva();
 if (!user) {
-    window.location.href = "../login.html";
+    window.location.href = "../login-folder/Login.html";
 }
 render();
 
@@ -60,7 +60,7 @@ function getSucursalIdFromUrl() {
 
 async function fetchSucursal(id) {
     try {
-        const response = await fetch(`/sucursales/${id}`, {
+        const response = await fetch(API_URL + `/sucursales/${id}`, {
             headers: authHeaders()
         });
         if (!response.ok) {
@@ -74,17 +74,3 @@ async function fetchSucursal(id) {
 }
 
 
-async function fetchValoracionXSucursal(id) {
-    try {
-        const response = await fetch(`/sucursales/${id}`, {
-            headers: authHeaders()
-        });3
-        if (!response.ok) {
-            return null;
-        }
-        return await response.json();
-    } catch (error) {
-        alert(error);
-        return null;
-    }
-}

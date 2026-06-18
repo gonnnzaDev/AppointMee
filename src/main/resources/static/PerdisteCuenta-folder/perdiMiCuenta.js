@@ -1,9 +1,9 @@
-import { sesionActiva } from "../recursos/modulos.js";
+import { API_URL, sesionActiva } from "../recursos/modulos.js";
 const user = await sesionActiva();
 
 
 if (!user) {
-    window.location.href = "../login.html";
+    window.location.href = "../login-folder/Login.html";
 }
 const cancelar = document.getElementById("cancelar");
 const enviar = document.getElementById("enviar");
@@ -46,8 +46,7 @@ cancelar.addEventListener('click', e => {
 function postFormulario(email, descripcion, pass) {
 
 
-    //poner bien el post
-    fetch("/usuarios/recuperar-cuenta", {
+    fetch(API_URL + "/usuarios/recuperar-cuenta", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

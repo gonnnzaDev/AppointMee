@@ -1,41 +1,39 @@
-import { authHeaders, sesionActiva } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva } from "../recursos/modulos.js";
 
 const usuariosBody = document.getElementById("usuariosBody");
 const sucursalesBody = document.getElementById("sucursalesBody");
-const serviciosBody = document.getElementById("serviciosBody");
 
 const user = await sesionActiva();
 
 if (!user) {
-    window.location.href = "../login.html";
+    window.location.href = "../login-folder/Login.html";
 }
 
 render();
 
-
 async function render() {
-    if (!usuariosBody || !sucursalesBody || !serviciosBody) return;
+    if (!usuariosBody || !sucursalesBody ) return;
 
-    const [usuariosList, sucursalesList, serviciosList] = await Promise.all([
+    const [usuariosList, sucursalesList] = await Promise.all([
         buscarUsuarios(),
         buscarSucursales(),
-        buscarServicios()
     ]);
 
     let usuariosHTML = "";
     usuariosList.forEach(u => {
+        const estadoTexto = u.estado ? "Activo" : "Inactivo";
+        const estadoClase = u.estado ? "badge--green" : "badge--red";
         usuariosHTML += `
             <tr>
                 <td>${u.id}</td>
                 <td>${u.nombre}</td>
                 <td>${u.apellido}</td>
-                <td>${u.email}</td>
-                <td>${u.rol}</td>
-                <td>${u.estado}</td>
+                <td><span class="badge ${estadoClase}">${estadoTexto}</span></td>
                 <td>
-                    <button class="btn btn-sm btn-info btn-detalle-usuario" data-id="${u.id}">
-                        Detalle
-                    </button>
+                    <div class="table-actions">
+                        <button class="btn-detalle-usuario" data-id="${u.id}">Detalle</button>
+                        <button class="btn-eliminar-usuario btn-danger" data-id="${u.id}">Eliminar</button>
+                    </div>
                 </td>
             </tr>`;
     });
@@ -50,49 +48,39 @@ async function render() {
                 <td>${s.puntuacion}</td>
                 <td>${s.cantidadPuntuaciones}</td>
                 <td>
-                    <button class="btn btn-sm btn-primary btn-detalle-sucursal" data-id="${s.id}">
-                        Detalle
-                    </button>
-                    <button class="btn btn-sm btn-danger btn-eliminar-sucursal ms-1" data-id="${s.id}">
-                        Eliminar
-                    </button>
+                    <div class="table-actions">
+                        <button class="btn-detalle-sucursal" data-id="${s.id}">Detalle</button>
+                        <button class="btn-eliminar-sucursal btn-danger" data-id="${s.id}">Eliminar</button>
+                    </div>
                 </td>
             </tr>`;
     });
     sucursalesBody.innerHTML = sucursalesHTML;
 
-    let serviciosHTML = "";
-    serviciosList.forEach(ser => {
-        serviciosHTML += `
-            <tr>
-                <td>${ser.nombre}</td>
-                <td>${ser.descripcion}</td>
-                <td>${ser.duracion}</td>
-                <td>${ser.precio}</td>
-            </tr>`;
-    });
-    serviciosBody.innerHTML = serviciosHTML;
-
     registrarEventos();
 }
 
-
 function registrarEventos() {
     usuariosBody.addEventListener("click", async (e) => {
-        const btn = e.target.closest(".btn-detalle-usuario");
-        if (!btn) return;
-        const userId = btn.dataset.id;
-        await abrirModalUsuario(userId);
+        const btnDetalle = e.target.closest(".btn-detalle-usuario");
+        if (btnDetalle) {
+            const userId = btnDetalle.dataset.id;
+            await abrirModalUsuario(userId);
+            return;
+        }
+
+        const btnEliminar = e.target.closest(".btn-eliminar-usuario");
+        if (btnEliminar) {
+            const userId = btnEliminar.dataset.id;
+            eliminarUsuario(userId);
+        }
     });
 
     sucursalesBody.addEventListener("click", (e) => {
         const btnDetalle = e.target.closest(".btn-detalle-sucursal");
         if (btnDetalle) {
             const sucursalId = btnDetalle.dataset.id;
-            window.open(
-                `https://appointmee-vcs2.onrender.com/sucursal-folder/Sucursal.html?id=${sucursalId}`,
-                "_blank"
-            );
+            abrirModalSucursal(sucursalId);
             return;
         }
 
@@ -104,129 +92,178 @@ function registrarEventos() {
     });
 }
 
-
 async function abrirModalUsuario(userId) {
-    const modalEl = document.getElementById("modalDetalleUsuario");
-    const modalBody = document.getElementById("modalDetalleUsuarioBody");
-    const modal = new bootstrap.Modal(modalEl);
-
-    modalBody.innerHTML = `
-        <div class="text-center py-4">
-            <div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div>
-        </div>`;
-    modal.show();
-
     const perfil = await buscarPerfilUsuario(userId);
     if (!perfil) {
-        modalBody.innerHTML = `<div class="alert alert-danger">No se pudo cargar la información del usuario.</div>`;
+        alert("No se pudo cargar la información del usuario.");
         return;
     }
 
     const roles = perfil.roles ? [...perfil.roles] : [];
-    const esEmpleador = roles.includes("EMPLEADOR");
-    const esCliente = roles.includes("CLIENTE");
-    const esEmpleado = roles.includes("EMPLEADO");
-    const esAdministrador = roles.includes("ADMINISTRADOR");
+    const coloresBadge = {
+        ADMINISTRADOR: "badge--red",
+        EMPLEADOR: "badge--blue",
+        EMPLEADO: "badge--green",
+        CLIENTE: "badge--amber"
+    };
+    const rolesHTML = roles.map(r =>
+        `<span class="badge ${coloresBadge[r] || ""}">${r}</span>`
+    ).join(" ");
 
     const fotoPerfil = perfil.fotoPerfil
-        ? `<img src="${perfil.fotoPerfil}" alt="Foto de perfil" class="rounded-circle mb-3" style="width:90px;height:90px;object-fit:cover;">`
-        : `<div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center mb-3 mx-auto" style="width:90px;height:90px;font-size:2rem;">
+        ? `<img src="${perfil.fotoPerfil}" alt="Foto" class="avatar-round">`
+        : `<div class="avatar-initial">
                ${(perfil.nombre || "?")[0].toUpperCase()}
            </div>`;
 
-    const coloresRol = {
-        ADMINISTRADOR: "danger",
-        EMPLEADOR: "primary",
-        EMPLEADO: "success",
-        CLIENTE: "warning"
-    };
-    const rolesHTML = roles.map(r =>
-        `<span class="badge bg-${coloresRol[r] || "secondary"} me-1">${r}</span>`
-    ).join("");
-
     let sucursalesSection = "";
-    if (perfil.sucursalesEmpleado && perfil.sucursalesEmpleado.length > 0) {
-        const sucursalesItems = perfil.sucursalesEmpleado.map(s => `
-            <li class="list-group-item d-flex justify-content-between align-items-center">
+
+    function renderSucursalList(lista, titulo) {
+        if (!lista || !lista.length) return "";
+        const items = lista.map(s => `
+            <li class="suc-item">
                 <div>
                     <strong>${s.nombre}</strong>
-                    <span class="text-muted ms-2">${s.categoria || ""}</span>
+                    <span class="suc-item-cat">${s.categoria || ""}</span>
                 </div>
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-warning text-dark">⭐ ${s.puntuacion ?? "-"} (${s.cantidadPuntuaciones ?? 0})</span>
-                    <a href="https://appointmee-vcs2.onrender.com/sucursal-folder/Sucursal.html?id=${s.id}"
-                       target="_blank" class="btn btn-sm btn-outline-primary">Ver</a>
+                <div class="suc-item-actions">
+                    <span class="badge badge--amber">⭐ ${s.puntuacion ?? "-"} (${s.cantidadPuntuaciones ?? 0})</span>
+                    <a href="../sucursal-folder/Sucursal.html?id=${s.id}"
+                       target="_blank" class="suc-item-link">Ver</a>
                 </div>
             </li>`).join("");
-        sucursalesSection = `
-            <hr>
-            <h6 class="fw-bold">Sucursales asociadas</h6>
-            <ul class="list-group list-group-flush">${sucursalesItems}</ul>`;
+        return `
+            <hr class="suc-list-hr">
+            <div class="suc-list-title">${titulo}</div>
+            <ul class="suc-list">${items}</ul>`;
     }
+
+    sucursalesSection += renderSucursalList(perfil.sucursalesEmpleado, "Sucursales donde trabaja");
+    sucursalesSection += renderSucursalList(perfil.sucursalesEmpleador, "Sucursales que posee");
 
     let seccionExtra = "";
-    if (esEmpleador) {
-        seccionExtra = `
-            <div class="alert alert-primary mt-3 mb-0">
-                <strong>Empleador:</strong> Este usuario es dueño/gestor de sucursales.
-                Puede crear sucursales, administrar empleados y gestionar turnos.
-            </div>`;
+    if (roles.includes("EMPLEADOR")) {
+        seccionExtra += `<div class="rol-info rol-info--blue"><strong>Empleador:</strong> Dueño/gestor de sucursales.</div>`;
     }
-    if (esCliente) {
-        seccionExtra += `
-            <div class="alert alert-warning mt-3 mb-0">
-                <strong>Cliente:</strong> Este usuario puede reservar turnos en cualquier sucursal.
-            </div>`;
+    if (roles.includes("CLIENTE")) {
+        seccionExtra += `<div class="rol-info rol-info--amber"><strong>Cliente:</strong> Puede reservar turnos.</div>`;
     }
-    if (esEmpleado) {
-        seccionExtra += `
-            <div class="alert alert-success mt-3 mb-0">
-                <strong>Empleado:</strong> Este usuario trabaja en una o más sucursales.
-            </div>`;
+    if (roles.includes("EMPLEADO")) {
+        seccionExtra += `<div class="rol-info rol-info--green"><strong>Empleado:</strong> Trabaja en una o más sucursales.</div>`;
     }
-    if (esAdministrador) {
-        seccionExtra += `
-            <div class="alert alert-danger mt-3 mb-0">
-                <strong>Administrador:</strong> Tiene acceso completo al panel de administración.
-            </div>`;
+    if (roles.includes("ADMINISTRADOR")) {
+        seccionExtra += `<div class="rol-info rol-info--red"><strong>Administrador:</strong> Acceso completo al panel.</div>`;
     }
 
-    modalBody.innerHTML = `
-        <div class="text-center">${fotoPerfil}</div>
-        <div class="row g-3">
-            <div class="col-12 text-center">${rolesHTML}</div>
-
-            <div class="col-md-6">
-                <label class="form-label text-muted small mb-0">ID</label>
-                <div class="fw-semibold">${perfil.id}</div>
+    const backdrop = document.createElement("div");
+    backdrop.className = "modal-overlay";
+    backdrop.innerHTML = `
+        <div class="form-simple form-simple--wide">
+            <div class="modal-head">
+                <h1 class="modal-title">Detalle de Usuario</h1>
+                <button id="btn-cerrar-modal" class="modal-close">&times;</button>
             </div>
-            <div class="col-md-6">
-                <label class="form-label text-muted small mb-0">Fecha de creación</label>
-                <div class="fw-semibold">${perfil.fechaCreacion ?? "-"}</div>
+            <div class="modal-avatar">${fotoPerfil}</div>
+            <div class="modal-roles">${rolesHTML}</div>
+            <div class="detail-grid">
+                <div><small class="detail-label">ID</small><div class="detail-value">${perfil.id}</div></div>
+                <div><small class="detail-label">Fecha de creación</small><div class="detail-value">${perfil.fechaCreacion ?? "-"}</div></div>
+                <div><small class="detail-label">Nombre</small><div class="detail-value">${perfil.nombre ?? "-"}</div></div>
+                <div><small class="detail-label">Apellido</small><div class="detail-value">${perfil.apellido ?? "-"}</div></div>
             </div>
-            <div class="col-md-6">
-                <label class="form-label text-muted small mb-0">Nombre</label>
-                <div class="fw-semibold">${perfil.nombre ?? "-"}</div>
+            <div class="detail-section">
+                <small class="detail-label">Email</small>
+                <div class="detail-value">${perfil.email ?? "-"}</div>
             </div>
-            <div class="col-md-6">
-                <label class="form-label text-muted small mb-0">Apellido</label>
-                <div class="fw-semibold">${perfil.apellido ?? "-"}</div>
-            </div>
-            <div class="col-12">
-                <label class="form-label text-muted small mb-0">Email</label>
-                <div class="fw-semibold">${perfil.email ?? "-"}</div>
+            ${seccionExtra}
+            ${sucursalesSection}
+            <div class="modal-foot">
+                <button id="btn-cerrar-modal-bottom" class="btn-ghost">Cerrar</button>
             </div>
         </div>
-
-        ${seccionExtra}
-        ${sucursalesSection}
     `;
+    document.body.appendChild(backdrop);
+
+    const cerrar = () => backdrop.remove();
+    backdrop.querySelector("#btn-cerrar-modal").onclick = cerrar;
+    backdrop.querySelector("#btn-cerrar-modal-bottom").onclick = cerrar;
+    backdrop.addEventListener("click", (e) => { if (e.target === backdrop) cerrar(); });
+
 }
 
+async function abrirModalSucursal(sucursalId) {
+    const s = await buscarSucursalPorId(sucursalId);
+    if (!s) {
+        alert("No se pudo cargar la información de la sucursal.");
+        return;
+    }
+
+    const foto = s.fotoPerfil
+        ? `<img src="${s.fotoPerfil}" alt="Foto" class="avatar-round--sm">`
+        : `<div class="avatar-initial avatar-initial--sm">
+               ${(s.nombre || "?")[0].toUpperCase()}
+           </div>`;
+
+    const empleados = s.empleados && s.empleados.length
+        ? Array.from(s.empleados).map(e => `${e.nombre} ${e.apellido}`).join(", ")
+        : "Sin empleados";
+
+    const backdrop = document.createElement("div");
+    backdrop.className = "modal-overlay";
+    backdrop.innerHTML = `
+        <div class="form-simple form-simple--wide">
+            <div class="modal-head">
+                <h1 class="modal-title">Detalle de Sucursal</h1>
+                <button id="btn-cerrar-modal" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-avatar">${foto}</div>
+            <div class="detail-grid detail-section">
+                <div><small class="detail-label">Nombre</small><div class="detail-value">${s.nombre}</div></div>
+                <div><small class="detail-label">Categoría</small><div class="detail-value">${s.categoria ?? "-"}</div></div>
+                <div class="col-full"><small class="detail-label">Dirección</small><div class="detail-value">${s.direccion ?? "-"}</div></div>
+                <div><small class="detail-label">Teléfono</small><div class="detail-value">${s.telefono ?? "-"}</div></div>
+                <div><small class="detail-label">Fecha de creación</small><div class="detail-value">${s.fechaCreacion ?? "-"}</div></div>
+                <div><small class="detail-label">Horario</small><div class="detail-value">${s.horaApertura ?? "-"} — ${s.horaCierre ?? "-"}</div></div>
+                <div><small class="detail-label">Puntuación</small><div class="detail-value">⭐ ${s.puntuacion ?? "-"} (${s.cantidadPuntuaciones ?? 0})</div></div>
+                <div><small class="detail-label">Empleador</small><div class="detail-value">${s.empleador ? s.empleador.nombre + " " + s.empleador.apellido : "-"}</div></div>
+            </div>
+            <div class="detail-section">
+                <small class="detail-label">Descripción</small>
+                <div class="detail-body">${s.descripcion ?? "-"}</div>
+            </div>
+            <div class="detail-section">
+                <small class="detail-label">Empleados</small>
+                <div class="detail-body">${empleados}</div>
+            </div>
+            <div class="modal-foot--flex">
+                <a href="../sucursal-folder/Sucursal.html?id=${s.id}"
+                   target="_blank" class="btn-link">Ir a la sucursal</a>
+                <button id="btn-cerrar-modal-bottom" class="btn-ghost">Cerrar</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(backdrop);
+
+    const cerrar = () => backdrop.remove();
+    backdrop.querySelector("#btn-cerrar-modal").onclick = cerrar;
+    backdrop.querySelector("#btn-cerrar-modal-bottom").onclick = cerrar;
+    backdrop.addEventListener("click", (e) => { if (e.target === backdrop) cerrar(); });
+}
+
+async function buscarSucursalPorId(id) {
+    try {
+        const res = await fetch(API_URL + `/sucursales/${id}`, { headers: authHeaders() });
+        if (!res.ok) throw new Error(`Error ${res.status}`);
+        return await res.json();
+    } catch (e) {
+        console.error("Error al cargar sucursal:", e);
+        return null;
+    }
+}
 
 async function buscarPerfilUsuario(userId) {
     try {
-        const response = await fetch(`/usuarios/${userId}`, { headers: authHeaders() });
+        const response = await fetch(API_URL + `/usuarios/${userId}`, { headers: authHeaders() });
         if (!response.ok) throw new Error(`Error ${response.status}`);
         return await response.json();
     } catch (error) {
@@ -237,7 +274,7 @@ async function buscarPerfilUsuario(userId) {
 
 async function buscarUsuarios() {
     try {
-        const response = await fetch("/usuarios/listar", { headers: authHeaders() });
+        const response = await fetch(API_URL + "/usuarios/listar", { headers: authHeaders() });
         if (!response.ok) throw new Error(`Error ${response.status}`);
         return await response.json();
     } catch (error) {
@@ -248,7 +285,7 @@ async function buscarUsuarios() {
 
 async function buscarSucursales() {
     try {
-        const response = await fetch("/sucursales/listar", { headers: authHeaders() });
+        const response = await fetch(API_URL + "/sucursales/listar", { headers: authHeaders() });
         if (!response.ok) throw new Error(`Error ${response.status}`);
         return await response.json();
     } catch (error) {
@@ -257,21 +294,29 @@ async function buscarSucursales() {
     }
 }
 
-async function buscarServicios() {
+async function eliminarUsuario(userId) {
+    if (!confirm(`¿Seguro que querés eliminar el usuario #${userId}?`)) return;
     try {
-        const response = await fetch("/servicios/listar", { headers: authHeaders() });
-        if (!response.ok) throw new Error(`Error ${response.status}`);
-        return await response.json();
+        const response = await fetch(API_URL + `/usuarios/eliminar/${userId}`, {
+            method: "DELETE",
+            headers: authHeaders()
+        });
+        if (response.ok) {
+            alert("Usuario eliminado correctamente.");
+            render();
+        } else {
+            const msg = await response.text();
+            alert(msg || `Error ${response.status}`);
+        }
     } catch (error) {
-        alert(error.message);
-        return [];
+        alert("Error al eliminar usuario: " + error.message);
     }
 }
 
 async function eliminarSucursal(sucursalId) {
     if (!confirm(`¿Seguro que querés eliminar la sucursal #${sucursalId}?`)) return;
     try {
-        const response = await fetch(`/sucursales/eliminar/${sucursalId}`, {
+        const response = await fetch(API_URL + `/sucursales/eliminar/${sucursalId}`, {
             method: "DELETE",
             headers: authHeaders()
         });

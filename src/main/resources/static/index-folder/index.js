@@ -1,11 +1,11 @@
-import { authHeaders, sesionActiva } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva } from "../recursos/modulos.js";
 
 let buscadorConectado = false;
 
 const u = await sesionActiva();
 
 if (!u) {
-    window.location.href = "../Login.html";
+    window.location.href = "../login-folder/Login.html";
 }
 
 const parametrosUrl = new URLSearchParams(window.location.search);
@@ -58,7 +58,7 @@ function renderListaSucursales(sucursales) {
 
 async function buscarSucursales() {
     try {
-        const response = await fetch(`/sucursales/listar`, {
+        const response = await fetch(API_URL + `/sucursales/listar`, {
             headers: authHeaders()
         });
         console.log(authHeaders());
@@ -72,7 +72,7 @@ async function buscarSucursales() {
 
 async function filtrarPorCategoria(categoria) {
     try {
-        const response = await fetch(
+        const response = await fetch(API_URL + 
             `/sucursales/listar/filtrar?categoria=${categoria}`,
             { headers: authHeaders() }
         );
@@ -89,7 +89,7 @@ async function filtrarPorNombre(texto) {
         const parametros = new URLSearchParams();
         if (texto) parametros.append("nombre", texto);
 
-        const response = await fetch(
+        const response = await fetch(API_URL + 
             `/sucursales/listar/filtrar?${parametros.toString()}`,
             { headers: authHeaders() }
         );
@@ -140,7 +140,7 @@ function iniciarBuscador(valorInicial, input) {
 
 async function buscarCategorias() {
     try {
-        const response = await fetch(`/sucursales/categorias`, {
+        const response = await fetch(API_URL + `/sucursales/categorias`, {
             headers: authHeaders()
         });
         if (!response.ok) throw new Error(`Error ${response.status}`);

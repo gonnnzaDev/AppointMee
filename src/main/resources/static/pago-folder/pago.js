@@ -1,9 +1,9 @@
-import { authHeaders, sesionActiva } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva } from "../recursos/modulos.js";
 
 const user = await sesionActiva();
 
 if (!user) {
-    window.location.href = "../login.html";
+    window.location.href = "../login-folder/Login.html";
 }
 
 const turnoId = new URLSearchParams(window.location.search).get("turnoId");
@@ -50,7 +50,7 @@ async function pagarConMercadoPago() {
     enviar.disabled = true;
 
     try {
-        const response = await fetch(`/pagos/${turnoId}`, {
+        const response = await fetch(API_URL + `/pagos/${turnoId}`, {
             method: 'POST',
             headers: authHeaders()
         });

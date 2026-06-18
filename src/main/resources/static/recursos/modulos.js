@@ -1,12 +1,14 @@
+export const API_URL = "http://localhost:8080";
+
 function getToken() {
     return localStorage.getItem("token");
 }
 
 export function authHeaders() {
-    return {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${getToken()}`
-    };
+    const token = getToken();
+    const headers = { "Content-Type": "application/json" };
+    if (token) headers.Authorization = `Bearer ${token}`;
+    return headers;
 }
 
 export async function sesionActiva() {
@@ -14,7 +16,7 @@ export async function sesionActiva() {
     try {
 
         const response = await fetch(
-            "/usuarios/me",
+            API_URL + "/usuarios/me",
             {
                 headers: authHeaders()
             }
@@ -31,7 +33,7 @@ export async function sesionActiva() {
     }
 }
 
-export const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // regla q todos los email deben cumplir
+export const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function cerrarSesion() {
     localStorage.removeItem("token");

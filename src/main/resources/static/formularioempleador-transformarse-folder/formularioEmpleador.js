@@ -1,8 +1,8 @@
-import { authHeaders, sesionActiva } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva } from "../recursos/modulos.js";
 const user = await sesionActiva();
 
 if (!user) {
-    window.location.href = "../login.html";
+    window.location.href = "../login-folder/Login.html";
 }
 
 render();
@@ -15,7 +15,7 @@ function render() {
             <p>Ingresá tu información y, una vez que validemos tus datos, te registraremos en el sistema como empleador.
             </p>
 
-            <div class="input-group mb-1">
+            <div class="input-group">
                 <textarea class="form-control" placeholder="Mensaje" id="mensaje"></textarea>
             </div>
             <div class="formulario-transformar-empleador-botones">
@@ -47,11 +47,11 @@ async function postMensaje(mensaje) {
 
     try {
         const response = await fetch(
-            `/solicitudes-empleador/solicitar`,
+            API_URL + `/solicitudes-empleador/solicitar`,
              {
             method: 'POST',
             headers: authHeaders(),
-            body: JSON.stringify(mensaje)
+            body: JSON.stringify({ motivo: mensaje })
         });
 
         const data = await response.text();

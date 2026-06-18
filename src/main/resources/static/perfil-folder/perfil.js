@@ -1,15 +1,19 @@
-import { sesionActiva, authHeaders, cerrarSesion } from "../recursos/modulos.js";
+import { API_URL, sesionActiva, authHeaders, cerrarSesion } from "../recursos/modulos.js";
 
 
 const user = await sesionActiva();
 
 if (!user) {
-    window.location.href = "../login.html";
+    window.location.href = "../login-folder/Login.html";
 }
 
 const usuario = await cargarUsuario(user.id);
 
-renderPerfil(usuario);
+if (!usuario) {
+    window.location.href = "../login-folder/Login.html";
+} else {
+    renderPerfil(usuario);
+}
 
 async function renderPerfil(usuario) {
 
@@ -17,19 +21,34 @@ async function renderPerfil(usuario) {
 
     if (infoAccountDiv) {
 
+        const roles = usuario.roles && usuario.roles.length
+            ? usuario.roles.map(r => `<span class="badge badge--blue">${r}</span>`).join(" ")
+            : "";
 
+     const fotoHtml = usuario.fotoPerfil
+        ? `<img src="${usuario.fotoPerfil}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">`
+        : '';
 
-        infoAccountDiv.innerHTML = `
-        <div class="profile-card">
-    <img src="${usuario.fotoPerfil}" alt="">
-    <h3>Nombre: ${usuario.nombre}</h3>
-    <h3>Apellido: ${usuario.apellido}</h3>
-    <h3>Email: ${usuario.email}</h3>
-    <h3>Fecha De Creacion: ${usuario.fechaCreacion}</h3>
-    <button type="button" id="btn-opciones-perfil">Opciones</button>
-    
+     const inicialHtml = usuario.fotoPerfil
+        ? `<div class="profile-inicial" style="display:none;">${(usuario.nombre || '?')[0].toUpperCase()}</div>`
+        : `<div class="profile-inicial">${(usuario.nombre || '?')[0].toUpperCase()}</div>`;
+
+     infoAccountDiv.innerHTML = `
+<div class="profile-card">
+    ${fotoHtml}${inicialHtml}
+    <div class="profile-info">
+        <h1 style="font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 700; letter-spacing: -.03em; color: var(--t); margin-bottom: 4px;">
+            ${usuario.nombre} ${usuario.apellido}
+        </h1>
+        <h3><strong>Email:</strong> ${usuario.email}</h3>
+        <h3><strong>Miembro desde:</strong> ${usuario.fechaCreacion}</h3>
+        <div class="profile-roles">${roles}</div>
     </div>
-    `;
+    <div class="profile-actions">
+        <button type="button" id="btn-opciones-perfil">Opciones</button>
+    </div>
+</div>
+`;
 
         const opciones = document.getElementById("btn-opciones-perfil");
 
@@ -160,7 +179,7 @@ function renderModificar(usuario) {
     const infoAccountDiv = document.getElementById("funcionalidadPerfil");
 
     infoAccountDiv.innerHTML = `
-            <div class="input-group mb-1">
+            <div class="input-group">
     <input type="text"
            class="form-control"
            placeholder="Nombre"
@@ -169,7 +188,7 @@ function renderModificar(usuario) {
            maxlength="60">
 </div>
 
-<div class="input-group mb-1">
+<div class="input-group">
     <input type="text"
            class="form-control"
            placeholder="Apellido"
@@ -178,7 +197,7 @@ function renderModificar(usuario) {
            maxlength="60">
 </div>
 
-<div class="input-group mb-1">
+<div class="input-group">
     <input type="password"
            class="form-control"
            placeholder="Contraseña"
@@ -186,7 +205,7 @@ function renderModificar(usuario) {
            minlength="8"
            maxlength="67">
 </div>
-<div class="input-group mb-1">
+<div class="input-group">
     <input type="password"
            class="form-control"
            placeholder="Repetir Contraseña "
@@ -194,7 +213,7 @@ function renderModificar(usuario) {
            minlength="8"
            maxlength="67">
 </div>
-<div class="input-group mb-1">
+<div class="input-group">
     <input type="email"
            class="form-control"
            placeholder="Email"
@@ -203,14 +222,16 @@ function renderModificar(usuario) {
            maxlength="150">
 </div>
 
-<div class="input-group mb-1">
+<div class="input-group">
     <input type="url"
            class="form-control"
            placeholder="URL de foto de perfil"
            id="foto-url-input">
 </div>
-<button id="cancelar">Volver</button>
-<button id="modificar">Modificar</button>
+<div class="form-actions">
+    <button class="btn-cancel" id="cancelar">Volver</button>
+    <button class="btn-submit" id="modificar">Modificar</button>
+</div>
             `;
 
 
@@ -226,8 +247,6 @@ function renderModificar(usuario) {
 
 
     modificar.addEventListener('click', () => {
-
-        console.log();
 
         modificarUsuario(usuario.id);
 
@@ -273,7 +292,7 @@ async function modificarUsuario(id) {
         if (fotoUrl) body.fotoUrl = fotoUrl;
 
         const response = await fetch(
-            `/usuarios/modificar/${id}`,
+            API_URL + `/usuarios/modificar/${id}`,
             {
                 method: "PATCH",
                 body: JSON.stringify(body),
@@ -298,7 +317,7 @@ async function eliminarCuenta() {
 
     try {
 
-        const response = await fetch(`/usuarios/borrar-cuenta`, {
+        const response = await fetch(API_URL + `/usuarios/borrar-cuenta`, {
             headers: authHeaders(),
             method: "DELETE"
         });
@@ -323,7 +342,7 @@ async function cargarUsuario(id) {
     try {
 
 
-        const response = await fetch(`/usuarios/${id}`,
+        const response = await fetch(API_URL + `/usuarios/${id}`,
             {
                 headers: authHeaders()
             }
@@ -339,7 +358,3 @@ async function cargarUsuario(id) {
         return null;
     }
 }
-
-
-
-

@@ -1,9 +1,9 @@
-import { authHeaders, sesionActiva } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva } from "../recursos/modulos.js";
 
 const user = await sesionActiva();
 
 if (!user) {
-    window.location.href = "../login.html";
+    window.location.href = "../login-folder/Login.html";
 }
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -18,7 +18,7 @@ obtenerDetalleTurno();
 
 async function obtenerDetalleTurno() {
     try {
-        const response = await fetch(`/turnos/propios/detalles/${turnoId}`, {
+        const response = await fetch(API_URL + `/turnos/propios/detalles/${turnoId}`, {
             headers: authHeaders()
         });
 
@@ -48,8 +48,8 @@ function renderComentarios(turno) {
     const btnGuardar = document.getElementById("guardar");
 
     if (
-        turno.estado === "REALIZADO" ||
-        turno.estado === "CANCELADO"
+        turno.estadoTurno === "REALIZADO" ||
+        turno.estadoTurno === "CANCELADO"
     ) {
 
         container.innerHTML = `
@@ -83,7 +83,7 @@ function renderDetalle(turno) {
 
     const infoContainer = document.getElementById("detalle-turno-info");
 
-    const fechaHora = new Date(turno.fechaHora).toLocaleString();
+    const fechaHora = new Date(turno.fechaTurno).toLocaleString();
     const fechaReserva = new Date(turno.fechaReserva).toLocaleDateString();
 
     const nombreEmpleado = turno.empleado
@@ -216,7 +216,7 @@ document
         try {
 
             const response = await fetch(
-                `/turnos/${turnoId}/resenia`,
+                API_URL + `/turnos/${turnoId}/resenia`,
                 {
                     method: "POST",
                     headers: {

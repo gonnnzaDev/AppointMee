@@ -1,4 +1,5 @@
 import {
+    API_URL,
     sesionActiva,
     authHeaders
 } from "../recursos/modulos.js";
@@ -7,7 +8,7 @@ import {
 const user = await sesionActiva();
 
 if (!user) {
-    window.location.href = "../login.html";
+    window.location.href = "../login-folder/Login.html";
 }
 
 let solicitudes = [];
@@ -35,7 +36,7 @@ async function cargarSolicitudes() {
     try {
 
         const response = await fetch(
-            `/solicitudes-empleado/recibidas`,
+            API_URL + `/solicitudes-empleado/recibidas`,
             {
                 headers: authHeaders()
             }
@@ -132,7 +133,7 @@ async function aprobarSolicitud(id) {
     try {
 
         const response = await fetch(
-            `/solicitudes-empleado/${id}/aprobar`,
+            API_URL + `/solicitudes-empleado/${id}/aprobar`,
             {
                 method: "PATCH",
                 headers: authHeaders()
@@ -160,7 +161,7 @@ async function rechazarSolicitud(id) {
     try {
 
         const response = await fetch(
-            `/solicitudes-empleado/${id}/rechazar`,
+            API_URL + `/solicitudes-empleado/${id}/rechazar`,
             {
                 method: "PATCH",
                 headers: authHeaders()
@@ -185,18 +186,9 @@ async function rechazarSolicitud(id) {
 
 async function cargarTurnos() {
 
-    try {
+    turnos = [];
 
-
-        turnos = [];
-
-        renderTurnos();
-
-    } catch (error) {
-
-        alert(error);
-
-    }
+    renderTurnos();
 
 }
 

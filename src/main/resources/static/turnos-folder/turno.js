@@ -1,8 +1,8 @@
-import { authHeaders,sesionActiva } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva } from "../recursos/modulos.js";
 
 const user = await sesionActiva();
 if (!user) {
-    window.location.href = "../login.html";
+    window.location.href = "../login-folder/Login.html";
 }
 
 
@@ -59,7 +59,7 @@ function renderPaso2() {
 
 async function cargarEmpleados() {
     try {
-        const res = await fetch(`/sucursales/${sucursalId}/elegir-empleado`, {
+        const res = await fetch(API_URL + `/sucursales/${sucursalId}/elegir-empleado`, {
             headers: authHeaders()
         });
         if (!res.ok) throw new Error(`Error ${res.status}`);
@@ -133,7 +133,7 @@ function renderPaso1() {
 
 async function cargarServicios() {
     try {
-        const res = await fetch(`/servicios/listar/sucursal/${sucursalId}`, {
+        const res = await fetch(API_URL + `/servicios/listar/sucursal/${sucursalId}`, {
             headers: authHeaders()
         });
         if (!res.ok) throw new Error(`Error ${res.status}`);
@@ -251,7 +251,7 @@ function renderPaso3() {
 async function cargarDisponibilidad() {
     try {
         const res = await fetch(
-            `/turnos/disponibilidad/empleado/${empleadoSeleccionado.id}/servicio/${servicioSeleccionado.id}`,
+            API_URL + `/turnos/disponibilidad/empleado/${empleadoSeleccionado.id}/servicio/${servicioSeleccionado.id}`,
             { headers: authHeaders() }
         );
         if (!res.ok) throw new Error(`Error ${res.status}`);
@@ -375,7 +375,7 @@ async function confirmarTurno() {
     if (btnSiguiente) btnSiguiente.disabled = true;
 
     try {
-        const resCrear = await fetch(`/turnos/registrar`, {
+        const resCrear = await fetch(API_URL + `/turnos/registrar`, {
             method: "POST",
             headers: authHeaders(),
             body: JSON.stringify({
@@ -411,7 +411,7 @@ async function confirmarTurno() {
 
 async function buscarTurnoRecienCreado() {
     try {
-        const res = await fetch(`/turnos/propios`, { headers: authHeaders() });
+        const res = await fetch(API_URL + `/turnos/propios`, { headers: authHeaders() });
         if (!res.ok) return null;
 
         const turnos = await res.json();

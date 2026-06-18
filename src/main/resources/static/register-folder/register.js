@@ -1,9 +1,9 @@
+import { API_URL } from "../recursos/modulos.js";
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 
 renderRegister();
 
-// Event listener para el botón de registrarse
 const registerPerson = document.getElementById("register-person");
 
 if (registerPerson) {
@@ -34,7 +34,6 @@ if (registerPerson) {
     });
 }
 
-// Event listener para el botón de cancelar
 const cancelButton = document.getElementById("cancel-button");
 
 if (cancelButton) {
@@ -45,7 +44,7 @@ if (cancelButton) {
 function postUser(name, surname, mail, pass) {
 
 
-    fetch("/usuarios/crear", {
+    fetch(API_URL + "/usuarios/crear", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -74,36 +73,30 @@ function renderRegister() {
     if (container) {
 
         container.innerHTML = `
-        
         <div class="form" id="info-register">
             <div class="credentials-form" id="realizar-registro-button">
-                <div class="input-group mb-1">
-                    <input type="text" class="form-control" placeholder="Nombre" aria-label="Name"
-                        aria-describedby="basic-addon1" id="register-name-input">
+                <h2 class="login-title">Crear cuenta</h2>
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Nombre" id="register-name-input">
                 </div>
-                <div class="input-group mb-1">
-                    <input type="text" class="form-control" placeholder="Apellido" aria-label="Surname"
-                        aria-describedby="basic-addon1" id="register-surname-input">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Apellido" id="register-surname-input">
                 </div>
-                <div class="input-group mb-1">
-                    <input type="text" class="form-control" placeholder="Email" aria-label="Email"
-                        aria-describedby="basic-addon1" id="register-mail-input">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Email" id="register-mail-input">
                 </div>
-                <div class="input-group mb-1">
-                    <input type="password" class="form-control" placeholder="Contraseña" aria-label="Password"
-                        aria-describedby="basic-addon1" id="register-password1-input">
+                <div class="input-group">
+                    <input type="password" class="form-control" placeholder="Contraseña" id="register-password1-input">
                 </div>
-                <div class="input-group mb-1">
-                    <input type="password" class="form-control" placeholder="Confirmar Contraseña" aria-label="Confirm Password"
-                        aria-describedby="basic-addon1" id="register-password2-input">
+                <div class="input-group">
+                    <input type="password" class="form-control" placeholder="Confirmar Contraseña" id="register-password2-input">
                 </div>
-                <div class="vstack gap-1 mb-3">
+                <div class="login-actions">
                     <button type="button" id="register-person">Crear Cuenta</button>
                     <button type="button" id="cancel-button">Volver a Login</button>
                 </div>
             </div>
         </div>
-        
         `
     }
 

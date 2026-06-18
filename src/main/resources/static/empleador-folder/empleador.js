@@ -1,34 +1,42 @@
-import { authHeaders, sesionActiva } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva } from "../recursos/modulos.js";
+
 const user = await sesionActiva();
 
 if (!user) {
-    window.location.href = "../login.html";
+    window.location.href = "../login-folder/Login.html";
 }
 
 let miId = null;
 let misSucursales = [];
 
-
-document.addEventListener("DOMContentLoaded", async () => {
-    await cargarMe();
-    await cargarSucursales();
-    bindEventos();
-});
+await cargarMe();
+await cargarSucursales();
+bindEventos();
 
 window.abrirModalModificarSucursal = abrirModalModificarSucursal;
-window.eliminarSucursal = eliminarSucursal;
 window.abrirModalModificarServicio = abrirModalModificarServicio;
+window.eliminarSucursal = eliminarSucursal;
 window.eliminarServicio = eliminarServicio;
 window.finalizarTurno = finalizarTurno;
 window.cancelarTurno = cancelarTurno;
 window.eliminarEmpleado = eliminarEmpleado;
 
-
-
+function crearModal(id) {
+    const old = document.getElementById(id);
+    if (old) old.remove();
+    const div = document.createElement("div");
+    div.className = "modal-overlay";
+    div.id = id;
+    div.addEventListener("click", (e) => {
+        if (e.target === div) div.remove();
+    });
+    document.body.appendChild(div);
+    return div;
+}
 
 async function cargarMe() {
     try {
-        const res = await fetch("/usuarios/me", { headers: authHeaders() });
+        const res = await fetch(API_URL + "/usuarios/me", { headers: authHeaders() });
         if (!res.ok) throw new Error(`Error ${res.status}`);
         const data = await res.json();
         miId = data.id;
@@ -37,19 +45,14 @@ async function cargarMe() {
     }
 }
 
-
-
 async function cargarSucursales() {
     try {
-        const res = await fetch("/sucursales/listar", { headers: authHeaders() });
+        const res = await fetch(API_URL + "/sucursales/listar/propias", { headers: authHeaders() });
         if (!res.ok) throw new Error(`Error ${res.status}`);
         const todas = await res.json();
-
         misSucursales = todas;
-
         renderSucursales(misSucursales);
         poblarSelectsSucursal(misSucursales);
-
     } catch (e) {
         alert("Error al cargar sucursales: " + e.message);
     }
@@ -60,7 +63,7 @@ function renderSucursales(sucursales) {
     body.innerHTML = "";
 
     if (!sucursales.length) {
-        body.innerHTML = `<tr><td colspan="4" style="color:var(--dk-text-3);font-family:var(--font-mono);font-size:12px;">Sin sucursales</td></tr>`;
+        body.innerHTML = `<tr><td colspan="4" style="color:var(--t3);font-family:var(--mono);font-size:12px;">Sin sucursales</td></tr>`;
         return;
     }
 
@@ -73,7 +76,7 @@ function renderSucursales(sucursales) {
             <td>
                 <div class="table-actions">
                     <button onclick="abrirModalModificarSucursal(${s.id})">Editar</button>
-                    <button onclick="eliminarSucursal(${s.id})" style="color:var(--dk-red);">Borrar</button>
+                    <button onclick="eliminarSucursal(${s.id})" style="color:var(--red);">Borrar</button>
                 </div>
             </td>
         `;
@@ -98,7 +101,7 @@ function poblarSelectsSucursal(sucursales) {
 async function eliminarSucursal(sucursalId) {
     if (!confirm("¿Borrar esta sucursal?")) return;
     try {
-        const res = await fetch(`/sucursales/borrar-sucursal-propia/${sucursalId}`, {
+        const res = await fetch(API_URL + `/sucursales/borrar-sucursal-propia/${sucursalId}`, {
             method: "DELETE",
             headers: authHeaders()
         });
@@ -110,21 +113,18 @@ async function eliminarSucursal(sucursalId) {
     }
 }
 
-
-
-
 async function cargarServicios(sucursalId) {
     const body = document.getElementById("serviciosBody");
     body.innerHTML = "";
     if (!sucursalId) return;
 
     try {
-        const res = await fetch(`/servicios/listar/sucursal/${sucursalId}`, { headers: authHeaders() });
+        const res = await fetch(API_URL + `/servicios/listar/sucursal/${sucursalId}`, { headers: authHeaders() });
         if (!res.ok) throw new Error(`Error ${res.status}`);
         const servicios = await res.json();
 
         if (!servicios.length) {
-            body.innerHTML = `<tr><td colspan="3" style="color:var(--dk-text-3);font-family:var(--font-mono);font-size:12px;">Sin servicios</td></tr>`;
+            body.innerHTML = `<tr><td colspan="3" style="color:var(--t3);font-family:var(--mono);font-size:12px;">Sin servicios</td></tr>`;
             return;
         }
 
@@ -136,7 +136,7 @@ async function cargarServicios(sucursalId) {
                 <td>
                     <div class="table-actions">
                         <button onclick="abrirModalModificarServicio(${s.id})">Editar</button>
-                        <button onclick="eliminarServicio(${s.id}, ${sucursalId})" style="color:var(--dk-red);">Borrar</button>
+                        <button onclick="eliminarServicio(${s.id}, ${sucursalId})" style="color:var(--red);">Borrar</button>
                     </div>
                 </td>
             `;
@@ -151,7 +151,7 @@ async function cargarServicios(sucursalId) {
 async function eliminarServicio(servicioId, sucursalId) {
     if (!confirm("¿Borrar este servicio?")) return;
     try {
-        const res = await fetch(`/servicios/eliminar/${servicioId}`, {
+        const res = await fetch(API_URL + `/servicios/eliminar/${servicioId}`, {
             method: "DELETE",
             headers: authHeaders()
         });
@@ -163,21 +163,23 @@ async function eliminarServicio(servicioId, sucursalId) {
     }
 }
 
-
-
-
 async function cargarTurnos(sucursalId) {
     const body = document.getElementById("turnosBody");
     body.innerHTML = "";
     if (!sucursalId) return;
 
+    const estado = document.getElementById("filtro-estado-turnos").value;
+
     try {
-        const res = await fetch(`/turnos/de-sucursal/${sucursalId}`, { headers: authHeaders() });
+        const res = await fetch(
+            API_URL + `/turnos/de-sucursal/${sucursalId}?estadoTurno=${estado}`,
+            { headers: authHeaders() }
+        );
         if (!res.ok) throw new Error(`Error ${res.status}`);
         const turnos = await res.json();
 
         if (!turnos.length) {
-            body.innerHTML = `<tr><td colspan="4" style="color:var(--dk-text-3);font-family:var(--font-mono);font-size:12px;">Sin turnos</td></tr>`;
+            body.innerHTML = `<tr><td colspan="4" style="color:var(--t3);font-family:var(--mono);font-size:12px;">Sin turnos</td></tr>`;
             return;
         }
 
@@ -193,7 +195,7 @@ async function cargarTurnos(sucursalId) {
                 <td>
                     <div class="table-actions">
                         <button onclick="finalizarTurno(${t.id}, ${sucursalId})">Finalizar</button>
-                        <button onclick="cancelarTurno(${t.id}, ${sucursalId})" style="color:var(--dk-red);">Cancelar</button>
+                        <button onclick="cancelarTurno(${t.id}, ${sucursalId})" style="color:var(--red);">Cancelar</button>
                     </div>
                 </td>
             `;
@@ -204,11 +206,15 @@ async function cargarTurnos(sucursalId) {
         alert("Error al cargar turnos: " + e.message);
     }
 }
-
+document.getElementById("filtro-estado-turnos").addEventListener("change", () => {
+    const sucursalId = document.getElementById("filtro-sucursal-turnos").value;
+    console.log()
+    cargarTurnos(sucursalId);
+});
 async function finalizarTurno(turnoId, sucursalId) {
     if (!confirm("¿Finalizar este turno?")) return;
     try {
-        const res = await fetch(`/turnos/finalizar/${turnoId}`, {
+        const res = await fetch(API_URL + `/turnos/finalizar/${turnoId}`, {
             method: "PATCH",
             headers: authHeaders()
         });
@@ -223,7 +229,7 @@ async function finalizarTurno(turnoId, sucursalId) {
 async function cancelarTurno(turnoId, sucursalId) {
     if (!confirm("¿Cancelar este turno?")) return;
     try {
-        const res = await fetch(`/turnos/cancelar/${turnoId}`, {
+        const res = await fetch(API_URL + `/turnos/cancelar/${turnoId}`, {
             method: "DELETE",
             headers: authHeaders()
         });
@@ -235,21 +241,18 @@ async function cancelarTurno(turnoId, sucursalId) {
     }
 }
 
-
-
-
 async function cargarEmpleados(sucursalId) {
     const body = document.getElementById("empleadosBody");
     body.innerHTML = "";
     if (!sucursalId) return;
 
     try {
-        const res = await fetch(`/sucursales/${sucursalId}/empleados`, { headers: authHeaders() });
+        const res = await fetch(API_URL + `/sucursales/${sucursalId}/empleados`, { headers: authHeaders() });
         if (!res.ok) throw new Error(`Error ${res.status}`);
         const empleados = await res.json();
 
         if (!empleados.length) {
-            body.innerHTML = `<tr><td colspan="3" style="color:var(--dk-text-3);font-family:var(--font-mono);font-size:12px;">Sin empleados</td></tr>`;
+            body.innerHTML = `<tr><td colspan="3" style="color:var(--t3);font-family:var(--mono);font-size:12px;">Sin empleados</td></tr>`;
             return;
         }
 
@@ -260,7 +263,7 @@ async function cargarEmpleados(sucursalId) {
                 <td>${e.apellido}</td>
                 <td>
                     <div class="table-actions">
-                        <button onclick="eliminarEmpleado(${sucursalId}, ${e.id})" style="color:var(--dk-red);">Quitar</button>
+                        <button onclick="eliminarEmpleado(${sucursalId}, ${e.id})" style="color:var(--red);">Quitar</button>
                     </div>
                 </td>
             `;
@@ -277,7 +280,7 @@ async function agregarEmpleado(sucursalId) {
     if (!email) { alert("Ingresá el email del empleado"); return; }
 
     try {
-        const res = await fetch(`/sucursales/${sucursalId}/empleados/agregar`, {
+        const res = await fetch(API_URL + `/sucursales/${sucursalId}/empleados/agregar`, {
             method: "POST",
             headers: authHeaders(),
             body: JSON.stringify({ email })
@@ -296,7 +299,7 @@ async function agregarEmpleado(sucursalId) {
 async function eliminarEmpleado(sucursalId, empleadoId) {
     if (!confirm("¿Quitar este empleado?")) return;
     try {
-        const res = await fetch(`/sucursales/${sucursalId}/empleados/eliminar/${empleadoId}`, {
+        const res = await fetch(API_URL + `/sucursales/${sucursalId}/empleados/eliminar/${empleadoId}`, {
             method: "DELETE",
             headers: authHeaders()
         });
@@ -308,13 +311,10 @@ async function eliminarEmpleado(sucursalId, empleadoId) {
     }
 }
 
-
-
-
 async function abrirModalModificarSucursal(sucursalId) {
     let suc;
     try {
-        const res = await fetch(`/sucursales/${sucursalId}`, { headers: authHeaders() });
+        const res = await fetch(API_URL + `/sucursales/${sucursalId}`, { headers: authHeaders() });
         if (!res.ok) throw new Error(`Error ${res.status}`);
         suc = await res.json();
     } catch (e) {
@@ -322,41 +322,44 @@ async function abrirModalModificarSucursal(sucursalId) {
         return;
     }
 
-    const input = (id, val) => `
-        <p>${id}</p>
-        <div class="input-group mb-1">
-            <input type="text" class="form-control" id="mod-suc-${id}" value="${val ?? ""}">
-        </div>`;
-
-    const div = document.createElement("div");
-    div.id = "modal-suc";
-    div.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center;";
+    const div = crearModal("modal-suc");
     div.innerHTML = `
-        <div class="form-simple" style="max-width:480px;width:90%;max-height:85vh;overflow-y:auto;">
+        <div class="form-simple">
             <h1>Editar Sucursal</h1>
-            ${input("nombre", suc.nombre)}
-            ${input("direccion", suc.direccion)}
-            ${input("telefono", suc.telefono)}
-            ${input("descripcion", suc.descripcion)}
+            <p>Nombre</p>
+            <div class="input-group">
+                <input type="text" class="form-control" id="mod-suc-nombre" value="${suc.nombre ?? ""}">
+            </div>
+            <p>Dirección</p>
+            <div class="input-group">
+                <input type="text" class="form-control" id="mod-suc-direccion" value="${suc.direccion ?? ""}">
+            </div>
+            <p>Teléfono</p>
+            <div class="input-group">
+                <input type="text" class="form-control" id="mod-suc-telefono" value="${suc.telefono ?? ""}">
+            </div>
+            <p>Descripción</p>
+            <div class="input-group">
+                <textarea class="form-control" id="mod-suc-descripcion" rows="3" style="resize:vertical;padding:8px 12px;height:auto;">${suc.descripcion ?? ""}</textarea>
+            </div>
             <p>Hora apertura</p>
-            <div class="input-group mb-1">
+            <div class="input-group">
                 <input type="time" class="form-control" id="mod-suc-horaApertura" value="${suc.horaApertura}">
             </div>
             <p>Hora cierre</p>
-            <div class="input-group mb-1">
+            <div class="input-group">
                 <input type="time" class="form-control" id="mod-suc-horaCierre" value="${suc.horaCierre}">
             </div>
             <p>URL foto</p>
-            <div class="input-group mb-1">
+            <div class="input-group">
                 <input type="url" class="form-control" id="mod-suc-fotoUrl" value="${suc.fotoPerfil ?? ""}">
             </div>
             <div class="form-actions">
                 <button class="btn-submit" id="btn-guardar-suc">Guardar</button>
-                <button class="btn-cancel" onclick="document.getElementById('modal-suc').remove()">Cancelar</button>
+                <button class="btn-cancel" onclick="this.closest('.modal-overlay').remove()">Cancelar</button>
             </div>
         </div>
     `;
-    document.body.appendChild(div);
 
     document.getElementById("btn-guardar-suc").addEventListener("click", async () => {
         const body = {
@@ -369,7 +372,7 @@ async function abrirModalModificarSucursal(sucursalId) {
             fotoUrl: document.getElementById("mod-suc-fotoUrl").value || undefined,
         };
         try {
-            const res = await fetch(`/sucursales/modificar/${sucursalId}`, {
+            const res = await fetch(API_URL + `/sucursales/modificar/${sucursalId}`, {
                 method: "PATCH",
                 headers: authHeaders(),
                 body: JSON.stringify(body)
@@ -383,48 +386,42 @@ async function abrirModalModificarSucursal(sucursalId) {
     });
 }
 
-
-
-
 async function abrirModalModificarServicio(servicioId) {
     try {
-        const res = await fetch(`/servicios/${servicioId}`, { headers: authHeaders() });
+        const res = await fetch(API_URL + `/servicios/${servicioId}`, { headers: authHeaders() });
         if (!res.ok) throw new Error(`Error ${res.status}`);
         const s = await res.json();
 
-        const div = document.createElement("div");
-        div.id = "modal-serv";
-        div.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center;";
+        const div = crearModal("modal-serv");
         div.innerHTML = `
-            <div class="form-simple" style="max-width:440px;width:90%;max-height:85vh;overflow-y:auto;">
+            <div class="form-simple">
                 <h1>Editar Servicio</h1>
                 <p>Nombre</p>
-                <div class="input-group mb-1">
+                <div class="input-group">
                     <input type="text" class="form-control" id="mod-serv-nombre" value="${s.nombre}">
                 </div>
                 <p>Descripción</p>
-                <div class="input-group mb-1">
-                    <textarea class="form-control" id="mod-serv-descripcion" rows="3">${s.descripcion}</textarea>
+                <div class="input-group">
+                    <textarea class="form-control" id="mod-serv-descripcion" rows="3" style="resize:vertical;padding:8px 12px;height:auto;">${s.descripcion}</textarea>
                 </div>
                 <p>Duración (min)</p>
-                <div class="input-group mb-1">
+                <div class="input-group">
                     <input type="number" class="form-control" id="mod-serv-duracion" value="${s.duracion}" min="30" max="360">
                 </div>
                 <p>Precio</p>
-                <div class="input-group mb-1">
+                <div class="input-group">
                     <input type="number" class="form-control" id="mod-serv-precio" value="${s.precio}" min="0.01" step="0.01">
                 </div>
                 <p>URL foto</p>
-                <div class="input-group mb-1">
+                <div class="input-group">
                     <input type="url" class="form-control" id="mod-serv-fotoUrl" value="${s.fotoPerfil ?? ""}">
                 </div>
                 <div class="form-actions">
                     <button class="btn-submit" id="btn-guardar-serv">Guardar</button>
-                    <button class="btn-cancel" onclick="document.getElementById('modal-serv').remove()">Cancelar</button>
+                    <button class="btn-cancel" onclick="this.closest('.modal-overlay').remove()">Cancelar</button>
                 </div>
             </div>
         `;
-        document.body.appendChild(div);
 
         document.getElementById("btn-guardar-serv").addEventListener("click", async () => {
             const body = {
@@ -435,7 +432,7 @@ async function abrirModalModificarServicio(servicioId) {
                 fotoUrl: document.getElementById("mod-serv-fotoUrl").value || undefined,
             };
             try {
-                const res = await fetch(`/servicios/modificar/${servicioId}`, {
+                const res = await fetch(API_URL + `/servicios/modificar/${servicioId}`, {
                     method: "PATCH",
                     headers: authHeaders(),
                     body: JSON.stringify(body)
@@ -457,66 +454,60 @@ async function abrirModalModificarServicio(servicioId) {
     }
 }
 
-
-
-
 function abrirModalAgregarSucursal() {
-    const div = document.createElement("div");
-    div.id = "modal-agregar-suc";
-    div.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center;";
+    const div = crearModal("modal-agregar-suc");
     div.innerHTML = `
-        <div class="form-simple" style="max-width:480px;width:90%;max-height:85vh;overflow-y:auto;">
+        <div class="form-simple">
             <h1>Agregar Sucursal</h1>
- 
+
             <p>Nombre de la sucursal</p>
-            <div class="input-group mb-1">
+            <div class="input-group">
                 <input type="text" class="form-control" placeholder="Nombre" id="add-suc-nombre" minlength="4" maxlength="120" required>
             </div>
- 
+
             <p>Dirección</p>
-            <div class="input-group mb-1">
+            <div class="input-group">
                 <input type="text" class="form-control" placeholder="Dirección" id="add-suc-direccion" minlength="10" maxlength="60" required>
             </div>
- 
+
             <p>Teléfono</p>
-            <div class="input-group mb-1">
+            <div class="input-group">
                 <input type="tel" class="form-control" placeholder="Teléfono" id="add-suc-telefono" minlength="8" maxlength="20">
             </div>
- 
+
             <p>Descripción</p>
-            <div class="input-group mb-1">
-                <textarea class="form-control" placeholder="Descripción" id="add-suc-descripcion" minlength="10" maxlength="1500" rows="4" required></textarea>
+            <div class="input-group">
+                <textarea class="form-control" placeholder="Descripción" id="add-suc-descripcion" minlength="10" maxlength="1500" rows="4" required style="resize:vertical;padding:8px 12px;height:auto;"></textarea>
             </div>
- 
+
             <p>Categoría</p>
-            <div class="input-group mb-1">
+            <div class="input-group">
                 <select class="form-control" id="add-suc-categoria" required>
                     <option value="">Seleccioná una categoría</option>
                 </select>
             </div>
- 
+
             <p>Hora de apertura</p>
-            <div class="input-group mb-1">
+            <div class="input-group">
                 <input type="time" class="form-control" id="add-suc-horaApertura" required>
             </div>
- 
+
             <p>Hora de cierre</p>
-            <div class="input-group mb-1">
+            <div class="input-group">
                 <input type="time" class="form-control" id="add-suc-horaCierre" required>
             </div>
- 
+
             <p>URL foto de perfil</p>
-            <div class="input-group mb-1">
+            <div class="input-group">
                 <input type="url" class="form-control" placeholder="https://..." id="add-suc-fotoUrl" required>
             </div>
- 
+
             <div class="form-actions">
                 <button class="btn-submit" id="btn-crear-suc">Enviar</button>
-                <button class="btn-cancel" onclick="document.getElementById('modal-agregar-suc').remove()">Cancelar</button>
+                <button class="btn-cancel" onclick="this.closest('.modal-overlay').remove()">Cancelar</button>
             </div>
         </div>
     `;
-    document.body.appendChild(div);
 
     cargarCategoriasSucursal();
 
@@ -538,7 +529,7 @@ function abrirModalAgregarSucursal() {
 
 async function cargarCategoriasSucursal() {
     try {
-        const response = await fetch(`/sucursales/categorias`, {
+        const response = await fetch(API_URL + `/sucursales/categorias`, {
             headers: authHeaders()
         });
 
@@ -547,9 +538,9 @@ async function cargarCategoriasSucursal() {
         const categorias = await response.json();
         const select = document.getElementById("add-suc-categoria");
 
-        categorias.forEach((cat) => {
+        categorias.forEach((cat, i) => {
             const option = document.createElement("option");
-            option.value = cat;
+            option.value = i + 1;
             option.textContent = cat;
             select.appendChild(option);
         });
@@ -572,7 +563,7 @@ async function postSucursal(nombre, direccion, telefono, descripcion, categoriaI
     };
 
     try {
-        const response = await fetch(`/sucursales/crear`, {
+        const response = await fetch(API_URL + `/sucursales/crear`, {
             method: "POST",
             headers: authHeaders(),
             body: JSON.stringify(datos)
@@ -591,49 +582,43 @@ async function postSucursal(nombre, direccion, telefono, descripcion, categoriaI
     }
 }
 
-
-
-
 function abrirModalAgregarServicio(sucursalId) {
-    const div = document.createElement("div");
-    div.id = "modal-agregar-serv";
-    div.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center;";
+    const div = crearModal("modal-agregar-serv");
     div.innerHTML = `
-        <div class="form-simple" style="max-width:440px;width:90%;max-height:85vh;overflow-y:auto;">
+        <div class="form-simple">
             <h1>Agregar Servicio</h1>
- 
+
             <p>Nombre del servicio</p>
-            <div class="input-group mb-1">
+            <div class="input-group">
                 <input type="text" class="form-control" placeholder="Nombre" id="add-serv-nombre" minlength="4" maxlength="60" required>
             </div>
- 
+
             <p>Descripción</p>
-            <div class="input-group mb-1">
-                <textarea class="form-control" placeholder="Descripción" id="add-serv-descripcion" minlength="10" maxlength="500" rows="4" required></textarea>
+            <div class="input-group">
+                <textarea class="form-control" placeholder="Descripción" id="add-serv-descripcion" minlength="10" maxlength="500" rows="4" required style="resize:vertical;padding:8px 12px;height:auto;"></textarea>
             </div>
- 
+
             <p>Duración (minutos)</p>
-            <div class="input-group mb-1">
+            <div class="input-group">
                 <input type="number" class="form-control" placeholder="Ej: 30" id="add-serv-duracion" min="30" max="360" required>
             </div>
- 
+
             <p>Precio</p>
-            <div class="input-group mb-1">
+            <div class="input-group">
                 <input type="number" class="form-control" placeholder="Ej: 1500.00" id="add-serv-precio" min="0.01" max="999999.99" step="0.01" required>
             </div>
- 
+
             <p>URL foto de perfil</p>
-            <div class="input-group mb-1">
+            <div class="input-group">
                 <input type="url" class="form-control" placeholder="https://..." id="add-serv-fotoUrl" required>
             </div>
- 
+
             <div class="form-actions">
                 <button class="btn-submit" id="btn-crear-serv">Enviar</button>
-                <button class="btn-cancel" onclick="document.getElementById('modal-agregar-serv').remove()">Cancelar</button>
+                <button class="btn-cancel" onclick="this.closest('.modal-overlay').remove()">Cancelar</button>
             </div>
         </div>
     `;
-    document.body.appendChild(div);
 
     document.getElementById("btn-crear-serv").addEventListener("click", async (e) => {
         e.preventDefault();
@@ -659,7 +644,7 @@ async function postServicio(nombre, descripcion, duracion, precio, sucursalId, f
     };
 
     try {
-        const response = await fetch(`/servicios/crear`, {
+        const response = await fetch(API_URL + `/servicios/crear`, {
             method: "POST",
             headers: authHeaders(),
             body: JSON.stringify(datos)
@@ -677,9 +662,6 @@ async function postServicio(nombre, descripcion, duracion, precio, sucursalId, f
         alert("Error al guardar: " + error.message);
     }
 }
-
-
-
 
 function bindEventos() {
 
@@ -711,5 +693,3 @@ function bindEventos() {
         agregarEmpleado(sucursalId);
     });
 }
-
-//

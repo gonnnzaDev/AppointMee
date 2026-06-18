@@ -1,9 +1,9 @@
-import { authHeaders, sesionActiva } from "../recursos/modulos.js";
+import { API_URL, authHeaders, sesionActiva } from "../recursos/modulos.js";
 
 const user = await sesionActiva();
 
 if (!user) {
-    window.location.href = "../login.html";
+    window.location.href = "../login-folder/Login.html";
 }
 
 renderTurnos();
@@ -21,20 +21,35 @@ async function renderTurnos() {
 
     container.innerHTML = ``;
 
-    turnosLista.forEach(turno => {
-        const idActual = turno.id || turno.idTurno;
+    if (turnosLista.length === 0) {
+        container.innerHTML = `<p style="color:var(--t3);font-family:var(--mono);text-align:center;padding:32px 0;">No tenés turnos registrados.</p>`;
+        return;
+    }
 
-        if (turno.estadoTurno == estadoP) {
-            container.innerHTML += `
+    const filtrados = turnosLista.filter(t => t.estadoTurno === estadoP);
+
+    if (filtrados.length === 0) {
+        container.innerHTML = `<p style="color:var(--t3);font-family:var(--mono);text-align:center;padding:32px 0;">No hay turnos con estado "${estadoP}".</p>`;
+        return;
+    }
+
+    filtrados.forEach(turno => {
+        const idActual = turno.id;
+
+        const fecha = new Date(turno.fechaTurno);
+        const fechaFormateada = isNaN(fecha.getTime())
+            ? turno.fechaTurno
+            : fecha.toLocaleString("es-AR");
+
+        container.innerHTML += `
             <div class="turno-misTurnos">
                 <p><strong>${turno.nombreServicio}</strong></p>
-                <p>${turno.fechaTurno}</p>
+                <p>${fechaFormateada}</p>
                 <p><span class="badge ${obtenerClaseBadge(turno.estadoTurno)}">${turno.estadoTurno}</span></p>
-                <p>🐝 ${turno.puntuacion || 'Sin calificar'}</p>
+                <p>🐝 ${turno.puntuacion != null ? turno.puntuacion : 'Sin calificar'}</p>
                 <button class="btn-submit btn-ver-detalle" data-id="${idActual}">Ver Detalle</button>
             </div>
         `;
-        }
     });
 
     container.querySelectorAll(".btn-ver-detalle").forEach(btn => {
@@ -55,22 +70,14 @@ function obtenerClaseBadge(estado) {
 
 async function buscarMisTurnos() {
     try {
-
         const response = await fetch(
-            `/turnos/propios`,
-            {
-                headers: authHeaders()
-            }
+            API_URL + `/turnos/propios`,
+            { headers: authHeaders() }
         );
-
-        if (!response.ok) {
-            throw new Error(`Error ${response.status}`);
-        }
-
+        if (!response.ok) throw new Error(`Error ${response.status}`);
         return await response.json();
-
     } catch (error) {
-        alert(error.message);
+        console.error("Error al buscar turnos:", error);
         return [];
     }
 }
