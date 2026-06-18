@@ -29,6 +29,32 @@ if (!sucursalId) {
     renderPaso1();
 }
 
+// ---------- Utilidades ----------
+
+// Escapa texto para insertarlo de forma segura dentro de innerHTML (previene XSS).
+function escaparHTML(str) {
+    if (str === null || str === undefined) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+// Escapa texto para insertarlo de forma segura dentro de un atributo onclick="..."
+// (además de escapar HTML, neutraliza backslashes para que no se pueda
+// "romper" la comilla simple que envuelve el argumento).
+function escaparAtributo(str) {
+    if (str === null || str === undefined) return "";
+    return String(str)
+        .replace(/\\/g, "\\\\")
+        .replace(/'/g, "\\'")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+}
+
 function renderPaso2() {
     const c = document.getElementById("agendarTurno-container");
     c.innerHTML = `
@@ -104,16 +130,20 @@ function renderPaginaEmpleados() {
 
     contenedor.innerHTML =
         `<div class="empleados-pagina">` +
-            pagina.map(e => `
-                <article class="empleado-article" data-id="${e.id}" onclick="seleccionarEmpleado(${e.id}, this)">
-                    <img src="${e.urlFotoPerfil || IMG_FALLBACK}"
-                         alt="Foto de ${e.nombre}"
+            pagina.map(e => {
+                const nombreCompleto = `${e.nombre} ${e.apellido}`;
+                const seleccionado = empleadoSeleccionado?.id === e.id;
+                return `
+                <article class="empleado-article${seleccionado ? " empleado-article--seleccionado" : ""}" data-id="${e.id}" onclick="seleccionarEmpleado(${e.id}, this)">
+                    <img src="${escaparAtributo(e.urlFotoPerfil || IMG_FALLBACK)}"
+                         alt="Foto de ${escaparAtributo(nombreCompleto)}"
                          onerror="this.src='${IMG_FALLBACK}'">
-                    <p class="empleado-nombre">${e.nombre} ${e.apellido}</p>
+                    <p class="empleado-nombre">${escaparHTML(nombreCompleto)}</p>
                     <p class="empleado-valoracion">
                         ${e.puntuacion ? "🐝".repeat(Math.round(e.puntuacion)) : "Sin calificar"} 
                     </p>
-                </article>`).join("") +
+                </article>`;
+            }).join("") +
         `</div>` +
         (totalPaginas > 1 ? `
             <div class="empleados-paginacion">
@@ -142,18 +172,22 @@ window.seleccionarEmpleado = function (id, el) {
         a.classList.remove("empleado-article--seleccionado"));
     el.classList.add("empleado-article--seleccionado");
 
+    // Buscamos los datos en la cache en vez de leerlos del DOM,
+    // así evitamos depender de cómo quedó renderizado el texto.
+    const datos = empleadosCache.find(e => e.id === id);
+
     empleadoSeleccionado = {
         id,
-        nombre: el.querySelector(".empleado-nombre")?.textContent ?? "",
-        imagen: el.querySelector("img")?.src ?? IMG_FALLBACK
+        nombre: datos ? `${datos.nombre} ${datos.apellido}` : (el.querySelector(".empleado-nombre")?.textContent ?? ""),
+        imagen: datos?.urlFotoPerfil || el.querySelector("img")?.src || IMG_FALLBACK
     };
 
     const info = document.getElementById("info-seleccionada");
     if (info) info.innerHTML = `
-        <img src="${empleadoSeleccionado.imagen}"
-             alt="${empleadoSeleccionado.nombre}"
+        <img src="${escaparAtributo(empleadoSeleccionado.imagen)}"
+             alt="${escaparAtributo(empleadoSeleccionado.nombre)}"
              onerror="this.src='${IMG_FALLBACK}'">
-        <h3>${empleadoSeleccionado.nombre}</h3>`;
+        <h3>${escaparHTML(empleadoSeleccionado.nombre)}</h3>`;
 
     document.getElementById("siguiente").disabled = false;
 };
@@ -187,28 +221,30 @@ function renderPaso1() {
     });
 }
 
+let serviciosCache = [];
+
 async function cargarServicios() {
     try {
         const res = await fetch(API_URL + `/servicios/listar/sucursal/${sucursalId}`, {
             headers: authHeaders()
         });
         await checkRes(res);
-        const servicios = await res.json();
+        serviciosCache = await res.json();
 
         const contenedor = document.getElementById("servicios-container");
         if (!contenedor) return;
 
-        if (!servicios.length) {
+        if (!serviciosCache.length) {
             contenedor.innerHTML = `<p class="turno-sin-dia">Esta sucursal no tiene servicios disponibles.</p>`;
             return;
         }
 
-        contenedor.innerHTML = servicios.map(s => `
-            <article class="empleado-article" data-id="${s.id}" onclick="seleccionarServicio(${s.id}, this, '${escapar(s.nombre)}')">
-                <img src="${s.fotoPerfil || IMG_FALLBACK}"
-                     alt="${s.nombre}"
+        contenedor.innerHTML = serviciosCache.map(s => `
+            <article class="empleado-article" data-id="${s.id}" onclick="seleccionarServicio(${s.id}, this)">
+                <img src="${escaparAtributo(s.fotoPerfil || IMG_FALLBACK)}"
+                     alt="${escaparAtributo(s.nombre)}"
                      onerror="this.src='${IMG_FALLBACK}'">
-                <p class="empleado-nombre">${s.nombre}</p>
+                <p class="empleado-nombre">${escaparHTML(s.nombre)}</p>
                 <p class="empleado-valoracion">
                     ⏱ ${s.duracion} min 
                 </p>
@@ -220,20 +256,23 @@ async function cargarServicios() {
     }
 }
 
-window.seleccionarServicio = function (id, el, nombre) {
+window.seleccionarServicio = function (id, el) {
     document.querySelectorAll(".servicios-container .empleado-article").forEach(a =>
         a.classList.remove("empleado-article--seleccionado"));
     el.classList.add("empleado-article--seleccionado");
 
-    servicioSeleccionado = { id, nombre };
+    // Tomamos el nombre desde la cache (datos reales del backend),
+    // no reconstruido a partir de un string ya escapado para onclick.
+    const datos = serviciosCache.find(s => s.id === id);
+    servicioSeleccionado = { id, nombre: datos?.nombre ?? el.querySelector(".empleado-nombre")?.textContent ?? "" };
     document.getElementById("siguiente").disabled = false;
 };
 
-function escapar(str) {
-    return str.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-}
-
 let cacheDisponibilidad = null;
+// Token de carrera: identifica la combinación empleado+servicio vigente
+// para descartar respuestas de fetch obsoletas si el usuario cambia de
+// selección antes de que la request anterior termine.
+let disponibilidadToken = 0;
 
 function renderPaso3() {
     diaSeleccionado = null;
@@ -258,7 +297,7 @@ function renderPaso3() {
                 <div class="turno-header">
                     <h1>¿Cuándo querés venir?</h1>
                     <p class="turno-paso-sub">
-                        ${empleadoSeleccionado.nombre} &nbsp;·&nbsp; ${servicioSeleccionado.nombre}
+                        ${escaparHTML(empleadoSeleccionado.nombre)} &nbsp;·&nbsp; ${escaparHTML(servicioSeleccionado.nombre)}
                     </p>
                 </div>
 
@@ -313,18 +352,30 @@ function renderPaso3() {
 }
 
 async function cargarDisponibilidad() {
+    // Cada llamada genera su propio token; si el usuario navega fuera de
+    // este paso antes de que la respuesta llegue, el token ya no coincide
+    // y el resultado se descarta en vez de pisar datos nuevos.
+    const tokenActual = ++disponibilidadToken;
+
     try {
         const res = await fetch(
             API_URL + `/turnos/disponibilidad/empleado/${empleadoSeleccionado.id}/servicio/${servicioSeleccionado.id}`,
             { headers: authHeaders() }
         );
         await checkRes(res);
-        cacheDisponibilidad = await res.json();
+        const datos = await res.json();
+
+        if (tokenActual !== disponibilidadToken) return; // respuesta obsoleta, se ignora
+        cacheDisponibilidad = datos;
     } catch (err) {
+        if (tokenActual !== disponibilidadToken) return;
         cacheDisponibilidad = [];
         alert("No se pudo cargar la disponibilidad: " + err.message);
     }
-    renderCalendario();
+
+    if (tokenActual === disponibilidadToken) {
+        renderCalendario();
+    }
 }
 
 function horariosParaFecha(y, m, d) {
@@ -362,13 +413,19 @@ function renderCalendario() {
         const esHoy = d === hoy.getDate() && vistaMes === hoy.getMonth() && vistaYear === hoy.getFullYear();
         const esSel = diaSeleccionado?.d === d && diaSeleccionado?.m === vistaMes && diaSeleccionado?.y === vistaYear;
         const horarios = horariosParaFecha(vistaYear, vistaMes, d);
+        // Si todavía no cargó la disponibilidad (horarios === null), no marcamos
+        // el día como "sin turnos": esperamos a tener datos reales.
         const sinTurnos = horarios !== null && horarios.length === 0;
 
         if (esPasado || sinTurnos) { btn.classList.add("cal-dia--pasado"); btn.disabled = true; }
         if (esHoy) btn.classList.add("cal-dia--hoy");
         if (esSel) btn.classList.add("cal-dia--seleccionado");
-        if (!esPasado && !sinTurnos) {
+        if (!esPasado && !sinTurnos && cacheDisponibilidad !== null) {
             btn.addEventListener("click", () => seleccionarDia(d, vistaMes, vistaYear));
+        } else if (!esPasado && cacheDisponibilidad === null) {
+            // Disponibilidad aún cargando: deshabilitamos temporalmente para
+            // evitar que el usuario seleccione un día sin datos.
+            btn.disabled = true;
         }
         grid.appendChild(btn);
     }
@@ -403,7 +460,7 @@ function renderHorarios() {
 
     const { d, m, y } = diaSeleccionado;
     const horarios = horariosParaFecha(y, m, d);
-    titulo.innerHTML = `Horarios disponibles <span>— ${d} de ${MESES[m]}</span>`;
+    titulo.innerHTML = `Horarios disponibles <span>— ${d} de ${escaparHTML(MESES[m])}</span>`;
 
     if (!horarios || !horarios.length) {
         grid.innerHTML = `<span class="turno-sin-dia">Sin turnos disponibles para este día.</span>`;
@@ -423,7 +480,7 @@ function renderHorarios() {
             fechaHoraSeleccionada = `${fecha}T${label}`;
 
             document.getElementById("turno-resumen-texto").innerHTML =
-                `Turno: <strong>${d} de ${MESES[m]} de ${y}</strong> a las <strong>${label} hs</strong>`;
+                `Turno: <strong>${d} de ${escaparHTML(MESES[m])} de ${y}</strong> a las <strong>${escaparHTML(label)} hs</strong>`;
             document.getElementById("turno-resumen").style.display = "flex";
             document.getElementById("siguiente").disabled = false;
             renderHorarios();
@@ -450,6 +507,9 @@ async function confirmarTurno() {
         });
         await checkRes(resCrear);
 
+        // Si el endpoint de creación devuelve el turno creado (o su id),
+        // usalo directamente acá en vez de "adivinarlo" después.
+        // Ejemplo: const turnoCreado = await resCrear.json(); const turnoId = turnoCreado.id;
         const turnoId = await buscarTurnoRecienCreado();
 
         if (!turnoId) {
@@ -466,6 +526,22 @@ async function confirmarTurno() {
     }
 }
 
+// Compara fecha+hora de forma tolerante a formatos distintos entre
+// fechaHoraSeleccionada ("YYYY-MM-DDTHH:mm") y lo que devuelva el backend
+// (que puede incluir segundos, milisegundos u offset de zona horaria).
+// En vez de comparar timestamps absolutos (sensibles a UTC vs hora local),
+// comparamos año/mes/día/hora/minuto en hora LOCAL de ambos valores.
+function mismaFechaHora(fechaA, fechaB) {
+    const a = new Date(fechaA);
+    const b = new Date(fechaB);
+    if (isNaN(a) || isNaN(b)) return false;
+    return a.getFullYear() === b.getFullYear() &&
+        a.getMonth() === b.getMonth() &&
+        a.getDate() === b.getDate() &&
+        a.getHours() === b.getHours() &&
+        a.getMinutes() === b.getMinutes();
+}
+
 async function buscarTurnoRecienCreado() {
     try {
         const res = await fetch(API_URL + `/turnos/propios`, { headers: authHeaders() });
@@ -473,12 +549,10 @@ async function buscarTurnoRecienCreado() {
 
         const turnos = await res.json();
 
-        const fechaBuscada = new Date(fechaHoraSeleccionada).getTime();
-
         const candidatos = turnos.filter(t =>
             t.nombreServicio === servicioSeleccionado.nombre &&
             t.estadoTurno === "PENDIENTE" &&
-            new Date(t.fechaTurno).getTime() === fechaBuscada
+            mismaFechaHora(t.fechaTurno, fechaHoraSeleccionada)
         );
 
         if (!candidatos.length) return null;
