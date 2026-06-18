@@ -1,9 +1,7 @@
 import { API_URL, authHeaders, sesionActiva, checkRes } from "../recursos/modulos.js";
 
 const user = await sesionActiva();
-if (!user) {
-    window.location.href = "../login-folder/Login.html";
-}
+
 
 const container = document.getElementById("sucursales-container");
 const roles = user.roles || [];
