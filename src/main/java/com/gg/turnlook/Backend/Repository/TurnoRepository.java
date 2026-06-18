@@ -20,10 +20,14 @@ public interface TurnoRepository extends JpaRepository<Turno, Integer> {
                                                               EstadoTurno estadoTurno);
 
 
-    List<Turno> findByServicioSucursalId(Integer sucursalId);
+    List<Turno> findByServicioSucursalIdAndEstado(Integer sucursalId, EstadoTurno estadoTurno);
 
 
-    List<Turno> findByCliente(Usuario cliente);
+    List<Turno> findByClienteEmail(String clienteEmail);
+
+
+    List<Turno> findByEmpleadoEmailAndServicioSucursalIdAndEstado(
+            String empleadoEmail, Integer sucursalId, EstadoTurno estadoTurno);
 
 
 }

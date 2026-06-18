@@ -1,14 +1,13 @@
 package com.gg.turnlook.Backend.Repository;
 
 
-
 import com.gg.turnlook.Backend.Enum.ECategoria;
 import com.gg.turnlook.Backend.Model.Sucursal;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
-
 
 
 public interface SucursalRepository extends JpaRepository<Sucursal, Integer> {
@@ -30,7 +29,17 @@ public interface SucursalRepository extends JpaRepository<Sucursal, Integer> {
     List<Sucursal> findByCategoriaCategoriaAndActivoTrue(ECategoria categoria);
 
 
-    List<Sucursal> findByEmpleadorEmailAndActivoTrue(String empleadorEmail);
+    @Query("""
+                SELECT s FROM Sucursal s
+                WHERE s.activo = true
+                AND (
+                    s.empleador.email = :email
+                    OR :email IN (
+                        SELECT e.email FROM s.empleados e
+                    )
+                )
+            """)
+    List<Sucursal> findSucursalesDondeEsta(String email);
 
 
 }

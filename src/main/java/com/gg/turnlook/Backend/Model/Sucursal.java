@@ -50,7 +50,7 @@ public class Sucursal {
 
     @Column(nullable = false)
     private boolean activo = true;
-    
+
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "imagen_id")

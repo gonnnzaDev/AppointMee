@@ -194,21 +194,40 @@ public class TurnoService {
     }
 
 
-    // uno para cancelar y reservar uno nuevo x cambio
-
-
     public List<TurnoMiniDTO> listarTurnosPorSucursal(
-            Integer sucursalId, String userEmail) {
+            Integer sucursalId, String empleadorEmail, EstadoTurno estadoTurno) {
 
         Sucursal sucursal = sucursalService.listarSucursalPorId(sucursalId);
 
-        if (!sucursalService.enSucursal(userEmail, sucursal)) {
+        if (!sucursalService.esEmpleadorAca(sucursal, empleadorEmail)) {
             throw new ForbiddenException("No tenes permisos");
         }
 
-        return turnoRepo.findByServicioSucursalId(sucursal.getId())
+        return turnoRepo.findByServicioSucursalIdAndEstado(sucursal.getId(),
+                        estadoTurno)
                 .stream()
                 .map(t -> new TurnoMiniDTO(t.getId(), t.getServicio().getNombre(),
+                        t.getFechaHora(), t.getEstado(),
+                        t.getResenia() != null ?
+                                t.getResenia().getPuntuacion() : null))
+                .toList();
+    }
+
+
+    public List<TurnoMiniDTO> listarTurnosPropiosPorSucursal(
+            Integer sucursalId, String empleadoEmail, EstadoTurno estadoTurno){
+
+        Sucursal  sucursal = sucursalService.listarSucursalPorId(sucursalId);
+
+        if(!sucursalService.enSucursal(empleadoEmail, sucursal)){
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        return turnoRepo.findByEmpleadoEmailAndServicioSucursalIdAndEstado(
+                empleadoEmail, sucursal.getId(), estadoTurno)
+                .stream()
+                .map(t -> new TurnoMiniDTO(
+                        t.getId(), t.getServicio().getNombre(),
                         t.getFechaHora(), t.getEstado(),
                         t.getResenia() != null ?
                                 t.getResenia().getPuntuacion() : null))
@@ -222,6 +241,11 @@ public class TurnoService {
 
         if (!sucursalService.enSucursal(userEmail, t.getServicio().getSucursal())) {
             throw new ForbiddenException("No tenes permisos");
+        }
+
+        if (!sucursalService.esEmpleadorAca(t.getServicio().getSucursal(), userEmail)
+                && !t.getEmpleado().getEmail().equals(userEmail)) {
+            throw new ForbiddenException("Este turno no esta asignado a vos");
         }
 
         Usuario c = t.getCliente();
@@ -253,9 +277,7 @@ public class TurnoService {
 
     public List<TurnoMiniDTO> listarTurnosPorCliente(String clienteEmail) {
 
-        Usuario cliente = usuarioService.listarUsuarioPorEmail(clienteEmail);
-
-        return turnoRepo.findByCliente(cliente).stream()
+        return turnoRepo.findByClienteEmail(clienteEmail).stream()
                 .map(t -> new TurnoMiniDTO(
                         t.getId(), t.getServicio().getNombre(),
                         t.getFechaHora(), t.getEstado(),

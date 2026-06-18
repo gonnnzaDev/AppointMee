@@ -17,12 +17,10 @@ import com.gg.turnlook.Backend.Excepciones.BadRequestException;
 import com.gg.turnlook.Backend.Excepciones.ConflictException;
 import com.gg.turnlook.Backend.Excepciones.ForbiddenException;
 import com.gg.turnlook.Backend.Excepciones.NotFoundException;
-import com.gg.turnlook.Backend.Model.Categoria;
-import com.gg.turnlook.Backend.Model.Imagen;
-import com.gg.turnlook.Backend.Model.Sucursal;
-import com.gg.turnlook.Backend.Model.Usuario;
+import com.gg.turnlook.Backend.Model.*;
 import com.gg.turnlook.Backend.Repository.CategoriaRepository;
 import com.gg.turnlook.Backend.Repository.SucursalRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,16 +39,18 @@ public class SucursalService {
     private final ImagenService imagenService;
     private final ReseniaService reseniaService;
     private final GestionEmpleadoService gestionEmpleadoService;
+    private final RolService rolService;
 
 
-    public SucursalService(SucursalRepository sucRepo, CategoriaRepository catRepo, UsuarioService usuarioService, ImagenService imagenService, ReseniaService reseniaService, GestionEmpleadoService gestionEmpleadoService) {
+
+    public SucursalService(SucursalRepository sucRepo, CategoriaRepository catRepo, UsuarioService usuarioService, ImagenService imagenService, ReseniaService reseniaService, GestionEmpleadoService gestionEmpleadoService, RolService rolService) {
         this.sucRepo = sucRepo;
         this.catRepo = catRepo;
         this.usuarioService = usuarioService;
         this.imagenService = imagenService;
         this.reseniaService = reseniaService;
         this.gestionEmpleadoService = gestionEmpleadoService;
-
+        this.rolService = rolService;
     }
 
 
@@ -315,9 +315,9 @@ public class SucursalService {
     }
 
 
-    public List<SucursalMiniDTO> listarSucursalesPropias(String empleadorEmail){
+    public List<SucursalMiniDTO> listarSucursalesPropias(String userEmail){
 
-        return sucRepo.findByEmpleadorEmailAndActivoTrue(empleadorEmail)
+        return sucRepo.findSucursalesDondeEsta(userEmail)
                 .stream()
                 .map(suc -> new SucursalMiniDTO(suc.getId(), suc.getNombre(),
                         suc.getCategoria().getCategoria().name(),
@@ -410,6 +410,32 @@ public class SucursalService {
         sucursal.getEmpleados().remove(empleado);
 
         sucRepo.save(sucursal);
+    }
+
+
+    @Transactional
+    public void convertirmeEnEmpleado(Integer sucursalId, String empleadorEmail){
+
+        Sucursal suc = listarSucursalPorId(sucursalId);
+
+        if(!esEmpleadorAca(suc, empleadorEmail)){
+            throw new ForbiddenException("No tenes permisos");
+        }
+
+        Usuario empleador = usuarioService.listarUsuarioPorEmail(empleadorEmail);
+
+        if(suc.getEmpleados().contains(empleador)){
+            throw new ConflictException("Ya sos empleado en la sucursal");
+        }
+
+        Rol rolEmpleado = rolService.listarPorRol(ERol.EMPLEADO);
+
+        if(!empleador.getRoles().contains(rolEmpleado)){
+            usuarioService.agregarRol(empleador, rolEmpleado);
+        }
+
+        suc.getEmpleados().add(empleador);
+        sucRepo.save(suc);
     }
 
 

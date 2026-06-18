@@ -5,6 +5,7 @@ package com.gg.turnlook.Backend.Controllers;
 
 import com.gg.turnlook.Backend.DTO.Resenia.ReseniaCrearDTO;
 import com.gg.turnlook.Backend.DTO.Turno.TurnoCrearDTO;
+import com.gg.turnlook.Backend.Enum.EstadoTurno;
 import com.gg.turnlook.Backend.Service.TurnoService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -73,19 +74,30 @@ public class TurnoController {
     }
 
 
-    // ver si ADMIN tmb 67
-    @PreAuthorize("hasAnyRole('EMPLEADOR','EMPLEADO')")
+    @PreAuthorize("hasRole('EMPLEADOR')")
     @GetMapping("/de-sucursal/{sucursalId}")
     public ResponseEntity<?> listarTurnosPorSucursal(
             @PathVariable("sucursalId") Integer sucursalId,
-            @AuthenticationPrincipal String userEmail) {
+            @RequestParam EstadoTurno estadoTurno,
+            @AuthenticationPrincipal String empleadorEmail) {
 
         return ResponseEntity.ok().body(turnoService.listarTurnosPorSucursal(
-                sucursalId, userEmail));
+                sucursalId, empleadorEmail, estadoTurno));
     }
 
 
-    // ver si ADMIN tmb 69
+    @PreAuthorize("hasRole('EMPLEADO')")
+    @GetMapping("/de-sucursal/{sucursalId}/propios")
+    public ResponseEntity<?> listarTurnosPropiosDeSucursal(
+            @PathVariable("sucursalId") Integer sucursalId,
+            @RequestParam EstadoTurno estadoTurno,
+            @AuthenticationPrincipal String empleadoEmail) {
+
+        return ResponseEntity.ok().body(turnoService.listarTurnosPropiosPorSucursal(
+                sucursalId, empleadoEmail, estadoTurno));
+    }
+
+
     @PreAuthorize("hasAnyRole('EMPLEADOR','EMPLEADO')")
     @GetMapping("/de-sucursal/detalles/{turnoId}")
     public ResponseEntity<?> verDetallesTurnosPorSucursal(

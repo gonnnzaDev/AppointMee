@@ -172,6 +172,17 @@ public class SucursalController {
     }
 
 
+    @PreAuthorize("hasRole('EMPLEADOR')")
+    @PatchMapping("/{sucursalId}/convertirme-empleado")
+    public ResponseEntity<?> convertirmeEnEmpleado(
+            @PathVariable("sucursalId") Integer sucursalId,
+            @AuthenticationPrincipal String empleadorEmail) {
+
+        sucursalService.convertirmeEnEmpleado(sucursalId, empleadorEmail);
+        return ResponseEntity.ok().body("Ahora sos empleado de la sucursal");
+    }
+
+
     @PreAuthorize("hasRole('CLIENTE')")
     @GetMapping("/{sucursalId}/elegir-empleado")
     public ResponseEntity<?> elegirEmpleado(@PathVariable("sucursalId") Integer sucursalId) {
