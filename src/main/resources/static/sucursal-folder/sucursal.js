@@ -1,4 +1,5 @@
 import { API_URL, authHeaders, sesionActiva, checkRes, formatearFechaLocal } from "../recursos/modulos.js";
+const IMG_FALLBACK = "https://xentra.glomastore.mx/img/sin_imagen.png";
 const user = await sesionActiva();
 if (!user) {
     window.location.href = "../login-folder/Login.html";
@@ -13,13 +14,21 @@ async function render() {
     const sucursal = await fetchSucursal(sucursalId);
     if (!sucursal) return;
 
-    const empleadosHtml = sucursal.empleados && sucursal.empleados.length
-        ? `<ul class="empleados-lista">${sucursal.empleados.map(e => `<li>${e.nombre}</li>`).join("")}</ul>`
-        : "<p class='sin-datos'>Sin empleados registrados</p>";
+    const empleadosHtml = `<div class="empleados-grid" id="empleados-grid"></div>`;
 
     container.innerHTML = `
-        <div class="principal-imagen-sucursal">
-            <img src="${sucursal.fotoPerfil || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQPQenKJTzexez3E1uN7qtSwZ8tgPQsVJ9DQ&s'}" alt="${sucursal.nombre}">
+        <div class="sucursal-galeria" id="sucursal-galeria">
+            <div class="principal-imagen-sucursal">
+                <img src="${sucursal.fotoPerfil || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQPQenKJTzexez3E1uN7qtSwZ8tgPQsVJ9DQ&s'}" alt="${sucursal.nombre}" id="main-sucursal-img">
+            </div>
+            ${sucursal.imagenes && sucursal.imagenes.length > 0 ? `
+            <div class="galeria-thumbs">
+                ${sucursal.imagenes.map((img, i) => `
+                    <button class="galeria-thumb${i === 0 ? ' galeria-thumb--activo' : ''}" data-url="${img.url}">
+                        <img src="${img.url}" alt="">
+                    </button>
+                `).join("")}
+            </div>` : ""}
         </div>
 
         <div class="info-sucursal">
@@ -86,7 +95,43 @@ async function render() {
             window.location.href = `../turnos-folder/Turnos.html?sucursalId=${sucursalId}`;
         });
 
+    const mainImg = document.getElementById("main-sucursal-img");
+    document.querySelectorAll(".galeria-thumb").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".galeria-thumb").forEach(t => t.classList.remove("galeria-thumb--activo"));
+            btn.classList.add("galeria-thumb--activo");
+            mainImg.src = btn.dataset.url;
+        });
+    });
+
     cargarResenias(sucursalId);
+    cargarEmpleadosConFotos(sucursalId);
+}
+
+async function cargarEmpleadosConFotos(sucursalId) {
+    try {
+        const res = await fetch(API_URL + `/sucursales/${sucursalId}/elegir-empleado`, {
+            headers: authHeaders()
+        });
+        await checkRes(res);
+        const empleados = await res.json();
+        const grid = document.getElementById("empleados-grid");
+        if (!grid) return;
+        if (!empleados.length) {
+            grid.innerHTML = "<p class='sin-datos'>Sin empleados registrados</p>";
+            return;
+        }
+        grid.innerHTML = empleados.map(e => `
+            <div class="empleado-foto-card">
+                <img src="${e.urlFotoPerfil || IMG_FALLBACK}" alt="${e.nombre}"
+                     onerror="this.src='${IMG_FALLBACK}'">
+                <span class="empleado-foto-nombre">${e.nombre} ${e.apellido}</span>
+            </div>
+        `).join("");
+    } catch {
+        const grid = document.getElementById("empleados-grid");
+        if (grid) grid.innerHTML = "<p class='sin-datos'>Sin empleados registrados</p>";
+    }
 }
 
 async function cargarResenias(sucursalId) {
