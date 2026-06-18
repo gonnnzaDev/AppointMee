@@ -20,7 +20,6 @@ async function render() {
 
     renderUsuarios(usuarios);
     renderSucursales(sucursales);
-
 }
 
 function renderUsuarios(lista) {
@@ -34,20 +33,29 @@ function renderUsuarios(lista) {
                 <td>${u.id}</td>
                 <td>${u.nombre}</td>
                 <td>${u.apellido}</td>
-                <td>${u.email}</td>
-                <td>${u.rol}</td>
-                <td>${u.estado}</td>
+                <td>${u.email ?? "-"}</td>
+                <td>${u.roles}</td>
+                <td>${u.estado ?? "-"}</td>
+
                 <td>
+
+                    <button
+                        class="btn btn-primary detalle-usuario"
+                        data-id="${u.id}">
+                        Detalle
+                    </button>
+
                     <button
                         class="btn btn-danger eliminar-usuario"
                         data-id="${u.id}">
                         Eliminar
                     </button>
+
                 </td>
+
             </tr>
         `;
     });
-
 }
 
 function renderSucursales(lista) {
@@ -58,21 +66,31 @@ function renderSucursales(lista) {
 
         sucursalesBody.innerHTML += `
             <tr>
+
                 <td>${s.nombre}</td>
                 <td>${s.categoria}</td>
                 <td>${s.puntuacion}</td>
                 <td>${s.cantidadPuntuaciones}</td>
+
                 <td>
+
+                    <button
+                        class="btn btn-info detalle-sucursal"
+                        data-id="${s.id}">
+                        Detalle
+                    </button>
+
                     <button
                         class="btn btn-danger eliminar-sucursal"
                         data-id="${s.id}">
                         Eliminar
                     </button>
+
                 </td>
+
             </tr>
         `;
     });
-
 }
 
 async function buscarUsuarios() {
@@ -93,9 +111,7 @@ async function buscarUsuarios() {
     } catch {
 
         return [];
-
     }
-
 }
 
 async function buscarSucursales() {
@@ -116,9 +132,95 @@ async function buscarSucursales() {
     } catch {
 
         return [];
-
     }
+}
 
+async function mostrarDetalleUsuario(id) {
+
+    try {
+
+        const response = await fetch(
+            `/usuarios/${id}`,
+            {
+                headers: authHeaders()
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("No se pudo cargar el usuario");
+        }
+
+        const usuario = await response.json();
+
+        document.getElementById("usuarioModalBody").innerHTML = `
+            <div class="text-center">
+
+                ${usuario.fotoPerfil
+                ? `
+                            <img
+                                src="${usuario.fotoPerfil}"
+                                class="img-thumbnail mb-3"
+                                style="max-width:200px;">
+                        `
+                : ""
+            }
+
+                <h3>
+                    ${usuario.nombre}
+                    ${usuario.apellido}
+                </h3>
+
+            </div>
+
+            <hr>
+
+            <p><strong>ID:</strong> ${usuario.id}</p>
+
+            <p>
+                <strong>Email:</strong>
+                ${usuario.email}
+            </p>
+
+            <p>
+                <strong>Fecha Creación:</strong>
+                ${usuario.fechaCreacion}
+            </p>
+
+            <p>
+                <strong>Roles:</strong>
+                ${usuario.roles?.join(", ")
+            ?? "Sin roles"
+            }
+            </p>
+
+            <hr>
+
+            <h5>Sucursales</h5>
+
+            ${usuario.sucursalesEmpleado?.length
+                ? `
+                        <ul>
+                            ${usuario.sucursalesEmpleado.map(s => `
+                                <li>
+                                    ${s.nombre}
+                                </li>
+                            `).join("")}
+                        </ul>
+                    `
+                : "<p>No posee sucursales asociadas.</p>"
+            }
+        `;
+
+        const modal = new bootstrap.Modal(
+            document.getElementById("usuarioModal")
+        );
+
+        modal.show();
+
+    } catch (error) {
+
+        alert(error.message);
+    }
 }
 
 document.addEventListener("click", async e => {
@@ -127,30 +229,53 @@ document.addEventListener("click", async e => {
 
     if (!id) return;
 
+    if (e.target.classList.contains("detalle-usuario")) {
+
+        await mostrarDetalleUsuario(id);
+        return;
+    }
+
+    if (e.target.classList.contains("detalle-sucursal")) {
+
+        window.open(
+            `https://appointmee-vcs2.onrender.com/sucursal-folder/Sucursal.html?id=${id}`,
+            "_blank"
+        );
+
+        return;
+    }
+
     if (e.target.classList.contains("eliminar-usuario")) {
 
         if (!confirm("¿Eliminar usuario?")) return;
 
-        await fetch(`/usuarios/${id}`, {
-            method: "DELETE",
-            headers: authHeaders()
-        });
+        await fetch(
+            `/usuarios/eliminar/${id}`,
+            {
+                method: "DELETE",
+                headers: authHeaders()
+            }
+        );
 
         await render();
+
+        return;
     }
 
     if (e.target.classList.contains("eliminar-sucursal")) {
 
         if (!confirm("¿Eliminar sucursal?")) return;
 
-        await fetch(`/sucursales/${id}`, {
-            method: "DELETE",
-            headers: authHeaders()
-        });
+        await fetch(
+            `/sucursales/eliminar/${id}`,
+            {
+                method: "DELETE",
+                headers: authHeaders()
+            }
+        );
 
         await render();
     }
-
 });
 
 function activarBuscador(inputId, tbodyId) {
@@ -166,14 +291,21 @@ function activarBuscador(inputId, tbodyId) {
             .forEach(tr => {
 
                 tr.style.display =
-                    tr.textContent.toLowerCase().includes(texto)
+                    tr.textContent
+                        .toLowerCase()
+                        .includes(texto)
                         ? ""
                         : "none";
             });
-
     });
-
 }
 
-activarBuscador("buscarUsuario", "usuariosBody");
-activarBuscador("buscarSucursal", "sucursalesBody");
+activarBuscador(
+    "buscarUsuario",
+    "usuariosBody"
+);
+
+activarBuscador(
+    "buscarSucursal",
+    "sucursalesBody"
+);

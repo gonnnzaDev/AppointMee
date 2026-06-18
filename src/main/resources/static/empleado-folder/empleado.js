@@ -51,7 +51,7 @@ async function cargarSolicitudes() {
 
     } catch (error) {
 
-        console.error(error);
+        alert(error);
 
     }
 
@@ -194,7 +194,7 @@ async function cargarTurnos() {
 
     } catch (error) {
 
-        console.error(error);
+        alert(error);
 
     }
 
