@@ -49,6 +49,12 @@ function renderListaSucursales(sucursales) {
                     <div class="turn-content">
                         <h2>${sucursal.nombre}</h2>
                         <p>${sucursal.categoria}</p>
+                        <span class="detalle-value">
+    ${sucursal.puntuacion
+                ? "🐝".repeat(Math.round(sucursal.puntuacion))
+                : "—"}
+    (${sucursal.puntuacion ?? 0} · ${sucursal.cantidadPuntuaciones ?? 0})
+</span>
                     </div>
                 </article>
             </a>
@@ -72,7 +78,7 @@ async function buscarSucursales() {
 
 async function filtrarPorCategoria(categoria) {
     try {
-        const response = await fetch(API_URL + 
+        const response = await fetch(API_URL +
             `/sucursales/listar/filtrar?categoria=${categoria}`,
             { headers: authHeaders() }
         );
@@ -89,7 +95,7 @@ async function filtrarPorNombre(texto) {
         const parametros = new URLSearchParams();
         if (texto) parametros.append("nombre", texto);
 
-        const response = await fetch(API_URL + 
+        const response = await fetch(API_URL +
             `/sucursales/listar/filtrar?${parametros.toString()}`,
             { headers: authHeaders() }
         );
@@ -152,7 +158,7 @@ async function buscarCategorias() {
 }
 
 function renderCategoriasParaFiltrar(categorias) {
-    const containerLeft = document.getElementById("category-container"); 
+    const containerLeft = document.getElementById("category-container");
     if (!containerLeft) return;
 
     containerLeft.innerHTML = `

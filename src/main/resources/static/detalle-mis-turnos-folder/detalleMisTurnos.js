@@ -80,7 +80,7 @@ function renderDetalle(turno) {
 
     const infoContainer = document.getElementById("detalle-turno-info");
 
-    const fechaHora = new Date(turno.fechaTurno).toLocaleString();
+   const fechaHora = new Date(turno.fechaTurno).toLocaleString("es-AR");
     const fechaReserva = new Date(turno.fechaReserva).toLocaleDateString();
 
     const nombreEmpleado = turno.empleado

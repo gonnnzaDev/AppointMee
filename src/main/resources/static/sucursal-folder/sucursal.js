@@ -46,7 +46,12 @@ async function render() {
                 </div>
                 <div class="detalle-item">
                     <span class="detalle-label">Puntuación</span>
-                    <span class="detalle-value">${sucursal.puntuacion ?? "—"} (${sucursal.cantidadPuntuaciones ?? 0})</span>
+                   <span class="detalle-value">
+    ${sucursal.puntuacion
+            ? "🐝".repeat(Math.round(sucursal.puntuacion))
+            : "—"}
+    (${sucursal.puntuacion ?? 0} · ${sucursal.cantidadPuntuaciones ?? 0})
+</span>
                 </div>
                 <div class="detalle-item">
                     <span class="detalle-label">Empleador</span>

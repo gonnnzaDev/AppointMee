@@ -1834,10 +1834,12 @@ button:active {
 }
 
 .turnos-persona {
+    padding: 40px;
     width: 100%;
     min-height: 100vh;
     align-items: center;
     align-content: center;
+    margin: 5vh 0;
 }
 
 .turnos-persona h1 {
