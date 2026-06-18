@@ -1,6 +1,7 @@
 import { API_URL, checkRes } from "../recursos/modulos.js";
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
+const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$/;
+const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%&*!_-]).+$/;
 
 renderRegister();
 
@@ -8,24 +9,30 @@ const registerPerson = document.getElementById("register-person");
 
 if (registerPerson) {
     registerPerson.addEventListener("click", function () {
-        const name = document.getElementById("register-name-input").value;
-        const surname = document.getElementById("register-surname-input").value;
-        const mail = document.getElementById("register-mail-input").value;
+        const name = document.getElementById("register-name-input").value.trim();
+        const surname = document.getElementById("register-surname-input").value.trim();
+        const mail = document.getElementById("register-mail-input").value.trim();
         const pass1 = document.getElementById("register-password1-input").value;
         const pass2 = document.getElementById("register-password2-input").value;
 
-        if (
-            name.trim() === "" ||
-            surname.trim() === "" ||
-            mail.trim() === "" ||
-            pass1.trim() === "" ||
-            pass2.trim() === ""
-        ) {
+        if (!name || !surname || !mail || !pass1 || !pass2) {
             alert("Completá todos los campos");
+        } else if (name.length < 3 || name.length > 60) {
+            alert("El nombre debe tener entre 3 y 60 caracteres");
+        } else if (!nameRegex.test(name)) {
+            alert("El nombre solo puede contener letras");
+        } else if (surname.length < 3 || surname.length > 60) {
+            alert("El apellido debe tener entre 3 y 60 caracteres");
+        } else if (!nameRegex.test(surname)) {
+            alert("El apellido solo puede contener letras");
         } else if (!emailRegex.test(mail)) {
             alert("Mail inválido");
-        } else if (pass1.length < 8) {
-            alert("La contraseña debe tener mínimo 8 caracteres");
+        } else if (mail.length < 8 || mail.length > 150) {
+            alert("El email debe tener entre 8 y 150 caracteres");
+        } else if (pass1.length < 8 || pass1.length > 67) {
+            alert("La contraseña debe tener entre 8 y 67 caracteres");
+        } else if (!passRegex.test(pass1)) {
+            alert("La contraseña debe contener al menos una minúscula, una mayúscula, un número y un carácter especial (@#$%&*!_-)");
         } else if (pass1 !== pass2) {
             alert("Las contraseñas no coinciden");
         } else {

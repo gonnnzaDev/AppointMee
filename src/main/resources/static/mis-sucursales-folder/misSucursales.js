@@ -12,12 +12,18 @@ let sucursales = [];
 
 if (roles.includes("EMPLEADOR")) {
     const propias = await fetchPropias();
-    sucursales = sucursales.concat(propias.map(s => ({ ...s, tipo: "Propia" })));
+    sucursales = propias.map(s => ({ ...s, tipo: "Propia" }));
 }
 
 if (roles.includes("EMPLEADO")) {
     const asociadas = await fetchAsociadas();
-    sucursales = sucursales.concat(asociadas.map(s => ({ ...s, tipo: "Asociada" })));
+    const ids = new Set(sucursales.map(s => s.id));
+    for (const s of asociadas) {
+        if (!ids.has(s.id)) {
+            sucursales.push({ ...s, tipo: "Asociada" });
+            ids.add(s.id);
+        }
+    }
 }
 
 if (sucursales.length === 0 && !roles.includes("EMPLEADOR") && !roles.includes("EMPLEADO")) {
